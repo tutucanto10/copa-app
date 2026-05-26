@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\copa-app\" -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(Sort-Object Mode -Descending)",
+      "Bash(Get-ChildItem -Path \"c:\\\\copa-app\" -Directory)",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(Remove-Item \"c:\\\\copa-app\\\\frontend\\\\src\\\\pages\\\\Fantasy.jsx\" -Force)",
+      "Bash(Remove-Item \"c:\\\\copa-app\\\\backend\\\\src\\\\routes\\\\fantasyRoutes.js\" -Force)",
+      "Bash(Remove-Item \"c:\\\\copa-app\\\\backend\\\\src\\\\controllers\\\\fantasyController.js\" -Force)",
+      "Bash(Remove-Item \"c:\\\\copa-app\\\\backend\\\\src\\\\services\\\\fantasyService.js\" -Force)",
+      "Bash(Write-Host \"Arquivos Fantasy removidos com sucesso\")",
+      "Bash(npm install *)",
+      "Bash(npx prisma *)",
+      "Bash(node scripts/setup.js)",
+      "Bash(node scripts/importarJogadoresElite.js)",
+      "Bash(node scripts/importarJogadoresForte.js)",
+      "Bash(node scripts/importarJogadoresMedios.js)",
+      "Bash(node scripts/importarJogadoresFracoRuim.js)",
+      "Bash(findstr /i \"total\\\\|conclu\\\\|erro\\\\|jogadores\")",
+      "Bash(node app.js)",
+      "Bash(curl -s http://localhost:3333/partidas)"
+    ]
+  }
+}

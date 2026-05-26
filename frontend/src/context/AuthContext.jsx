@@ -1,0 +1,56 @@
+import { createContext, useContext, useState, useEffect } from 'react'
+import api from '../api/api'
+
+const AuthContext = createContext(null)
+
+export function AuthProvider({ children }) {
+  const [usuario, setUsuario] = useState(null)
+  const [carregando, setCarregando] = useState(true)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    const user = localStorage.getItem('usuario')
+    if (token && user) {
+      setUsuario(JSON.parse(user))
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    }
+    setCarregando(false)
+  }, [])
+
+  async function login(nome) {
+    const res = await api.post('/auth/login', { nome })
+    const { token, usuario } = res.data
+    localStorage.setItem('token', token)
+    localStorage.setItem('usuario', JSON.stringify(usuario))
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    setUsuario(usuario)
+    return usuario
+  }
+
+  async function cadastro(nome, foto_url) {
+    const res = await api.post('/auth/cadastro', { nome, foto_url })
+    const { token, usuario } = res.data
+    localStorage.setItem('token', token)
+    localStorage.setItem('usuario', JSON.stringify(usuario))
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    setUsuario(usuario)
+    return usuario
+  }
+
+  function logout() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('usuario')
+    delete api.defaults.headers.common['Authorization']
+    setUsuario(null)
+  }
+
+  return (
+    <AuthContext.Provider value={{ usuario, login, cadastro, logout, carregando }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export function useAuth() {
+  return useContext(AuthContext)
+}

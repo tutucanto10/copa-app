@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Usuario {
+  id              Int              @id @default(autoincrement())
+  nome            String           @unique
+  email           String?          @unique
+  foto_url        String?
+  isAdmin         Boolean          @default(false)
+  apostas         Aposta[]
+  apostasGoleador ApostaGoleador[]
+  ligas           MembroLiga[]
+}
+
+model Selecao {
+  id         Int       @id @default(autoincrement())
+  nome       String
+  escudo_url String?
+  jogadores  Jogador[]
+  casas      Partida[] @relation("SelecaoCasa")
+  foras      Partida[] @relation("SelecaoFora")
+}
+
+model Jogador {
+  id              Int              @id @default(autoincrement())
+  nome            String
+  posicao         String
+  selecaoId       Int
+  preco           Float            @default(6)
+  selecao         Selecao          @relation(fields: [selecaoId], references: [id])
+  eventos         Evento[]
+  apostasGoleador ApostaGoleador[]
+  foto_url        String?
+}
+
+model Partida {
+  id              Int              @id @default(autoincrement())
+  selecaoCasaId   Int
+  selecaoForaId   Int
+  data            DateTime
+  placarCasa      Int              @default(0)
+  placarFora      Int              @default(0)
+  status          Status           @default(AGENDADA)
+  rodada          Int              @default(1)
+  selecaoCasa     Selecao          @relation("SelecaoCasa", fields: [selecaoCasaId], references: [id])
+  selecaoFora     Selecao          @relation("SelecaoFora", fields: [selecaoForaId], references: [id])
+  eventos         Evento[]
+  apostas         Aposta[]
+  apostasGoleador ApostaGoleador[]
+}
+
+model Evento {
+  id        Int        @id @default(autoincrement())
+  partidaId Int
+  jogadorId Int
+  tipo      TipoEvento
+  minuto    Int
+  partida   Partida    @relation(fields: [partidaId], references: [id])
+  jogador   Jogador    @relation(fields: [jogadorId], references: [id])
+}
+
+model Aposta {
+  id         Int     @id @default(autoincrement())
+  usuarioId  Int
+  partidaId  Int
+  placarCasa Int
+  placarFora Int
+  usuario    Usuario @relation(fields: [usuarioId], references: [id])
+  partida    Partida @relation(fields: [partidaId], references: [id])
+  vencedor String? // 'casa' | 'empate' | 'fora'
+}
+
+model ApostaGoleador {
+  id        Int     @id @default(autoincrement())
+  usuarioId Int
+  partidaId Int
+  jogadorId Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  partida   Partida @relation(fields: [partidaId], references: [id])
+  jogador   Jogador @relation(fields: [jogadorId], references: [id])
+}
+
+model Rodada {
+  id            Int           @id @default(autoincrement())
+  numero        Int           @unique
+  status        StatusRodada  @default(ABERTA)
+  dataAbertura  DateTime?
+  dataFechamento DateTime?
+}
+
+model Liga {
+  id       Int           @id @default(autoincrement())
+  nome     String        @unique
+  membros  MembroLiga[]
+}
+
+model MembroLiga {
+  id        Int     @id @default(autoincrement())
+  usuarioId Int
+  ligaId    Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  liga      Liga    @relation(fields: [ligaId], references: [id])
+
+  @@unique([usuarioId, ligaId])
+}
+
+enum Status {
+  AGENDADA
+  AO_VIVO
+  FINALIZADA
+}
+
+enum TipoEvento {
+  GOL
+  ASSISTENCIA
+  AMARELO
+  VERMELHO
+}
+
+enum StatusRodada {
+  ABERTA
+  FECHADA
+}

@@ -1,0 +1,38 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --verde: #00a651;
+  --verde-escuro: #007a3d;
+  --amarelo: #f5d000;
+  --vermelho: #e8192c;
+  --azul-franca: #002395;
+  --bg: #0a0e1a;
+  --bg-card: #111827;
+  --bg-card2: #1a2235;
+  --borda: #1e2d45;
+  --texto: #f0f4ff;
+  --texto-suave: #8b9bb4;
+  --fonte-display: 'Bebas Neue', sans-serif;
+  --fonte-body: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--fonte-body);
+  background-color: var(--bg);
+  color: var(--texto);
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--fonte-body);
+}
