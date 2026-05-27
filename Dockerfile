@@ -8,7 +8,8 @@ ENV VITE_API_URL=""
 RUN npm run build
 
 # Stage 2: backend + frontend embutido
-FROM node:20-alpine
+FROM node:20-slim
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY backend/package*.json ./
 COPY backend/prisma ./prisma
