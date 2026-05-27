@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 const MEDALHAS = ['🥇', '🥈', '🥉']
 
 export default function ModalPerfil({ onClose }) {
-  const { usuario, logout } = useAuth()
+  const { usuario, logout, atualizarUsuario } = useAuth()
   const [perfil, setPerfil] = useState(null)
   const [loading, setLoading] = useState(true)
   const [editando, setEditando] = useState(false)
@@ -47,12 +47,10 @@ export default function ModalPerfil({ onClose }) {
       const r = await api.get(`/perfil/${usuario.id}`)
       setPerfil(r.data)
       setEditando(false)
-
-      // Atualiza localStorage
-      const userAtual = JSON.parse(localStorage.getItem('usuario') || '{}')
-      const atualizado = { ...userAtual, nome: nomeEdit || userAtual.nome, foto_url: fotoEdit || userAtual.foto_url }
-      localStorage.setItem('usuario', JSON.stringify(atualizado))
-      window.location.reload()
+      atualizarUsuario({
+        nome: nomeEdit || usuario.nome,
+        foto_url: fotoEdit || usuario.foto_url,
+      })
     } catch (err) {
       alert('Erro: ' + err.message)
     } finally {
