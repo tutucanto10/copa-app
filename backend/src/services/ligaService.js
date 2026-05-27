@@ -1,5 +1,8 @@
 const prisma = require('../config/prisma');
 
+const rankingCache = new Map();
+const CACHE_TTL = 2 * 60 * 1000;
+
 async function listarLigas() {
   return prisma.liga.findMany({
     include: {
@@ -35,6 +38,10 @@ async function removerMembro({ usuarioId, ligaId }) {
 }
 
 async function rankingPorLiga(ligaId) {
+  const key = String(ligaId);
+  const cached = rankingCache.get(key);
+  if (cached && Date.now() - cached.ts < CACHE_TTL) return cached.data;
+
   const liga = await prisma.liga.findUnique({
     where: { id: Number(ligaId) },
     include: {
@@ -45,7 +52,7 @@ async function rankingPorLiga(ligaId) {
               id: true,
               nome: true,
               apostas: { include: { partida: true } },
-              apostasGoleador: { include: { jogador: true, partida: true } },
+              apostasGoleador: { include: { partida: true } },
             },
           },
         },
@@ -55,67 +62,64 @@ async function rankingPorLiga(ligaId) {
 
   if (!liga) throw new Error('Liga não encontrada');
 
-  const ranking = await Promise.all(
-    liga.membros.map(async (membro) => {
-      const usuario = membro.usuario;
-      let pontos = 0;
-      let placaresExatos = 0;
-      let vencedoresAcertados = 0;
-      let goleadoresAcertados = 0;
-
-      for (const aposta of usuario.apostas) {
-        const partida = aposta.partida;
-        if (partida.status !== 'FINALIZADA') continue;
-
-        const vencedorReal =
-          partida.placarCasa > partida.placarFora ? 'casa' :
-          partida.placarFora > partida.placarCasa ? 'fora' : 'empate';
-
-        // Placar exato → +3pts
-        const acertouPlacar =
-          aposta.placarCasa === partida.placarCasa &&
-          aposta.placarFora === partida.placarFora &&
-          aposta.placarCasa >= 0
-
-        if (acertouPlacar) {
-          pontos += 3;
-          placaresExatos++;
-        }
-
-        // Vencedor certo → +1pt (acumulável com placar exato)
-        if (aposta.vencedor && aposta.vencedor === vencedorReal) {
-          pontos += 1;
-          vencedoresAcertados++;
-        }
-      }
-
-      for (const apostaGol of usuario.apostasGoleador) {
-        if (apostaGol.partida.status !== 'FINALIZADA') continue;
-        const golReal = await prisma.evento.findFirst({
-          where: {
-            partidaId: apostaGol.partidaId,
-            jogadorId: apostaGol.jogadorId,
-            tipo: 'GOL',
-          },
-        });
-        if (golReal) goleadoresAcertados++;
-      }
-
-      return {
-        id: usuario.id,
-        nome: usuario.nome,
-        pontos,
-        placaresExatos,
-        vencedoresAcertados,
-        goleadoresAcertados,
-      };
-    })
+  // Busca todos os eventos de gol em uma única query (evita N+1)
+  const apostasGolFinalizadas = liga.membros.flatMap((m) =>
+    m.usuario.apostasGoleador.filter((ag) => ag.partida.status === 'FINALIZADA')
   );
 
-  return {
+  const golSet = new Set();
+  if (apostasGolFinalizadas.length > 0) {
+    const eventosGol = await prisma.evento.findMany({
+      where: {
+        tipo: 'GOL',
+        OR: apostasGolFinalizadas.map((ag) => ({
+          partidaId: ag.partidaId,
+          jogadorId: ag.jogadorId,
+        })),
+      },
+      select: { partidaId: true, jogadorId: true },
+    });
+    eventosGol.forEach((e) => golSet.add(`${e.partidaId}-${e.jogadorId}`));
+  }
+
+  const ranking = liga.membros.map((membro) => {
+    const usuario = membro.usuario;
+    let pontos = 0;
+    let placaresExatos = 0;
+    let vencedoresAcertados = 0;
+    let goleadoresAcertados = 0;
+
+    for (const aposta of usuario.apostas) {
+      const partida = aposta.partida;
+      if (partida.status !== 'FINALIZADA') continue;
+
+      const vencedorReal =
+        partida.placarCasa > partida.placarFora ? 'casa' :
+        partida.placarFora > partida.placarCasa ? 'fora' : 'empate';
+
+      const acertouPlacar =
+        aposta.placarCasa === partida.placarCasa &&
+        aposta.placarFora === partida.placarFora &&
+        aposta.placarCasa >= 0;
+
+      if (acertouPlacar) { pontos += 3; placaresExatos++; }
+      if (aposta.vencedor && aposta.vencedor === vencedorReal) { pontos += 1; vencedoresAcertados++; }
+    }
+
+    for (const apostaGol of usuario.apostasGoleador) {
+      if (apostaGol.partida.status !== 'FINALIZADA') continue;
+      if (golSet.has(`${apostaGol.partidaId}-${apostaGol.jogadorId}`)) goleadoresAcertados++;
+    }
+
+    return { id: usuario.id, nome: usuario.nome, pontos, placaresExatos, vencedoresAcertados, goleadoresAcertados };
+  });
+
+  const data = {
     liga: { id: liga.id, nome: liga.nome },
     ranking: ranking.sort((a, b) => b.pontos - a.pontos),
   };
+  rankingCache.set(key, { data, ts: Date.now() });
+  return data;
 }
 
 async function listarUsuarios() {

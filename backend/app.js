@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const path = require('path');
 
 const partidaRoutes   = require('./src/routes/partidaRoutes');
@@ -19,6 +20,7 @@ const pushRoutes = require('./src/routes/pushRoutes');
 
 const app = express();
 
+app.use(compression());
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
   credentials: true,

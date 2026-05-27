@@ -35,19 +35,16 @@ export default function Ranking() {
 
   useEffect(() => {
     if (!usuario) return
-    api.get('/ligas').then((r) => {
-      const todas = r.data
-      if (usuario.isAdmin) {
-        setLigas(todas)
-        if (todas.length > 0) setLigaAtiva(todas[0].id)
-      } else {
-        api.get('/ligas/usuarios').then((u) => {
+    setLoading(true)
+    const req = usuario.isAdmin
+      ? api.get('/ligas').then((r) => r.data)
+      : api.get('/ligas/usuarios').then((u) => {
           const eu = u.data.find((usr) => usr.id === usuario.id)
-          const minhasLigas = eu?.ligas?.map((ml) => ml.liga) || []
-          setLigas(minhasLigas)
-          if (minhasLigas.length > 0) setLigaAtiva(minhasLigas[0].id)
+          return eu?.ligas?.map((ml) => ml.liga) || []
         })
-      }
+    req.then((ligas) => {
+      setLigas(ligas)
+      if (ligas.length > 0) setLigaAtiva(ligas[0].id)
     }).finally(() => setLoading(false))
   }, [usuario])
 
