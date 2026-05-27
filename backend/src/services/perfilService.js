@@ -1,93 +1,70 @@
 const prisma = require('../config/prisma');
 
-async function buscarPerfil(usuarioId) {
-  const usuario = await prisma.usuario.findUnique({
-    where: { id: Number(usuarioId) },
-    include: {
-      apostas: { include: { partida: true } },
-      apostasGoleador: { include: { jogador: true, partida: true } },
-      ligas: { include: { liga: true } },
-    },
-  });
-
-  if (!usuario) throw new Error('Usuário não encontrado');
-
-  let pontos = 0;
-  let placaresExatos = 0;
-  let vencedoresAcertados = 0;
-  let goleadoresAcertados = 0;
-
-  for (const aposta of usuario.apostas) {
+function calcularPontos(apostas) {
+  let pontos = 0, placaresExatos = 0, vencedoresAcertados = 0;
+  for (const aposta of apostas) {
     const partida = aposta.partida;
     if (partida.status !== 'FINALIZADA') continue;
-
+    const vencedorReal =
+      partida.placarCasa > partida.placarFora ? 'casa' :
+      partida.placarFora > partida.placarCasa ? 'fora' : 'empate';
     if (
       aposta.placarCasa === partida.placarCasa &&
       aposta.placarFora === partida.placarFora
     ) {
-      pontos += 3;
-      placaresExatos++;
-      continue;
-    }
-
-    const vencedorReal =
-      partida.placarCasa > partida.placarFora ? 'casa' :
-      partida.placarFora > partida.placarCasa ? 'fora' : 'empate';
-
-    const vencedorAposta =
-      aposta.placarCasa > aposta.placarFora ? 'casa' :
-      aposta.placarFora > aposta.placarCasa ? 'fora' : 'empate';
-
-    if (vencedorReal !== 'empate' && vencedorReal === vencedorAposta) {
-      pontos += 1;
-      vencedoresAcertados++;
+      pontos += 3; placaresExatos++;
+    } else if (aposta.vencedor && aposta.vencedor === vencedorReal) {
+      pontos += 1; vencedoresAcertados++;
     }
   }
+  return { pontos, placaresExatos, vencedoresAcertados };
+}
 
-  for (const apostaGol of usuario.apostasGoleador) {
-    if (apostaGol.partida.status !== 'FINALIZADA') continue;
-    const golReal = await prisma.evento.findFirst({
-      where: {
-        partidaId: apostaGol.partidaId,
-        jogadorId: apostaGol.jogadorId,
-        tipo: 'GOL',
+async function buscarPerfil(usuarioId) {
+  const [usuario, eventosGol] = await Promise.all([
+    prisma.usuario.findUnique({
+      where: { id: Number(usuarioId) },
+      include: {
+        apostas: { include: { partida: true } },
+        apostasGoleador: { include: { partida: true } },
+        ligas: { include: { liga: true } },
       },
-    });
-    if (golReal) goleadoresAcertados++;
+    }),
+    prisma.evento.findMany({
+      where: { tipo: 'GOL' },
+      select: { partidaId: true, jogadorId: true },
+    }),
+  ]);
+
+  if (!usuario) throw new Error('Usuário não encontrado');
+
+  const golSet = new Set(eventosGol.map((e) => `${e.partidaId}-${e.jogadorId}`));
+
+  const { pontos, placaresExatos, vencedoresAcertados } = calcularPontos(usuario.apostas);
+
+  let goleadoresAcertados = 0;
+  for (const ag of usuario.apostasGoleador) {
+    if (ag.partida.status !== 'FINALIZADA') continue;
+    if (golSet.has(`${ag.partidaId}-${ag.jogadorId}`)) goleadoresAcertados++;
   }
 
+  // Ranking por liga — busca todos os membros de uma vez por liga
   const ligasComPosicao = await Promise.all(
     usuario.ligas.map(async (ml) => {
-      const rankingLiga = await prisma.membroLiga.findMany({
+      const membros = await prisma.membroLiga.findMany({
         where: { ligaId: ml.ligaId },
-        include: {
-          usuario: {
-            include: { apostas: { include: { partida: true } } },
-          },
-        },
+        include: { usuario: { include: { apostas: { include: { partida: true } } } } },
       });
 
-      const pontosPorUsuario = await Promise.all(
-        rankingLiga.map(async (m) => {
-          let pts = 0;
-          for (const ap of m.usuario.apostas) {
-            if (ap.partida.status !== 'FINALIZADA') continue;
-            if (
-              ap.placarCasa === ap.partida.placarCasa &&
-              ap.placarFora === ap.partida.placarFora
-            ) { pts += 3; continue; }
-            const vR = ap.partida.placarCasa > ap.partida.placarFora ? 'casa' : ap.partida.placarFora > ap.partida.placarCasa ? 'fora' : 'empate';
-            const vA = ap.placarCasa > ap.placarFora ? 'casa' : ap.placarFora > ap.placarCasa ? 'fora' : 'empate';
-            if (vR !== 'empate' && vR === vA) pts += 1;
-          }
-          return { usuarioId: m.usuarioId, pontos: pts };
-        })
-      );
+      const pontosPorUsuario = membros.map((m) => ({
+        usuarioId: m.usuarioId,
+        pontos: calcularPontos(m.usuario.apostas).pontos,
+      }));
 
       pontosPorUsuario.sort((a, b) => b.pontos - a.pontos);
       const posicao = pontosPorUsuario.findIndex((p) => p.usuarioId === usuario.id) + 1;
 
-      return { liga: ml.liga, posicao, total: rankingLiga.length };
+      return { liga: ml.liga, posicao, total: membros.length };
     })
   );
 

@@ -24,6 +24,9 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 
+// Health check — usado pelo UptimeRobot para manter o app acordado
+app.get('/health', (req, res) => res.json({ ok: true }));
+
 // Rota de login admin (SEM proteção)
 app.post('/admin/login', loginAdmin);
 
