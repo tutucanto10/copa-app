@@ -1,4 +1,5 @@
 const { buscarPerfil, atualizarPerfil, buscarApostasUsuario } = require('../services/perfilService');
+const prisma = require('../config/prisma');
 
 async function show(req, res) {
   try {
@@ -28,4 +29,16 @@ async function update(req, res) {
   }
 }
 
-module.exports = { show, apostas, update };
+async function foto(req, res) {
+  try {
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: Number(req.params.usuarioId) },
+      select: { foto_url: true },
+    });
+    res.json({ foto_url: usuario?.foto_url || null });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+module.exports = { show, apostas, update, foto };

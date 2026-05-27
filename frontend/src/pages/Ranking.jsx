@@ -6,15 +6,24 @@ import ModalPerfilPublico from '../components/ModalPerfilPublico'
 const MEDALHAS = ['🥇', '🥈', '🥉']
 
 function Avatar({ user, size = 44 }) {
-  if (user.foto_url) {
+  const [fotoUrl, setFotoUrl] = useState(null)
+
+  useEffect(() => {
+    api.get(`/perfil/${user.id}/foto`)
+      .then((r) => { if (r.data.foto_url) setFotoUrl(r.data.foto_url) })
+      .catch(() => {})
+  }, [user.id])
+
+  const iniciais = (user.nome || '?').split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+
+  if (fotoUrl) {
     return (
-      <img src={user.foto_url} alt={user.nome} style={{
+      <img src={fotoUrl} alt={user.nome} style={{
         width: size, height: size, borderRadius: '50%',
         objectFit: 'cover', border: '2px solid #1e2d45', flexShrink: 0,
       }} />
     )
   }
-  const iniciais = (user.nome || '?').split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%',
