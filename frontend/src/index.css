@@ -27,10 +27,26 @@ body {
   min-height: 100vh;
 }
 
+.main-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 @media (max-width: 767px) {
   .main-content {
     padding-bottom: 72px;
   }
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  height: 100%;
 }
 
 a {

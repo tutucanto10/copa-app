@@ -60,33 +60,32 @@ function Nav() {
         background: '#0d1321',
         borderBottom: '1px solid #1e2d45',
         padding: '0 1.5rem',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '1.5rem',
         height: '60px',
         position: 'sticky',
         top: 0,
         zIndex: 100,
       }}>
-        <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.6rem', letterSpacing: '2px', color: '#00a651', marginRight: 'auto' }}>
-          <img src="/bola-copa.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain', verticalAlign: 'middle', marginRight: 6 }} />
-          BOLÃO
-        </span>
+        <div className="nav-inner">
+          <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.6rem', letterSpacing: '2px', color: '#00a651', marginRight: 'auto' }}>
+            <img src="/bola-copa.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain', verticalAlign: 'middle', marginRight: 6 }} />
+            BOLÃO
+          </span>
 
-        {!isMobile && <>
-          {navItems.map(({ path, label }) => (
-            <Link key={path} to={path} style={linkStyle(path)}>{label}</Link>
-          ))}
-        </>}
+          {!isMobile && <>
+            {navItems.map(({ path, label }) => (
+              <Link key={path} to={path} style={linkStyle(path)}>{label}</Link>
+            ))}
+          </>}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: isMobile ? 'auto' : undefined }}>
-          <button onClick={() => setModalAberto(true)} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
-            <Avatar />
-            {!isMobile && <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{usuario?.nome}</span>}
-          </button>
-          {!isMobile && (
-            <button onClick={logout} style={{ background: 'none', border: '1px solid #1e2d45', borderRadius: 8, color: '#8b9bb4', padding: '0.3rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Sair</button>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: isMobile ? 'auto' : undefined }}>
+            <button onClick={() => setModalAberto(true)} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
+              <Avatar />
+              {!isMobile && <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{usuario?.nome}</span>}
+            </button>
+            {!isMobile && (
+              <button onClick={logout} style={{ background: 'none', border: '1px solid #1e2d45', borderRadius: 8, color: '#8b9bb4', padding: '0.3rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Sair</button>
+            )}
+          </div>
         </div>
       </nav>
 
