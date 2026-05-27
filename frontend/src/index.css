@@ -27,6 +27,12 @@ body {
   min-height: 100vh;
 }
 
+@media (max-width: 767px) {
+  .main-content {
+    padding-bottom: 72px;
+  }
+}
+
 a {
   text-decoration: none;
   color: inherit;

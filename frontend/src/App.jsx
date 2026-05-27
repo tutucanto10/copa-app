@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Home from './pages/Home'
@@ -11,31 +11,23 @@ import Login from './pages/Login'
 import ModalPerfil from './components/ModalPerfil'
 import api from './api/api'
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+  return isMobile
+}
+
 function Nav() {
   const { pathname } = useLocation()
   const { usuario, logout } = useAuth()
   const [modalAberto, setModalAberto] = useState(false)
+  const isMobile = useIsMobile()
 
-  const navStyle = {
-    background: '#0d1321',
-    borderBottom: '1px solid #1e2d45',
-    padding: '0 2rem',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '2rem',
-    height: '60px',
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-  }
-
-  const logoStyle = {
-    fontFamily: 'var(--fonte-display)',
-    fontSize: '1.6rem',
-    letterSpacing: '2px',
-    color: '#00a651',
-    marginRight: 'auto',
-  }
+  const iniciais = usuario?.nome?.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase() || '?'
 
   const linkStyle = (path) => ({
     fontSize: '0.85rem',
@@ -48,53 +40,93 @@ function Nav() {
     transition: 'color 0.2s',
   })
 
-  const iniciais = usuario?.nome?.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase() || '?'
+  const navItems = [
+    { path: '/', label: 'Partidas', icon: '🏟' },
+    { path: '/copa', label: 'Copa', icon: '🏆' },
+    { path: '/ranking', label: 'Ranking', icon: '📊' },
+    ...(usuario?.isAdmin ? [{ path: '/admin', label: 'Admin', icon: '⚙️' }] : []),
+  ]
+
+  const Avatar = ({ size = 34 }) => usuario?.foto_url ? (
+    <img src={usuario.foto_url} alt={usuario.nome} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', border: '2px solid #00a651' }} />
+  ) : (
+    <div style={{ width: size, height: size, borderRadius: '50%', background: '#0a1a10', border: '2px solid #00a651', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: size * 0.35, color: '#00a651' }}>{iniciais}</div>
+  )
 
   return (
     <>
-      <nav style={navStyle}>
-        <span style={logoStyle}><img src="/bola-copa.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain', verticalAlign: 'middle', marginRight: 6 }} />BOLÃO</span>
-        <Link to="/" style={linkStyle('/')}>Partidas</Link>
-        <Link to="/copa" style={linkStyle('/copa')}>Copa</Link>
-        <Link to="/ranking" style={linkStyle('/ranking')}>Ranking</Link>
-        {usuario?.isAdmin && (
-          <Link to="/admin" style={linkStyle('/admin')}>Admin</Link>
-        )}
+      {/* Top navbar */}
+      <nav style={{
+        background: '#0d1321',
+        borderBottom: '1px solid #1e2d45',
+        padding: '0 1.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1.5rem',
+        height: '60px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+      }}>
+        <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.6rem', letterSpacing: '2px', color: '#00a651', marginRight: 'auto' }}>
+          <img src="/bola-copa.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain', verticalAlign: 'middle', marginRight: 6 }} />
+          BOLÃO
+        </span>
 
-        {/* Perfil clicável + Sair */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: 'auto' }}>
-          <button
-            onClick={() => setModalAberto(true)}
-            style={{
-              background: 'none', border: 'none',
-              display: 'flex', alignItems: 'center', gap: '0.6rem',
-              cursor: 'pointer',
-            }}
-          >
-            {usuario?.foto_url ? (
-              <img src={usuario.foto_url} alt={usuario.nome} style={{
-                width: 34, height: 34, borderRadius: '50%',
-                objectFit: 'cover', border: '2px solid #00a651',
-              }} />
-            ) : (
-              <div style={{
-                width: 34, height: 34, borderRadius: '50%',
-                background: '#0a1a10', border: '2px solid #00a651',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 700, fontSize: '0.85rem', color: '#00a651',
-              }}>{iniciais}</div>
-            )}
-            <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{usuario?.nome}</span>
+        {!isMobile && <>
+          {navItems.map(({ path, label }) => (
+            <Link key={path} to={path} style={linkStyle(path)}>{label}</Link>
+          ))}
+        </>}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: isMobile ? 'auto' : undefined }}>
+          <button onClick={() => setModalAberto(true)} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
+            <Avatar />
+            {!isMobile && <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{usuario?.nome}</span>}
           </button>
-
-          <button onClick={logout} style={{
-            background: 'none', border: '1px solid #1e2d45',
-            borderRadius: 8, color: '#8b9bb4',
-            padding: '0.3rem 0.75rem', fontSize: '0.8rem',
-            cursor: 'pointer',
-          }}>Sair</button>
+          {!isMobile && (
+            <button onClick={logout} style={{ background: 'none', border: '1px solid #1e2d45', borderRadius: 8, color: '#8b9bb4', padding: '0.3rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Sair</button>
+          )}
         </div>
       </nav>
+
+      {/* Bottom navbar — mobile only */}
+      {isMobile && (
+        <nav style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0,
+          background: '#0d1321',
+          borderTop: '1px solid #1e2d45',
+          display: 'flex',
+          zIndex: 100,
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}>
+          {navItems.map(({ path, label, icon }) => (
+            <Link key={path} to={path} style={{
+              flex: 1, display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              padding: '0.5rem 0',
+              color: pathname === path ? '#00a651' : '#8b9bb4',
+              fontSize: '0.6rem', fontWeight: 600,
+              letterSpacing: '0.5px', textTransform: 'uppercase', gap: '0.2rem',
+            }}>
+              <span style={{ fontSize: '1.3rem' }}>{icon}</span>
+              {label}
+            </Link>
+          ))}
+          <button onClick={() => setModalAberto(true)} style={{
+            flex: 1, display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            background: 'none', border: 'none',
+            padding: '0.5rem 0', color: '#8b9bb4',
+            fontSize: '0.6rem', fontWeight: 600,
+            letterSpacing: '0.5px', textTransform: 'uppercase', gap: '0.2rem',
+            cursor: 'pointer',
+          }}>
+            <Avatar size={24} />
+            Perfil
+          </button>
+        </nav>
+      )}
 
       {modalAberto && <ModalPerfil onClose={() => setModalAberto(false)} />}
     </>
@@ -186,13 +218,15 @@ export default function App() {
         <Route path="/*" element={
           <RotaProtegida>
             <Nav />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/partida/:id" element={<Partida />} />
-              <Route path="/copa" element={<Copa />} />
-              <Route path="/ranking" element={<Ranking />} />
-              <Route path="/admin" element={<RotaAdmin><Admin /></RotaAdmin>} />
-            </Routes>
+            <div className="main-content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/partida/:id" element={<Partida />} />
+                <Route path="/copa" element={<Copa />} />
+                <Route path="/ranking" element={<Ranking />} />
+                <Route path="/admin" element={<RotaAdmin><Admin /></RotaAdmin>} />
+              </Routes>
+            </div>
           </RotaProtegida>
         } />
       </Routes>
