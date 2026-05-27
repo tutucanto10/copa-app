@@ -82,9 +82,6 @@ export default function Login() {
             color: '#00a651',
             margin: 0,
           }}>BOLÃO</h1>
-          <p style={{ color: '#8b9bb4', fontSize: '0.85rem', marginTop: 4 }}>
-            Artur Canto
-          </p>
         </div>
 
         {/* Abas */}

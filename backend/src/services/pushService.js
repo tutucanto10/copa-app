@@ -1,11 +1,19 @@
 const webpush = require('web-push');
 const prisma = require('../config/prisma');
 
-webpush.setVapidDetails(
-  'mailto:bolao@copa2026.com',
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
-);
+let vapidConfigurado = false;
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  try {
+    webpush.setVapidDetails(
+      'mailto:bolao@copa2026.com',
+      process.env.VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    );
+    vapidConfigurado = true;
+  } catch (err) {
+    console.warn('VAPID inválido, push desativado:', err.message);
+  }
+}
 
 async function salvarSubscription(usuarioId, subscription) {
   const { endpoint, keys: { p256dh, auth } } = subscription;
@@ -17,6 +25,7 @@ async function salvarSubscription(usuarioId, subscription) {
 }
 
 async function notificarTodos(titulo, corpo, url = '/') {
+  if (!vapidConfigurado) return { enviadas: 0, total: 0 };
   const subs = await prisma.pushSubscription.findMany();
   const payload = JSON.stringify({ titulo, corpo, url });
   const resultados = await Promise.allSettled(
