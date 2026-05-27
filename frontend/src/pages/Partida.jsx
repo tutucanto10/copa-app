@@ -20,6 +20,7 @@ export default function Partida() {
   const [goleadoresSelecionados, setGoleadoresSelecionados] = useState([])
   const [goleadoresFeitos, setGoleadoresFeitos] = useState(null)
   const [enviando, setEnviando] = useState(false)
+  const [enviandoVencedor, setEnviandoVencedor] = useState(false)
   const [abaAtiva, setAbaAtiva] = useState('vencedor')
   const [rodadaAberta, setRodadaAberta] = useState(true)
 
@@ -72,20 +73,24 @@ export default function Partida() {
   const acertouVencedor = vencedorFeito && finalizada && vencedorFeito === vencedorReal
 
   async function handleVencedor(opcao) {
-  if (vencedorFeito || !podeApostar) return
-  setVencedorAposta(opcao)
-  try {
-    await api.post('/apostas/vencedor', {
-      usuarioId: USUARIO_ID,
-      partidaId: Number(id),
-      vencedor: opcao,
-    })
-    localStorage.setItem(`vencedor_${id}`, opcao)
-    setVencedorFeito(opcao)
-  } catch (err) {
-    alert('Erro ao registrar aposta de vencedor: ' + err.message)
+    if (vencedorFeito || !podeApostar || enviandoVencedor) return
+    setVencedorAposta(opcao)
+    setEnviandoVencedor(true)
+    try {
+      await api.post('/apostas/vencedor', {
+        usuarioId: USUARIO_ID,
+        partidaId: Number(id),
+        vencedor: opcao,
+      })
+      localStorage.setItem(`vencedor_${id}`, opcao)
+      setVencedorFeito(opcao)
+    } catch (err) {
+      alert('Erro ao registrar aposta de vencedor: ' + err.message)
+      setVencedorAposta(null)
+    } finally {
+      setEnviandoVencedor(false)
+    }
   }
-}
 
   async function handleAposta(e) {
     e.preventDefault()
@@ -301,33 +306,41 @@ export default function Partida() {
                   )}
                 </div>
               ) : !podeApostar ? msgBloqueio : (
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  {[
-                    { key: 'casa', label: partida.selecaoCasa?.nome, flag: partida.selecaoCasa?.escudo_url },
-                    { key: 'empate', label: 'Empate', flag: null },
-                    { key: 'fora', label: partida.selecaoFora?.nome, flag: partida.selecaoFora?.escudo_url },
-                  ].map((op) => (
-                    <button key={op.key} onClick={() => handleVencedor(op.key)} style={{
-                      flex: 1, minWidth: 100,
-                      background: vencedorAposta === op.key ? '#0a1a10' : '#0a0e1a',
-                      border: `2px solid ${vencedorAposta === op.key ? '#00a651' : '#1e2d45'}`,
-                      borderRadius: 12, padding: '1rem',
-                      display: 'flex', flexDirection: 'column',
-                      alignItems: 'center', gap: '0.5rem',
-                      cursor: 'pointer', transition: 'all 0.15s',
-                    }}>
-                      {op.flag ? (
-                        <img src={op.flag} alt={op.label} style={{ width: 32, height: 32, objectFit: 'contain' }} />
-                      ) : (
-                        <span style={{ fontSize: '1.5rem' }}>🤝</span>
-                      )}
-                      <span style={{
-                        fontFamily: 'var(--fonte-display)', fontSize: '0.95rem',
-                        letterSpacing: 1, color: '#f0f4ff',
-                      }}>{op.label}</span>
-                    </button>
-                  ))}
-                </div>
+                <>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    {[
+                      { key: 'casa', label: partida.selecaoCasa?.nome, flag: partida.selecaoCasa?.escudo_url },
+                      { key: 'empate', label: 'Empate', flag: null },
+                      { key: 'fora', label: partida.selecaoFora?.nome, flag: partida.selecaoFora?.escudo_url },
+                    ].map((op) => (
+                      <button key={op.key} onClick={() => handleVencedor(op.key)}
+                        disabled={enviandoVencedor}
+                        style={{
+                          flex: 1, minWidth: 100,
+                          background: vencedorAposta === op.key ? '#0a1a10' : '#0a0e1a',
+                          border: `2px solid ${vencedorAposta === op.key ? '#00a651' : '#1e2d45'}`,
+                          borderRadius: 12, padding: '1rem',
+                          display: 'flex', flexDirection: 'column',
+                          alignItems: 'center', gap: '0.5rem',
+                          cursor: enviandoVencedor ? 'not-allowed' : 'pointer',
+                          opacity: enviandoVencedor && vencedorAposta !== op.key ? 0.4 : 1,
+                          transition: 'all 0.15s',
+                        }}>
+                        {op.flag ? (
+                          <img src={op.flag} alt={op.label} style={{ width: 32, height: 32, objectFit: 'contain' }} />
+                        ) : (
+                          <span style={{ fontSize: '1.5rem' }}>🤝</span>
+                        )}
+                        <span style={{
+                          fontFamily: 'var(--fonte-display)', fontSize: '0.95rem',
+                          letterSpacing: 1, color: '#f0f4ff',
+                        }}>
+                          {enviandoVencedor && vencedorAposta === op.key ? 'Registrando...' : op.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </>
               )}
             </>
           )}
