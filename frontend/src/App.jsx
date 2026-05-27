@@ -66,7 +66,7 @@ function Nav() {
         zIndex: 100,
       }}>
         <div className="nav-inner">
-          <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.6rem', letterSpacing: '2px', color: '#00a651', marginRight: 'auto' }}>
+          <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.6rem', letterSpacing: '2px', color: '#00a651', marginRight: !isMobile ? 'auto' : undefined }}>
             <img src="/bola-copa.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain', verticalAlign: 'middle', marginRight: 6 }} />
             BOLÃO
           </span>
@@ -77,7 +77,7 @@ function Nav() {
             ))}
           </>}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: isMobile ? 'auto' : undefined }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: 'auto' }}>
             <button onClick={() => setModalAberto(true)} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
               <Avatar />
               {!isMobile && <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{usuario?.nome}</span>}
