@@ -11,8 +11,8 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /app
 COPY backend/package*.json ./
-RUN npm ci --omit=dev
 COPY backend/prisma ./prisma
+RUN npm ci --omit=dev
 RUN npx prisma generate
 COPY backend/ ./
 COPY --from=frontend /frontend/dist ./public
