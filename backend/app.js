@@ -7,7 +7,6 @@ const partidaRoutes   = require('./src/routes/partidaRoutes');
 const apostasRoutes   = require('./src/routes/apostaRoutes');
 const eventoRoutes    = require('./src/routes/eventoRoutes');
 const goleadorRoutes  = require('./src/routes/goleadorRoutes');
-const rankingRoutes   = require('./src/routes/rankingRoutes');
 const authRoutes      = require('./src/routes/authRoutes');
 const ligaRoutes      = require('./src/routes/ligaRoutes');
 const rodadaRoutes    = require('./src/routes/rodadaRoutes');
@@ -35,7 +34,6 @@ app.post('/admin/login', loginAdmin);
 
 // Rotas públicas (usuários podem ver)
 app.use('/auth',            authRoutes);
-app.use('/ranking',         rankingRoutes);
 app.use('/perfil',          perfilRoutes);
 app.use('/aposta',          apostasRoutes);
 app.use('/apostas',         apostasRoutes);
