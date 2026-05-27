@@ -2,7 +2,13 @@ const prisma = require('../config/prisma');
 
 async function listarLigas() {
   return prisma.liga.findMany({
-    include: { membros: { include: { usuario: true } } },
+    include: {
+      membros: {
+        include: {
+          usuario: { select: { id: true, nome: true } },
+        },
+      },
+    },
   });
 }
 
@@ -113,7 +119,11 @@ async function rankingPorLiga(ligaId) {
 
 async function listarUsuarios() {
   return prisma.usuario.findMany({
-    include: { ligas: { include: { liga: true } } },
+    select: {
+      id: true,
+      nome: true,
+      ligas: { include: { liga: true } },
+    },
     orderBy: { nome: 'asc' },
   });
 }
