@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const partidaRoutes   = require('./src/routes/partidaRoutes');
 const apostasRoutes   = require('./src/routes/apostaRoutes');
@@ -44,6 +45,13 @@ app.use('/eventos',         verificarAdmin, eventoRoutes);
 app.use('/evento',          verificarAdmin, eventoRoutes);
 app.use('/rodadas',         verificarAdmin, rodadaRoutes);
 app.use('/jogadores',       verificarAdmin, jogadorRoutes);
+
+// Serve frontend estático em produção
+const publicDir = path.join(__dirname, 'public');
+app.use(express.static(publicDir));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(publicDir, 'index.html'));
+});
 
 const PORT = process.env.PORT || 3333;
 app.listen(PORT, () => {
