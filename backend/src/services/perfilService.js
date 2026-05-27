@@ -92,4 +92,63 @@ async function atualizarPerfil(usuarioId, { nome, foto_url }) {
   });
 }
 
-module.exports = { buscarPerfil, atualizarPerfil };
+async function buscarApostasUsuario(usuarioId) {
+  const [apostas, eventosGol] = await Promise.all([
+    prisma.aposta.findMany({
+      where: { usuarioId: Number(usuarioId) },
+      include: {
+        partida: {
+          include: { selecaoCasa: true, selecaoFora: true },
+        },
+      },
+      orderBy: { partida: { data: 'asc' } },
+    }),
+    prisma.evento.findMany({
+      where: { tipo: 'GOL' },
+      select: { partidaId: true, jogadorId: true },
+    }),
+  ]);
+
+  return apostas.map((a) => {
+    const p = a.partida;
+    const finalizada = p.status === 'FINALIZADA';
+    let resultado = 'pendente';
+    let pontos = 0;
+
+    if (finalizada) {
+      const vencedorReal =
+        p.placarCasa > p.placarFora ? 'casa' :
+        p.placarFora > p.placarCasa ? 'fora' : 'empate';
+
+      if (a.placarCasa === p.placarCasa && a.placarFora === p.placarFora) {
+        resultado = 'placar_exato';
+        pontos = 3;
+      } else if (a.vencedor && a.vencedor === vencedorReal) {
+        resultado = 'vencedor_certo';
+        pontos = 1;
+      } else {
+        resultado = 'errou';
+      }
+    }
+
+    return {
+      id: a.id,
+      placarCasa: a.placarCasa,
+      placarFora: a.placarFora,
+      vencedor: a.vencedor,
+      resultado,
+      pontos,
+      partida: {
+        id: p.id,
+        data: p.data,
+        status: p.status,
+        placarCasa: p.placarCasa,
+        placarFora: p.placarFora,
+        selecaoCasa: { nome: p.selecaoCasa.nome, escudo_url: p.selecaoCasa.escudo_url },
+        selecaoFora: { nome: p.selecaoFora.nome, escudo_url: p.selecaoFora.escudo_url },
+      },
+    };
+  });
+}
+
+module.exports = { buscarPerfil, atualizarPerfil, buscarApostasUsuario };

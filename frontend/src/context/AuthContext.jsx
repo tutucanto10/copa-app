@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import api from '../api/api'
+import { subscribePush } from '../utils/push'
 
 const AuthContext = createContext(null)
 
@@ -24,6 +25,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('usuario', JSON.stringify(usuario))
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`
     setUsuario(usuario)
+    subscribePush(usuario.id)
     return usuario
   }
 
@@ -34,6 +36,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('usuario', JSON.stringify(usuario))
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`
     setUsuario(usuario)
+    subscribePush(usuario.id)
     return usuario
   }
 

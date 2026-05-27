@@ -9,14 +9,25 @@ datasource db {
 }
 
 model Usuario {
-  id              Int              @id @default(autoincrement())
-  nome            String           @unique
-  email           String?          @unique
-  foto_url        String?
-  isAdmin         Boolean          @default(false)
-  apostas         Aposta[]
-  apostasGoleador ApostaGoleador[]
-  ligas           MembroLiga[]
+  id                Int                @id @default(autoincrement())
+  nome              String             @unique
+  email             String?            @unique
+  foto_url          String?
+  isAdmin           Boolean            @default(false)
+  apostas           Aposta[]
+  apostasGoleador   ApostaGoleador[]
+  ligas             MembroLiga[]
+  pushSubscriptions PushSubscription[]
+}
+
+model PushSubscription {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
 }
 
 model Selecao {
