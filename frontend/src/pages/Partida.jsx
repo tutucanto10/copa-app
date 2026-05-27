@@ -57,7 +57,8 @@ export default function Partida() {
   }, [partida])
 
   const finalizada = partida?.status === 'FINALIZADA'
-  const podeApostar = !finalizada && rodadaAberta
+  const aoVivo = partida?.status === 'AO_VIVO'
+  const podeApostar = !finalizada && !aoVivo
 
   const acertouPlacar = apostaFeita && finalizada &&
     apostaFeita.placarCasa === partida?.placarCasa &&
@@ -162,7 +163,11 @@ export default function Partida() {
       borderRadius: 8, padding: '0.75rem 1rem',
       color: '#e8192c', fontWeight: 600, fontSize: '0.9rem',
     }}>
-      🔒 {finalizada ? 'Partida finalizada — apostas encerradas' : 'Apostas encerradas — prazo: 12:00'}
+      🔒 {finalizada
+        ? 'Partida finalizada — apostas encerradas'
+        : aoVivo
+        ? 'Jogo em andamento — apostas encerradas'
+        : 'Apostas encerradas'}
     </div>
   )
 

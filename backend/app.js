@@ -16,6 +16,8 @@ const copaRoutes      = require('./src/routes/copaRoutes');
 
 const { verificarAdmin, loginAdmin } = require('./middleware/adminAuth');
 const pushRoutes = require('./src/routes/pushRoutes');
+const prisma = require('./src/config/prisma');
+const { limparCacheRanking } = require('./src/services/ligaService');
 
 const app = express();
 
@@ -62,5 +64,22 @@ const PORT = process.env.PORT || 3333;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
+
+// Job: AGENDADA → AO_VIVO quando falta ≤ 1 hora para o início
+setInterval(async () => {
+  try {
+    const umaHoraFutura = new Date(Date.now() + 60 * 60 * 1000);
+    const { count } = await prisma.partida.updateMany({
+      where: { status: 'AGENDADA', data: { lte: umaHoraFutura } },
+      data: { status: 'AO_VIVO' },
+    });
+    if (count > 0) {
+      console.log(`⚽ ${count} partida(s) → AO_VIVO`);
+      limparCacheRanking();
+    }
+  } catch (err) {
+    console.error('Erro no job de status:', err.message);
+  }
+}, 5 * 60 * 1000);
 
 module.exports = app;

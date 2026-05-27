@@ -117,11 +117,6 @@ async function limparEReimp() {
     })
     console.log(`   ✅ ${apostasGoleador.count} apostas de goleador deletadas`)
     
-    const partidaRodadas = await prisma.partidaRodada.deleteMany({
-      where: { partidaId: { in: partidaIds } }
-    })
-    console.log(`   ✅ ${partidaRodadas.count} vínculos com rodadas deletados`)
-    
     // 2. Deletar partidas
     const partidas = await prisma.partida.deleteMany({
       where: { id: { in: partidaIds } }
@@ -161,7 +156,7 @@ async function limparEReimp() {
           data: {
             selecaoCasaId: casaId,
             selecaoForaId: foraId,
-            data: new Date(j.data),
+            data: new Date(j.data + '-03:00'),
             placarCasa: 0,
             placarFora: 0,
             status: 'AGENDADA',
