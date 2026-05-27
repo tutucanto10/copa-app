@@ -1,7 +1,7 @@
 const prisma = require('../config/prisma');
 const jwt = require('jsonwebtoken');
 
-const SECRET = process.env.JWT_SECRET || 'bolao_secret_2024';
+const SECRET = process.env.JWT_SECRET;
 
 async function login(nome) {
   let usuario = await prisma.usuario.findUnique({ where: { nome } });

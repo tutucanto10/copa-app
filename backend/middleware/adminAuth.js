@@ -1,8 +1,12 @@
 const jwt = require('jsonwebtoken')
 
-// Senha do admin (MUDE AQUI PARA SUA SENHA FORTE!)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Copa@#Admin!'
-const JWT_SECRET = process.env.JWT_SECRET || 'secret-key-ultra-seguro-copa-2026-jwt-token-xyz'
+if (!process.env.ADMIN_PASSWORD || !process.env.JWT_SECRET) {
+  console.error('FATAL: ADMIN_PASSWORD e JWT_SECRET são obrigatórios')
+  process.exit(1)
+}
+
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
+const JWT_SECRET = process.env.JWT_SECRET
 
 // Middleware para verificar se é admin
 function verificarAdmin(req, res, next) {

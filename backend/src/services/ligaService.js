@@ -3,6 +3,10 @@ const prisma = require('../config/prisma');
 const rankingCache = new Map();
 const CACHE_TTL = 2 * 60 * 1000;
 
+function limparCacheRanking() {
+  rankingCache.clear();
+}
+
 async function listarLigas() {
   return prisma.liga.findMany({
     include: {
@@ -148,4 +152,5 @@ module.exports = {
   rankingPorLiga,
   listarUsuarios,
   atualizarUsuario,
+  limparCacheRanking,
 };

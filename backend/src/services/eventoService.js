@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const { limparCacheRanking } = require('./ligaService');
 
 async function listarEventos(partidaId) {
   return prisma.evento.findMany({
@@ -41,6 +42,7 @@ async function criarEvento({ partidaId, jogadorId, tipo, minuto }) {
         ? { placarCasa: { increment: 1 } }
         : { placarFora: { increment: 1 } },
     });
+    limparCacheRanking();
   }
 
   return evento;

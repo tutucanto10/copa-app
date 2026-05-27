@@ -40,6 +40,7 @@ export default function Ranking() {
   const [ligaAtiva, setLigaAtiva] = useState(null)
   const [rankingBolao, setRankingBolao] = useState([])
   const [loading, setLoading] = useState(true)
+  const [erro, setErro] = useState(null)
   const [perfilAberto, setPerfilAberto] = useState(null)
 
   useEffect(() => {
@@ -54,14 +55,17 @@ export default function Ranking() {
     req.then((ligas) => {
       setLigas(ligas)
       if (ligas.length > 0) setLigaAtiva(ligas[0].id)
-    }).finally(() => setLoading(false))
+    }).catch(() => setErro('Não foi possível carregar o ranking. Tente novamente.'))
+      .finally(() => setLoading(false))
   }, [usuario])
 
   useEffect(() => {
     if (!ligaAtiva) return
     setLoading(true)
+    setErro(null)
     api.get(`/ligas/${ligaAtiva}/ranking`)
       .then((r) => setRankingBolao(r.data.ranking))
+      .catch(() => setErro('Erro ao carregar ranking. Tente novamente.'))
       .finally(() => setLoading(false))
   }, [ligaAtiva])
 
@@ -152,7 +156,9 @@ export default function Ranking() {
                 <span style={{ fontSize: '0.8rem', color: '#8b9bb4' }}>Clique em alguém para ver o perfil</span>
               </div>
 
-              {loading ? (
+              {erro ? (
+                <div style={{ textAlign: 'center', color: '#e8192c', padding: '2rem' }}>{erro}</div>
+              ) : loading ? (
                 <div style={{ textAlign: 'center', color: '#8b9bb4', padding: '2rem' }}>Carregando...</div>
               ) : rankingBolao.length === 0 ? (
                 <div style={{ textAlign: 'center', color: '#8b9bb4', padding: '2rem' }}>
