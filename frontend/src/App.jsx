@@ -53,7 +53,7 @@ function Nav() {
   return (
     <>
       <nav style={navStyle}>
-        <span style={logoStyle}>⚽ BOLÃO</span>
+        <span style={logoStyle}><img src="/bola-copa.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain', verticalAlign: 'middle', marginRight: 6 }} />BOLÃO</span>
         <Link to="/" style={linkStyle('/')}>Partidas</Link>
         <Link to="/copa" style={linkStyle('/copa')}>Copa</Link>
         <Link to="/ranking" style={linkStyle('/ranking')}>Ranking</Link>

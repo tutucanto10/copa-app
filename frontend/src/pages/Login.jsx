@@ -74,7 +74,7 @@ export default function Login() {
       }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>⚽</div>
+          <img src="/bola-copa.png" alt="Bola Copa 2026" style={{ width: 90, height: 90, objectFit: 'contain', marginBottom: '0.5rem' }} />
           <h1 style={{
             fontFamily: 'var(--fonte-display)',
             fontSize: '2.5rem',
