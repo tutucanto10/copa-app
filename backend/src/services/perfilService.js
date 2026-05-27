@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const { rankingPorLiga } = require('./ligaService');
 
 function calcularPontos(apostas) {
   let pontos = 0, placaresExatos = 0, vencedoresAcertados = 0;
@@ -21,50 +22,47 @@ function calcularPontos(apostas) {
 }
 
 async function buscarPerfil(usuarioId) {
-  const [usuario, eventosGol] = await Promise.all([
-    prisma.usuario.findUnique({
-      where: { id: Number(usuarioId) },
-      include: {
-        apostas: { include: { partida: true } },
-        apostasGoleador: { include: { partida: true } },
-        ligas: { include: { liga: true } },
-      },
-    }),
-    prisma.evento.findMany({
-      where: { tipo: 'GOL' },
-      select: { partidaId: true, jogadorId: true },
-    }),
-  ]);
+  const usuario = await prisma.usuario.findUnique({
+    where: { id: Number(usuarioId) },
+    include: {
+      apostas: { include: { partida: true } },
+      apostasGoleador: { include: { partida: true } },
+      ligas: { include: { liga: true } },
+    },
+  });
 
   if (!usuario) throw new Error('Usuário não encontrado');
 
-  const golSet = new Set(eventosGol.map((e) => `${e.partidaId}-${e.jogadorId}`));
-
   const { pontos, placaresExatos, vencedoresAcertados } = calcularPontos(usuario.apostas);
 
+  // Busca gols só das partidas que o usuário apostou em goleador
   let goleadoresAcertados = 0;
-  for (const ag of usuario.apostasGoleador) {
-    if (ag.partida.status !== 'FINALIZADA') continue;
-    if (golSet.has(`${ag.partidaId}-${ag.jogadorId}`)) goleadoresAcertados++;
+  const apostasGolFinalizadas = usuario.apostasGoleador.filter(
+    (ag) => ag.partida.status === 'FINALIZADA'
+  );
+  if (apostasGolFinalizadas.length > 0) {
+    const eventosGol = await prisma.evento.findMany({
+      where: {
+        tipo: 'GOL',
+        OR: apostasGolFinalizadas.map((ag) => ({
+          partidaId: ag.partidaId,
+          jogadorId: ag.jogadorId,
+        })),
+      },
+      select: { partidaId: true, jogadorId: true },
+    });
+    const golSet = new Set(eventosGol.map((e) => `${e.partidaId}-${e.jogadorId}`));
+    for (const ag of apostasGolFinalizadas) {
+      if (golSet.has(`${ag.partidaId}-${ag.jogadorId}`)) goleadoresAcertados++;
+    }
   }
 
-  // Ranking por liga — busca todos os membros de uma vez por liga
+  // Usa o cache do rankingPorLiga para calcular posição sem refazer tudo do zero
   const ligasComPosicao = await Promise.all(
     usuario.ligas.map(async (ml) => {
-      const membros = await prisma.membroLiga.findMany({
-        where: { ligaId: ml.ligaId },
-        include: { usuario: { include: { apostas: { include: { partida: true } } } } },
-      });
-
-      const pontosPorUsuario = membros.map((m) => ({
-        usuarioId: m.usuarioId,
-        pontos: calcularPontos(m.usuario.apostas).pontos,
-      }));
-
-      pontosPorUsuario.sort((a, b) => b.pontos - a.pontos);
-      const posicao = pontosPorUsuario.findIndex((p) => p.usuarioId === usuario.id) + 1;
-
-      return { liga: ml.liga, posicao, total: membros.length };
+      const { ranking } = await rankingPorLiga(ml.ligaId);
+      const posicao = ranking.findIndex((r) => r.id === usuario.id) + 1;
+      return { liga: ml.liga, posicao, total: ranking.length };
     })
   );
 
@@ -93,21 +91,15 @@ async function atualizarPerfil(usuarioId, { nome, foto_url }) {
 }
 
 async function buscarApostasUsuario(usuarioId) {
-  const [apostas, eventosGol] = await Promise.all([
-    prisma.aposta.findMany({
-      where: { usuarioId: Number(usuarioId) },
-      include: {
-        partida: {
-          include: { selecaoCasa: true, selecaoFora: true },
-        },
+  const apostas = await prisma.aposta.findMany({
+    where: { usuarioId: Number(usuarioId) },
+    include: {
+      partida: {
+        include: { selecaoCasa: true, selecaoFora: true },
       },
-      orderBy: { partida: { data: 'asc' } },
-    }),
-    prisma.evento.findMany({
-      where: { tipo: 'GOL' },
-      select: { partidaId: true, jogadorId: true },
-    }),
-  ]);
+    },
+    orderBy: { partida: { data: 'asc' } },
+  });
 
   return apostas.map((a) => {
     const p = a.partida;
