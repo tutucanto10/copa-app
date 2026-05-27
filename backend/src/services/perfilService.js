@@ -1,5 +1,6 @@
 const prisma = require('../config/prisma');
 const { rankingPorLiga } = require('./ligaService');
+const { uploadFoto } = require('../config/supabase');
 
 function calcularPontos(apostas) {
   let pontos = 0, placaresExatos = 0, vencedoresAcertados = 0;
@@ -81,13 +82,16 @@ async function buscarPerfil(usuarioId) {
 }
 
 async function atualizarPerfil(usuarioId, { nome, foto_url }) {
-  return prisma.usuario.update({
-    where: { id: Number(usuarioId) },
-    data: {
-      ...(nome && { nome }),
-      ...(foto_url !== undefined && { foto_url }),
-    },
-  });
+  const data = {}
+  if (nome) data.nome = nome
+  if (foto_url !== undefined) {
+    if (foto_url && foto_url.startsWith('data:')) {
+      data.foto_url = await uploadFoto(Number(usuarioId), foto_url)
+    } else {
+      data.foto_url = foto_url
+    }
+  }
+  return prisma.usuario.update({ where: { id: Number(usuarioId) }, data })
 }
 
 async function buscarApostasUsuario(usuarioId) {

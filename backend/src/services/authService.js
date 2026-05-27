@@ -1,5 +1,6 @@
 const prisma = require('../config/prisma');
 const jwt = require('jsonwebtoken');
+const { uploadFoto } = require('../config/supabase');
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -24,8 +25,14 @@ async function cadastro({ nome, foto_url }) {
   if (existe) throw new Error('Esse nome já está em uso. Escolha outro.');
 
   const usuario = await prisma.usuario.create({
-    data: { nome, foto_url: foto_url || null },
+    data: { nome, foto_url: null },
   });
+
+  if (foto_url && foto_url.startsWith('data:')) {
+    const url = await uploadFoto(usuario.id, foto_url);
+    await prisma.usuario.update({ where: { id: usuario.id }, data: { foto_url: url } });
+    usuario.foto_url = url;
+  }
 
   const token = jwt.sign(
     { id: usuario.id, nome: usuario.nome, isAdmin: usuario.isAdmin },
