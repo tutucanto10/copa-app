@@ -41,7 +41,9 @@ async function rankingPorLiga(ligaId) {
       membros: {
         include: {
           usuario: {
-            include: {
+            select: {
+              id: true,
+              nome: true,
               apostas: { include: { partida: true } },
               apostasGoleador: { include: { jogador: true, partida: true } },
             },
@@ -102,7 +104,6 @@ async function rankingPorLiga(ligaId) {
       return {
         id: usuario.id,
         nome: usuario.nome,
-        foto_url: usuario.foto_url || null,
         pontos,
         placaresExatos,
         vencedoresAcertados,
