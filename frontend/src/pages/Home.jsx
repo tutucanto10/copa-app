@@ -503,9 +503,9 @@ function CardRegras() {
 
   return (
     <div style={{
-      background: 'var(--color-background-secondary)',
-      border: '0.5px solid var(--color-border-tertiary)',
-      borderRadius: 12, marginTop: '2rem', overflow: 'hidden',
+      background: '#111827',
+      border: '1px solid #1e2d45',
+      borderRadius: 12, marginBottom: '1.75rem', overflow: 'hidden',
     }}>
       <button
         onClick={() => setAberto(!aberto)}
@@ -515,10 +515,10 @@ function CardRegras() {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
       >
-        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: 1 }}>
+        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f0f4ff', letterSpacing: 1 }}>
           📋 REGRAS DO BOLÃO
         </span>
-        <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>{aberto ? '▲' : '▼'}</span>
+        <span style={{ color: '#8b9bb4', fontSize: '0.85rem' }}>{aberto ? '▲' : '▼'}</span>
       </button>
 
       {aberto && (
@@ -540,7 +540,7 @@ function CardRegras() {
                 }}>
                   <span style={{ fontSize: '1.1rem' }}>{r.icone}</span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>{r.label}</div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#f0f4ff' }}>{r.label}</div>
                     <div style={{ fontSize: '0.72rem', color: '#8b9bb4' }}>{r.desc}</div>
                   </div>
                   <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1rem', color: r.cor, fontWeight: 700 }}>{r.pts}</span>
@@ -651,6 +651,7 @@ export default function Home() {
 
       <CardCampeao usuarioId={usuario?.id} />
       <CardMvp usuarioId={usuario?.id} />
+      <CardRegras />
 
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{
@@ -792,8 +793,6 @@ export default function Home() {
           </div>
         ))
       })()}
-
-      <CardRegras />
     </div>
   )
 }
