@@ -21,7 +21,9 @@ const { verificarAdmin, loginAdmin } = require('./middleware/adminAuth');
 const pushRoutes = require('./src/routes/pushRoutes');
 const prisma = require('./src/config/prisma');
 const { limparCacheRanking } = require('./src/services/ligaService');
-const { notificarLembretes } = require('./src/services/pushService');
+const { notificarLembretes, notificarResultadoPartida, notificarMvpRodada } = require('./src/services/pushService');
+const { buscarAoVivo, converterStatus } = require('./src/services/apiFootballService');
+const { mvpRodadaSingle } = require('./src/services/mvpService');
 
 const app = express();
 
@@ -71,6 +73,61 @@ const PORT = process.env.PORT || 3333;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
+
+// Job: atualização de placar ao vivo via API-Football (a cada 2 min)
+setInterval(async () => {
+  if (!process.env.APIFOOTBALL_KEY) return;
+  try {
+    const fixtures = await buscarAoVivo();
+    if (!fixtures || fixtures.length === 0) return;
+
+    // Pega IDs externos dos fixtures ao vivo
+    const externalIds = fixtures.map((f) => f.fixture.id);
+
+    // Busca nossas partidas que têm esses IDs externos
+    const partidas = await prisma.partida.findMany({
+      where: { externalId: { in: externalIds } },
+      include: { selecaoCasa: true, selecaoFora: true },
+    });
+
+    for (const partida of partidas) {
+      const fixture = fixtures.find((f) => f.fixture.id === partida.externalId);
+      if (!fixture) continue;
+
+      const novoStatus   = converterStatus(fixture.fixture.status.short);
+      const novoPlacarCasa = fixture.goals.home ?? partida.placarCasa;
+      const novoPlacarFora = fixture.goals.away ?? partida.placarFora;
+
+      const mudou =
+        novoStatus   !== partida.status ||
+        novoPlacarCasa !== partida.placarCasa ||
+        novoPlacarFora !== partida.placarFora;
+
+      if (!mudou) continue;
+
+      const atualizada = await prisma.partida.update({
+        where: { id: partida.id },
+        data: { status: novoStatus, placarCasa: novoPlacarCasa, placarFora: novoPlacarFora },
+        include: { selecaoCasa: true, selecaoFora: true },
+      });
+
+      limparCacheRanking();
+      console.log(`⚽ Placar atualizado: ${partida.selecaoCasa.nome} ${novoPlacarCasa}×${novoPlacarFora} ${partida.selecaoFora.nome} [${novoStatus}]`);
+
+      // Se acabou de finalizar, dispara notificações
+      if (novoStatus === 'FINALIZADA' && partida.status !== 'FINALIZADA') {
+        notificarResultadoPartida(atualizada).catch((e) => console.error('Push resultado:', e.message));
+        mvpRodadaSingle(atualizada.rodada).then((mvpData) => {
+          if (mvpData?.completa && mvpData.mvp) {
+            return notificarMvpRodada(atualizada.rodada, mvpData.mvp);
+          }
+        }).catch((e) => console.error('Push MVP:', e.message));
+      }
+    }
+  } catch (err) {
+    console.error('Erro no job de placar ao vivo:', err.message);
+  }
+}, 2 * 60 * 1000);
 
 // Job: lembrete de aposta 2h antes de cada jogo
 setInterval(() => {
