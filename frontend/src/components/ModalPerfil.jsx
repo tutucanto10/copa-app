@@ -11,6 +11,7 @@ export default function ModalPerfil({ onClose }) {
   const [editando, setEditando] = useState(false)
   const [nomeEdit, setNomeEdit] = useState('')
   const [fotoEdit, setFotoEdit] = useState('')
+  const [telefoneEdit, setTelefoneEdit] = useState('')
   const [salvando, setSalvando] = useState(false)
   const modalRef = useRef(null)
 
@@ -43,6 +44,7 @@ export default function ModalPerfil({ onClose }) {
       await api.put(`/perfil/${usuario.id}`, {
         nome: nomeEdit || undefined,
         foto_url: fotoEdit || undefined,
+        telefone: telefoneEdit,
       })
       const r = await api.get(`/perfil/${usuario.id}`)
       setPerfil(r.data)
@@ -151,7 +153,30 @@ export default function ModalPerfil({ onClose }) {
                 outline: 'none', textAlign: 'center', width: '100%',
               }}
             />
+          ) : editando ? (
+            <input
+              value={telefoneEdit}
+              onChange={(e) => setTelefoneEdit(e.target.value)}
+              placeholder="WhatsApp (ex: 21 98041-4777)"
+              style={{
+                marginTop: '0.5rem',
+                background: '#0a0e1a', border: '1px solid #1e2d45',
+                borderRadius: 8, color: '#f0f4ff',
+                padding: '0.4rem 0.75rem', fontSize: '0.85rem',
+                outline: 'none', textAlign: 'center', width: '100%',
+              }}
+            />
+          ) : perfil?.telefone ? (
+            <div style={{ fontSize: '0.78rem', color: '#8b9bb4', marginTop: 4 }}>
+              📱 {perfil.telefone}
+            </div>
           ) : (
+            <div style={{ fontSize: '0.75rem', color: '#e8192c44', marginTop: 4 }}>
+              ⚠️ Sem WhatsApp cadastrado
+            </div>
+          )}
+
+          {!editando && (
             <div style={{
               fontFamily: 'var(--fonte-display)', fontSize: '1.8rem',
               letterSpacing: '2px', color: '#f0f4ff', marginTop: '0.75rem',
@@ -270,7 +295,7 @@ export default function ModalPerfil({ onClose }) {
                 </>
               ) : (
                 <>
-                  <button onClick={() => { setNomeEdit(perfil.nome); setFotoEdit(''); setEditando(true) }} style={{
+                  <button onClick={() => { setNomeEdit(perfil.nome); setFotoEdit(''); setTelefoneEdit(perfil.telefone || ''); setEditando(true) }} style={{
                     flex: 1, background: '#1e2d45', color: '#f0f4ff',
                     border: 'none', borderRadius: 8, padding: '0.75rem',
                     fontWeight: 700, cursor: 'pointer',

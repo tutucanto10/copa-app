@@ -14,6 +14,7 @@ model Usuario {
   email             String?            @unique
   foto_url          String?
   senha             String?
+  telefone          String?            @unique
   isAdmin           Boolean            @default(false)
   apostas           Aposta[]
   apostasGoleador   ApostaGoleador[]

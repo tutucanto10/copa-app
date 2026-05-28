@@ -1,4 +1,5 @@
-const { login, cadastro, definirSenha, verificarToken } = require('../services/authService');
+const { login, cadastro, definirSenha, esqueceuSenha, verificarToken } = require('../services/authService');
+const { enviarMensagem } = require('../services/whatsappService');
 
 async function loginHandler(req, res) {
   try {
@@ -37,4 +38,19 @@ async function definirSenhaHandler(req, res) {
   }
 }
 
-module.exports = { loginHandler, cadastroHandler, definirSenhaHandler };
+async function esqueceuSenhaHandler(req, res) {
+  try {
+    const { telefone } = req.body;
+    if (!telefone) return res.status(400).json({ error: 'Telefone obrigatório' });
+    const { usuario, tempSenha } = await esqueceuSenha(telefone);
+    await enviarMensagem(
+      usuario.telefone,
+      `🏆 *Bolão Copa 2026*\n\nOlá, ${usuario.nome}! Sua senha temporária é:\n\n*${tempSenha}*\n\nEntre com essa senha e troque no seu perfil depois. 🔐`
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+}
+
+module.exports = { loginHandler, cadastroHandler, definirSenhaHandler, esqueceuSenhaHandler };

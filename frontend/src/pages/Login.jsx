@@ -6,7 +6,7 @@ import api from '../api/api'
 export default function Login() {
   const { login, cadastro, completarLogin } = useAuth()
   const navigate = useNavigate()
-  const [modo, setModo] = useState('login')
+  const [modo, setModo] = useState('login') // 'login' | 'cadastro' | 'esqueci'
   const [nome, setNome] = useState('')
   const [senha, setSenha] = useState('')
   const [senhaConfirm, setSenhaConfirm] = useState('')
@@ -14,6 +14,8 @@ export default function Login() {
   const [fotoBase64, setFotoBase64] = useState(null)
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
+  const [telefoneEsqueci, setTelefoneEsqueci] = useState('')
+  const [esqueciSucesso, setEsqueciSucesso] = useState(false)
 
   // Estado para criação de senha obrigatória (usuários sem senha)
   const [criarSenhaData, setCriarSenhaData] = useState(null) // { token, usuario }
@@ -29,6 +31,21 @@ export default function Login() {
       setFotoBase64(ev.target.result)
     }
     reader.readAsDataURL(file)
+  }
+
+  async function handleEsqueci(e) {
+    e.preventDefault()
+    if (!telefoneEsqueci.trim()) return setErro('Digite seu número de WhatsApp')
+    setErro('')
+    setCarregando(true)
+    try {
+      await api.post('/auth/esqueci-senha', { telefone: telefoneEsqueci.trim() })
+      setEsqueciSucesso(true)
+    } catch (err) {
+      setErro(err.response?.data?.error || 'Erro ao enviar senha')
+    } finally {
+      setCarregando(false)
+    }
   }
 
   async function handleSubmit(e) {
@@ -159,6 +176,91 @@ export default function Login() {
     )
   }
 
+  if (modo === 'esqueci') {
+    return (
+      <div style={{
+        minHeight: '100vh', background: '#0a0e1a',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
+      }}>
+        <div style={{
+          background: '#111827', border: '1px solid #1e2d45',
+          borderRadius: 16, padding: '2.5rem', width: '100%', maxWidth: 420,
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>💬</div>
+            <h2 style={{
+              fontFamily: 'var(--fonte-display)', fontSize: '1.6rem',
+              letterSpacing: '3px', color: '#00a651', margin: '0 0 0.5rem',
+            }}>ESQUECI MINHA SENHA</h2>
+            <p style={{ color: '#8b9bb4', fontSize: '0.9rem', margin: 0 }}>
+              Digite o número de WhatsApp cadastrado na sua conta e enviaremos uma senha temporária.
+            </p>
+          </div>
+
+          {esqueciSucesso ? (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>✅</div>
+              <div style={{ color: '#00a651', fontWeight: 700, fontSize: '1rem', marginBottom: '0.5rem' }}>
+                Senha enviada!
+              </div>
+              <div style={{ color: '#8b9bb4', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+                Verifique seu WhatsApp e use a senha temporária para entrar.
+              </div>
+              <button onClick={() => { setModo('login'); setEsqueciSucesso(false); setTelefoneEsqueci('') }} style={{
+                background: '#00a651', color: '#fff', border: 'none',
+                borderRadius: 8, padding: '0.75rem 2rem',
+                fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer',
+              }}>IR PARA O LOGIN</button>
+            </div>
+          ) : (
+            <form onSubmit={handleEsqueci} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
+                  Número de WhatsApp
+                </label>
+                <input
+                  type="tel"
+                  placeholder="Ex: 21 98041-4777"
+                  value={telefoneEsqueci}
+                  onChange={(e) => setTelefoneEsqueci(e.target.value)}
+                  style={{
+                    width: '100%', background: '#0a0e1a', border: '1px solid #1e2d45',
+                    borderRadius: 8, color: '#f0f4ff', padding: '0.75rem 1rem',
+                    fontSize: '1rem', outline: 'none', boxSizing: 'border-box',
+                  }}
+                  autoFocus
+                />
+              </div>
+
+              {erro && (
+                <div style={{
+                  background: '#1f0a0a', border: '1px solid #e8192c',
+                  borderRadius: 8, padding: '0.6rem 1rem',
+                  color: '#e8192c', fontSize: '0.85rem',
+                }}>{erro}</div>
+              )}
+
+              <button type="submit" disabled={carregando} style={{
+                background: '#00a651', color: '#fff', border: 'none',
+                borderRadius: 8, padding: '0.85rem', fontWeight: 700,
+                fontSize: '1rem', letterSpacing: 1,
+                cursor: carregando ? 'not-allowed' : 'pointer',
+                opacity: carregando ? 0.7 : 1,
+              }}>
+                {carregando ? 'Enviando...' : 'ENVIAR SENHA'}
+              </button>
+
+              <button type="button" onClick={() => { setModo('login'); setErro('') }} style={{
+                background: 'none', border: 'none', color: '#8b9bb4',
+                fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline',
+              }}>← Voltar para o login</button>
+            </form>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={{
       minHeight: '100vh', background: '#0a0e1a',
@@ -270,6 +372,16 @@ export default function Login() {
                 style={inputStyle}
               />
             </div>
+          )}
+
+          {modo === 'login' && (
+            <button type="button" onClick={() => { setModo('esqueci'); setErro('') }} style={{
+              background: 'none', border: 'none', color: '#8b9bb4',
+              fontSize: '0.8rem', cursor: 'pointer', textAlign: 'right',
+              padding: 0, textDecoration: 'underline', alignSelf: 'flex-end',
+            }}>
+              Esqueci minha senha
+            </button>
           )}
 
           {erro && (

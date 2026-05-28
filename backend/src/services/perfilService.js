@@ -102,6 +102,7 @@ async function buscarPerfil(usuarioId) {
     nome: usuario.nome,
     email: usuario.email,
     foto_url: usuario.foto_url,
+    telefone: usuario.telefone,
     isAdmin: usuario.isAdmin,
     pontos,
     placaresExatos,
@@ -113,9 +114,10 @@ async function buscarPerfil(usuarioId) {
   };
 }
 
-async function atualizarPerfil(usuarioId, { nome, foto_url }) {
+async function atualizarPerfil(usuarioId, { nome, foto_url, telefone }) {
   const data = {}
   if (nome) data.nome = nome
+  if (telefone !== undefined) data.telefone = telefone ? telefone.replace(/\D/g, '') : null
   if (foto_url !== undefined) {
     if (foto_url && foto_url.startsWith('data:')) {
       data.foto_url = await uploadFoto(Number(usuarioId), foto_url)

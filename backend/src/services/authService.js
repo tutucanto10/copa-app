@@ -56,6 +56,22 @@ async function definirSenha(usuarioId, senha) {
   });
 }
 
+async function esqueceuSenha(telefone) {
+  const usuario = await prisma.usuario.findUnique({ where: { telefone: telefone.replace(/\D/g, '').replace(/^55/, '') } })
+    ?? await prisma.usuario.findFirst({ where: { telefone: { endsWith: telefone.replace(/\D/g, '').slice(-11) } } });
+
+  if (!usuario) throw new Error('Nenhuma conta encontrada com esse número.');
+
+  // Gera senha temporária legível
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const tempSenha = 'Copa' + Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+
+  const hash = await bcrypt.hash(tempSenha, 10);
+  await prisma.usuario.update({ where: { id: usuario.id }, data: { senha: hash } });
+
+  return { usuario, tempSenha };
+}
+
 async function verificarToken(token) {
   try {
     return jwt.verify(token, SECRET);
@@ -64,4 +80,4 @@ async function verificarToken(token) {
   }
 }
 
-module.exports = { login, cadastro, definirSenha, verificarToken };
+module.exports = { login, cadastro, definirSenha, esqueceuSenha, verificarToken };
