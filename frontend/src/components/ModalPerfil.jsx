@@ -180,16 +180,15 @@ export default function ModalPerfil({ onClose }) {
               <div style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 700 }}>
                 📊 Estatísticas do Bolão
               </div>
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.6rem' }}>
                 {[
                   { label: 'PONTOS', valor: perfil.pontos, cor: '#00a651' },
-                  { label: 'PLACARES EXATOS', valor: perfil.placaresExatos, cor: '#f5d000' },
+                  { label: 'EXATOS', valor: perfil.placaresExatos, cor: '#f5d000' },
                   { label: 'VENCEDORES', valor: perfil.vencedoresAcertados, cor: '#3b82f6' },
                   { label: 'GOLEADORES', valor: perfil.goleadoresAcertados, cor: '#8b9bb4' },
                   { label: 'SEQUÊNCIA 🔥', valor: perfil.streak ?? 0, cor: '#f97316' },
                 ].map((s) => (
                   <div key={s.label} style={{
-                    flex: 1, minWidth: 80,
                     background: '#0a0e1a', border: '1px solid #1e2d45',
                     borderRadius: 10, padding: '0.75rem',
                     textAlign: 'center',
