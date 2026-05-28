@@ -1,5 +1,5 @@
 const { login, cadastro, definirSenha, esqueceuSenha, verificarToken } = require('../services/authService');
-const { enviarMensagem } = require('../services/whatsappService');
+const { enviarSenhaTemporaria } = require('../services/emailService');
 
 async function loginHandler(req, res) {
   try {
@@ -40,13 +40,10 @@ async function definirSenhaHandler(req, res) {
 
 async function esqueceuSenhaHandler(req, res) {
   try {
-    const { nome, telefone } = req.body;
-    if (!nome || !telefone) return res.status(400).json({ error: 'Nome e telefone obrigatórios' });
-    const { usuario, tempSenha } = await esqueceuSenha(nome, telefone);
-    await enviarMensagem(
-      usuario.telefone,
-      `🏆 *Bolão Copa 2026*\n\nOlá, ${usuario.nome}! Sua senha temporária é:\n\n*${tempSenha}*\n\nEntre com essa senha e troque no seu perfil depois. 🔐`
-    );
+    const { nome, email } = req.body;
+    if (!nome || !email) return res.status(400).json({ error: 'Nome e email obrigatórios' });
+    const { usuario, tempSenha } = await esqueceuSenha(nome, email);
+    await enviarSenhaTemporaria(usuario.nome, usuario.email, tempSenha);
     res.json({ ok: true });
   } catch (err) {
     res.status(400).json({ error: err.message });

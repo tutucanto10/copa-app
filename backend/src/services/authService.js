@@ -56,18 +56,12 @@ async function definirSenha(usuarioId, senha) {
   });
 }
 
-async function esqueceuSenha(nome, telefone) {
-  const digits = telefone.replace(/\D/g, '');
-  const semCodigo = digits.replace(/^55/, '');
-
+async function esqueceuSenha(nome, email) {
   const usuario = await prisma.usuario.findFirst({
-    where: {
-      nome,
-      OR: [{ telefone: digits }, { telefone: semCodigo }],
-    },
+    where: { nome, email },
   });
 
-  if (!usuario) throw new Error('Nome e número não coincidem. Verifique os dados.');
+  if (!usuario) throw new Error('Nome e email não coincidem. Verifique os dados.');
 
   // Gera senha temporária legível
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';

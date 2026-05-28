@@ -14,7 +14,7 @@ export default function Login() {
   const [fotoBase64, setFotoBase64] = useState(null)
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
-  const [telefoneEsqueci, setTelefoneEsqueci] = useState('')
+  const [emailEsqueci, setEmailEsqueci] = useState('')
   const [nomeEsqueci, setNomeEsqueci] = useState('')
   const [esqueciSucesso, setEsqueciSucesso] = useState(false)
 
@@ -36,11 +36,11 @@ export default function Login() {
 
   async function handleEsqueci(e) {
     e.preventDefault()
-    if (!telefoneEsqueci.trim()) return setErro('Digite seu número de WhatsApp')
+    if (!nomeEsqueci.trim() || !emailEsqueci.trim()) return setErro('Preencha nome e email')
     setErro('')
     setCarregando(true)
     try {
-      await api.post('/auth/esqueci-senha', { nome: nomeEsqueci.trim(), telefone: telefoneEsqueci.trim() })
+      await api.post('/auth/esqueci-senha', { nome: nomeEsqueci.trim(), email: emailEsqueci.trim() })
       setEsqueciSucesso(true)
     } catch (err) {
       setErro(err.response?.data?.error || 'Erro ao enviar senha')
@@ -194,7 +194,7 @@ export default function Login() {
               letterSpacing: '3px', color: '#00a651', margin: '0 0 0.5rem',
             }}>ESQUECI MINHA SENHA</h2>
             <p style={{ color: '#8b9bb4', fontSize: '0.9rem', margin: 0 }}>
-              Digite o número de WhatsApp cadastrado na sua conta e enviaremos uma senha temporária.
+              Digite seu nome e o email cadastrado na conta. Enviaremos uma senha temporária por email.
             </p>
           </div>
 
@@ -202,10 +202,10 @@ export default function Login() {
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>✅</div>
               <div style={{ color: '#00a651', fontWeight: 700, fontSize: '1rem', marginBottom: '0.5rem' }}>
-                Senha enviada!
+                Email enviado!
               </div>
               <div style={{ color: '#8b9bb4', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-                Verifique seu WhatsApp e use a senha temporária para entrar.
+                Verifique sua caixa de entrada e use a senha temporária para entrar.
               </div>
               <button onClick={() => { setModo('login'); setEsqueciSucesso(false); setTelefoneEsqueci('') }} style={{
                 background: '#00a651', color: '#fff', border: 'none',
@@ -234,13 +234,13 @@ export default function Login() {
               </div>
               <div>
                 <label style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
-                  Número de WhatsApp cadastrado
+                  Email cadastrado
                 </label>
                 <input
-                  type="tel"
-                  placeholder="Ex: 21 98041-4777"
-                  value={telefoneEsqueci}
-                  onChange={(e) => setTelefoneEsqueci(e.target.value)}
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={emailEsqueci}
+                  onChange={(e) => setEmailEsqueci(e.target.value)}
                   style={{
                     width: '100%', background: '#0a0e1a', border: '1px solid #1e2d45',
                     borderRadius: 8, color: '#f0f4ff', padding: '0.75rem 1rem',

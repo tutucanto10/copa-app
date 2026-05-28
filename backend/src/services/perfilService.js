@@ -114,10 +114,10 @@ async function buscarPerfil(usuarioId) {
   };
 }
 
-async function atualizarPerfil(usuarioId, { nome, foto_url, telefone }) {
+async function atualizarPerfil(usuarioId, { nome, foto_url, email }) {
   const data = {}
   if (nome) data.nome = nome
-  if (telefone !== undefined) data.telefone = telefone ? telefone.replace(/\D/g, '') : null
+  if (email !== undefined) data.email = email || null
   if (foto_url !== undefined) {
     if (foto_url && foto_url.startsWith('data:')) {
       data.foto_url = await uploadFoto(Number(usuarioId), foto_url)
