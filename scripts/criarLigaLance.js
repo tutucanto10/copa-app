@@ -31,16 +31,15 @@ async function uploadLogo(filePath) {
 }
 
 async function main() {
-  // Procura o arquivo de logo na pasta scripts/
-  const extensoes = ['png', 'jpg', 'jpeg', 'svg', 'webp'];
-  let logoPath = null;
-  for (const ext of extensoes) {
-    const p = path.join(__dirname, `lance-logo.${ext}`);
-    if (fs.existsSync(p)) { logoPath = p; break; }
-  }
+  // Procura o arquivo de logo na pasta scripts/ ou backend/scripts/
+  const candidatos = [
+    ...['png','jpg','jpeg','svg','webp'].map(e => path.join(__dirname, `lance-logo.${e}`)),
+    path.join(__dirname, '../backend/scripts/Logotipo_do_Lance!.svg.png'),
+  ];
+  let logoPath = candidatos.find(p => fs.existsSync(p)) || null;
 
   if (!logoPath) {
-    console.error('❌ Arquivo de logo não encontrado em scripts/');
+    console.error('❌ Arquivo de logo não encontrado.');
     console.error('   Coloque o arquivo como: scripts/lance-logo.png (ou .jpg, .svg)');
     process.exit(1);
   }
