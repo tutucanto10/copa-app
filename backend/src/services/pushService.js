@@ -142,4 +142,54 @@ async function notificarMvpRodada(rodada, mvp) {
   )
 }
 
-module.exports = { salvarSubscription, notificarTodos, notificarUsuario, notificarResultadoPartida, notificarMvpRodada };
+async function notificarLembretes() {
+  if (!vapidConfigurado) return
+
+  const agora = new Date()
+  // Janela de 30 min centrada em 2h antes do jogo — cada partida cai aqui só uma vez por execução
+  const min = new Date(agora.getTime() + 105 * 60 * 1000) // 1h45
+  const max = new Date(agora.getTime() + 135 * 60 * 1000) // 2h15
+
+  const partidas = await prisma.partida.findMany({
+    where: { status: 'AGENDADA', data: { gte: min, lte: max } },
+    include: { selecaoCasa: true, selecaoFora: true },
+  })
+
+  if (partidas.length === 0) return
+
+  for (const partida of partidas) {
+    const jaApostaram = await prisma.aposta.findMany({
+      where: { partidaId: partida.id },
+      select: { usuarioId: true },
+    })
+    const jaIds = new Set(jaApostaram.map((a) => a.usuarioId))
+
+    const subs = await prisma.pushSubscription.findMany({
+      where: { usuarioId: { notIn: [...jaIds] } },
+    })
+
+    if (subs.length === 0) continue
+
+    const horasRestantes = Math.round((new Date(partida.data) - agora) / 3600000)
+    const payload = JSON.stringify({
+      titulo: '⚠️ Você ainda não apostou!',
+      corpo: `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} começa em ${horasRestantes}h`,
+      url: `/partida/${partida.id}`,
+    })
+
+    await Promise.allSettled(
+      subs.map((s) =>
+        webpush.sendNotification(
+          { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+          payload
+        ).catch(async (err) => {
+          if (err.statusCode === 410) await prisma.pushSubscription.delete({ where: { endpoint: s.endpoint } })
+        })
+      )
+    )
+
+    console.log(`🔔 Lembrete enviado para ${subs.length} usuário(s) — ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`)
+  }
+}
+
+module.exports = { salvarSubscription, notificarTodos, notificarUsuario, notificarResultadoPartida, notificarMvpRodada, notificarLembretes };

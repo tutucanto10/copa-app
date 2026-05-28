@@ -21,6 +21,7 @@ const { verificarAdmin, loginAdmin } = require('./middleware/adminAuth');
 const pushRoutes = require('./src/routes/pushRoutes');
 const prisma = require('./src/config/prisma');
 const { limparCacheRanking } = require('./src/services/ligaService');
+const { notificarLembretes } = require('./src/services/pushService');
 
 const app = express();
 
@@ -70,6 +71,13 @@ const PORT = process.env.PORT || 3333;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
+
+// Job: lembrete de aposta 2h antes de cada jogo
+setInterval(() => {
+  notificarLembretes().catch((err) =>
+    console.error('Erro no job de lembretes:', err.message)
+  );
+}, 30 * 60 * 1000);
 
 // Job: AGENDADA → AO_VIVO quando falta ≤ 1 hora para o início
 setInterval(async () => {
