@@ -419,6 +419,34 @@ export default function Login() {
           }}>
             {carregando ? 'Aguarde...' : modo === 'login' ? 'ENTRAR' : 'CRIAR CONTA'}
           </button>
+
+          {modo === 'login' && (
+            <div style={{
+              marginTop: '1.25rem',
+              background: '#0a1a10',
+              border: '1px solid #1e2d4588',
+              borderRadius: 10,
+              padding: '0.85rem 1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.6rem',
+            }}>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <span>🔑</span>
+                <span style={{ fontSize: '0.78rem', color: '#8b9bb4', lineHeight: 1.5 }}>
+                  <strong style={{ color: '#f0f4ff' }}>Primeira vez com senha?</strong>{' '}
+                  Se você já tinha conta antes desta atualização, deixe o campo senha em branco e clique em Entrar — você será redirecionado para criar uma senha nova.
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <span>💡</span>
+                <span style={{ fontSize: '0.78rem', color: '#8b9bb4', lineHeight: 1.5 }}>
+                  <strong style={{ color: '#f0f4ff' }}>Dica:</strong>{' '}
+                  Cadastre seu email no perfil para poder recuperar a senha caso esqueça.
+                </span>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </div>
