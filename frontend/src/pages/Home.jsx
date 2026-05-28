@@ -400,11 +400,10 @@ function CardCampeao({ usuarioId }) {
           </button>
           {verTodas && (
             <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              {rankCampeao.map(({ selecao, count, nomes }) => (
+              {rankCampeao.map(({ selecao, count }) => (
                 <div key={selecao.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   {selecao.escudo_url && <img src={selecao.escudo_url} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />}
                   <span style={{ fontSize: '0.82rem', color: '#f0f4ff', flex: 1 }}>{selecao.nome}</span>
-                  <span style={{ fontSize: '0.75rem', color: '#8b9bb4' }}>{nomes.join(', ')}</span>
                   <span style={{
                     background: '#0a1a10', border: '1px solid #00a651',
                     borderRadius: 20, padding: '0.1rem 0.5rem',
