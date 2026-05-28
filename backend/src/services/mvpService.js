@@ -48,9 +48,65 @@ async function mvpRodadaSingle(rodada) {
   };
 }
 
-async function mvpRodadas() {
-  const results = await Promise.all([1, 2, 3].map(mvpRodadaSingle));
-  return results.filter((r) => r.finalizadas > 0);
+async function mvpPorLiga(ligaId) {
+  const membros = await prisma.membroLiga.findMany({
+    where: { ligaId },
+    select: { usuarioId: true },
+  });
+  const userIds = membros.map((m) => m.usuarioId);
+
+  const results = await Promise.all(
+    [1, 2, 3].map(async (rodada) => {
+      const [totalPartidas, partidas] = await Promise.all([
+        prisma.partida.count({ where: { rodada } }),
+        prisma.partida.findMany({
+          where: { rodada, status: 'FINALIZADA' },
+          select: { id: true, placarCasa: true, placarFora: true },
+        }),
+      ]);
+
+      if (partidas.length === 0) return null;
+
+      const apostas = await prisma.aposta.findMany({
+        where: {
+          partidaId: { in: partidas.map((p) => p.id) },
+          usuarioId: { in: userIds },
+        },
+        include: { usuario: { select: { id: true, nome: true, foto_url: true } } },
+      });
+
+      const placarMap = Object.fromEntries(partidas.map((p) => [p.id, p]));
+      const ranking = calcularPontosApostas(apostas, placarMap);
+
+      return {
+        rodada,
+        mvp: ranking[0] || null,
+        completa: partidas.length === totalPartidas,
+        finalizadas: partidas.length,
+        total: totalPartidas,
+      };
+    })
+  );
+
+  return results.filter((r) => r !== null && r.finalizadas > 0);
 }
 
-module.exports = { mvpRodadaSingle, mvpRodadas };
+async function mvpPorUsuario(usuarioId) {
+  const ligas = await prisma.membroLiga.findMany({
+    where: { usuarioId },
+    include: { liga: true },
+  });
+
+  if (ligas.length === 0) return [];
+
+  const results = await Promise.all(
+    ligas.map(async ({ liga }) => {
+      const rodadas = await mvpPorLiga(liga.id);
+      return { liga: { id: liga.id, nome: liga.nome }, rodadas };
+    })
+  );
+
+  return results.filter((r) => r.rodadas.length > 0);
+}
+
+module.exports = { mvpRodadaSingle, mvpPorUsuario };
