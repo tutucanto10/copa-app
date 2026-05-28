@@ -40,9 +40,9 @@ async function definirSenhaHandler(req, res) {
 
 async function esqueceuSenhaHandler(req, res) {
   try {
-    const { telefone } = req.body;
-    if (!telefone) return res.status(400).json({ error: 'Telefone obrigatório' });
-    const { usuario, tempSenha } = await esqueceuSenha(telefone);
+    const { nome, telefone } = req.body;
+    if (!nome || !telefone) return res.status(400).json({ error: 'Nome e telefone obrigatórios' });
+    const { usuario, tempSenha } = await esqueceuSenha(nome, telefone);
     await enviarMensagem(
       usuario.telefone,
       `🏆 *Bolão Copa 2026*\n\nOlá, ${usuario.nome}! Sua senha temporária é:\n\n*${tempSenha}*\n\nEntre com essa senha e troque no seu perfil depois. 🔐`

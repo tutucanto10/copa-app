@@ -15,6 +15,7 @@ export default function Login() {
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
   const [telefoneEsqueci, setTelefoneEsqueci] = useState('')
+  const [nomeEsqueci, setNomeEsqueci] = useState('')
   const [esqueciSucesso, setEsqueciSucesso] = useState(false)
 
   // Estado para criação de senha obrigatória (usuários sem senha)
@@ -39,7 +40,7 @@ export default function Login() {
     setErro('')
     setCarregando(true)
     try {
-      await api.post('/auth/esqueci-senha', { telefone: telefoneEsqueci.trim() })
+      await api.post('/auth/esqueci-senha', { nome: nomeEsqueci.trim(), telefone: telefoneEsqueci.trim() })
       setEsqueciSucesso(true)
     } catch (err) {
       setErro(err.response?.data?.error || 'Erro ao enviar senha')
@@ -216,7 +217,24 @@ export default function Login() {
             <form onSubmit={handleEsqueci} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
-                  Número de WhatsApp
+                  Seu nome (como cadastrado)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: João Silva"
+                  value={nomeEsqueci}
+                  onChange={(e) => setNomeEsqueci(e.target.value)}
+                  style={{
+                    width: '100%', background: '#0a0e1a', border: '1px solid #1e2d45',
+                    borderRadius: 8, color: '#f0f4ff', padding: '0.75rem 1rem',
+                    fontSize: '1rem', outline: 'none', boxSizing: 'border-box',
+                  }}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
+                  Número de WhatsApp cadastrado
                 </label>
                 <input
                   type="tel"
