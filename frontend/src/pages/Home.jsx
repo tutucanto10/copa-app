@@ -419,6 +419,160 @@ function CardCampeao({ usuarioId }) {
   )
 }
 
+function CardMvp() {
+  const [mvps, setMvps] = useState([])
+
+  useEffect(() => {
+    api.get('/mvp').then((r) => setMvps(r.data)).catch(() => {})
+  }, [])
+
+  if (mvps.length === 0) return null
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #1a1200, #0d1321)',
+      border: '1px solid #f5d000',
+      borderRadius: 16, padding: '1.25rem',
+      marginBottom: '1.75rem',
+    }}>
+      <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.1rem', letterSpacing: 2, color: '#f5d000', marginBottom: '1rem' }}>
+        🏅 MVP DAS RODADAS
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+        {mvps.map(({ rodada, mvp, completa }) => {
+          const iniciais = mvp.usuario.nome.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+          return (
+            <div key={rodada} style={{
+              background: '#0a0e1a',
+              border: `1px solid ${completa ? '#f5d00044' : '#1e2d45'}`,
+              borderRadius: 10, padding: '0.65rem 1rem',
+              display: 'flex', alignItems: 'center', gap: '0.75rem',
+            }}>
+              <span style={{ fontSize: '0.7rem', color: '#8b9bb4', fontWeight: 700, minWidth: 64 }}>
+                RODADA {rodada}{!completa && ' ⏳'}
+              </span>
+              {mvp.usuario.foto_url ? (
+                <img src={mvp.usuario.foto_url} alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+              ) : (
+                <div style={{
+                  width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                  background: '#1a1200', border: '2px solid #f5d000',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '0.7rem', fontWeight: 700, color: '#f5d000',
+                }}>{iniciais}</div>
+              )}
+              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f0f4ff', flex: 1 }}>
+                {mvp.usuario.nome}
+              </span>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.2rem', color: '#f5d000', lineHeight: 1 }}>
+                  {mvp.pontos}pts
+                </div>
+                {mvp.exatos > 0 && (
+                  <div style={{ fontSize: '0.65rem', color: '#8b9bb4', marginTop: 1 }}>
+                    {mvp.exatos} exato{mvp.exatos > 1 ? 's' : ''}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function CardRegras() {
+  const [aberto, setAberto] = useState(false)
+
+  return (
+    <div style={{
+      background: 'var(--color-background-secondary)',
+      border: '0.5px solid var(--color-border-tertiary)',
+      borderRadius: 12, marginTop: '2rem', overflow: 'hidden',
+    }}>
+      <button
+        onClick={() => setAberto(!aberto)}
+        style={{
+          width: '100%', background: 'none', border: 'none',
+          padding: '1rem 1.25rem', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}
+      >
+        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: 1 }}>
+          📋 REGRAS DO BOLÃO
+        </span>
+        <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>{aberto ? '▲' : '▼'}</span>
+      </button>
+
+      {aberto && (
+        <div style={{ padding: '0 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {/* Pontuação */}
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.6rem' }}>
+              Pontuação
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {[
+                { icone: '🎯', label: 'Placar exato', desc: 'Acertou o placar certinho', pts: '+3 pts', cor: '#00a651' },
+                { icone: '✅', label: 'Vencedor certo', desc: 'Acertou quem ganhou (placar errado)', pts: '+1 pt', cor: '#3b82f6' },
+                { icone: '❌', label: 'Errou', desc: 'Não acertou nada', pts: '0 pts', cor: '#e8192c' },
+              ].map((r) => (
+                <div key={r.label} style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  background: '#0a0e1a', borderRadius: 8, padding: '0.6rem 0.85rem',
+                }}>
+                  <span style={{ fontSize: '1.1rem' }}>{r.icone}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>{r.label}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#8b9bb4' }}>{r.desc}</div>
+                  </div>
+                  <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1rem', color: r.cor, fontWeight: 700 }}>{r.pts}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tipos de aposta */}
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.6rem' }}>
+              Tipos de Aposta
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {[
+                { icone: '🏆', label: 'Quem vence?', desc: 'Escolha o time vencedor ou empate — vale +1pt se acertar com placar errado' },
+                { icone: '🎯', label: 'Placar exato', desc: 'Aposte no placar — vale +3pts se acertar exatamente' },
+                { icone: '⚽', label: 'Goleadores', desc: 'Escolha os jogadores que vão marcar gol na partida' },
+                { icone: '🏅', label: 'Palpite do campeão', desc: 'Aposte em qual seleção vai vencer a Copa 2026' },
+              ].map((t) => (
+                <div key={t.label} style={{
+                  display: 'flex', alignItems: 'flex-start', gap: '0.75rem',
+                  background: '#0a0e1a', borderRadius: 8, padding: '0.6rem 0.85rem',
+                }}>
+                  <span style={{ fontSize: '1.1rem', marginTop: 1 }}>{t.icone}</span>
+                  <div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>{t.label}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#8b9bb4', marginTop: 2 }}>{t.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Quando apostas fecham */}
+          <div style={{
+            background: '#1f0a0a', border: '1px solid #e8192c44',
+            borderRadius: 8, padding: '0.75rem 1rem',
+            fontSize: '0.8rem', color: '#8b9bb4',
+          }}>
+            🔒 <strong style={{ color: '#f0f4ff' }}>Apostas fecham</strong> quando a partida entra em <strong style={{ color: '#00a651' }}>AO VIVO</strong>. Após isso não é possível apostar ou alterar.
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Home() {
   const { usuario } = useAuth()
   const [rodadaAtiva, setRodadaAtiva] = useState(1) // Rodada da Copa: 1, 2 ou 3
@@ -480,6 +634,7 @@ export default function Home() {
       `}</style>
 
       <CardCampeao usuarioId={usuario?.id} />
+      <CardMvp />
 
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{
@@ -621,6 +776,8 @@ export default function Home() {
           </div>
         ))
       })()}
+
+      <CardRegras />
     </div>
   )
 }

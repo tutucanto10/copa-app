@@ -15,6 +15,7 @@ const perfilRoutes    = require('./src/routes/perfilRoutes');
 const copaRoutes          = require('./src/routes/copaRoutes');
 const comparativoRoutes   = require('./src/routes/comparativoRoutes');
 const campeaoRoutes       = require('./src/routes/campeaoRoutes');
+const mvpRoutes           = require('./src/routes/mvpRoutes');
 
 const { verificarAdmin, loginAdmin } = require('./middleware/adminAuth');
 const pushRoutes = require('./src/routes/pushRoutes');
@@ -45,6 +46,7 @@ app.use('/aposta-goleador', goleadorRoutes);
 app.use('/ligas',           ligaRoutes);
 app.use('/duelo',           comparativoRoutes);
 app.use('/campeao',         campeaoRoutes);
+app.use('/mvp',             mvpRoutes);
 app.use('/push',            pushRoutes);
 
 // Partidas e Copa: públicos para visualização

@@ -112,4 +112,34 @@ async function notificarResultadoPartida(partida) {
   )
 }
 
-module.exports = { salvarSubscription, notificarTodos, notificarUsuario, notificarResultadoPartida };
+async function notificarMvpRodada(rodada, mvp) {
+  if (!vapidConfigurado) return
+  // Notificação especial para o MVP
+  await notificarUsuario(
+    mvp.usuario.id,
+    `🏆 Você é o MVP da Rodada ${rodada}!`,
+    `${mvp.pontos} pts nessa rodada. Incrível!`,
+    '/'
+  )
+  // Notificação geral para todos os outros
+  const subsOutros = await prisma.pushSubscription.findMany({
+    where: { usuarioId: { not: mvp.usuario.id } },
+  })
+  const payload = JSON.stringify({
+    titulo: `🏅 MVP da Rodada ${rodada}`,
+    corpo: `${mvp.usuario.nome} dominou com ${mvp.pontos} pts!`,
+    url: '/',
+  })
+  await Promise.allSettled(
+    subsOutros.map((s) =>
+      webpush.sendNotification(
+        { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+        payload
+      ).catch(async (err) => {
+        if (err.statusCode === 410) await prisma.pushSubscription.delete({ where: { endpoint: s.endpoint } })
+      })
+    )
+  )
+}
+
+module.exports = { salvarSubscription, notificarTodos, notificarUsuario, notificarResultadoPartida, notificarMvpRodada };

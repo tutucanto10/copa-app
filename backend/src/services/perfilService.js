@@ -10,6 +10,7 @@ const BADGES = [
   { id: 'analista',  emoji: '🧠', nome: 'Analista',   desc: '10+ vencedores certos',           check: (s) => s.vencedoresAcertados >= 10 },
   { id: 'scout',     emoji: '🦅', nome: 'Scout',      desc: '3+ goleadores acertados',         check: (s) => s.goleadoresAcertados >= 3 },
   { id: 'dedicado',  emoji: '💪', nome: 'Dedicado',   desc: 'Apostou em 50+ partidas',         check: (s) => s.totalApostas >= 50 },
+  { id: 'sequencia', emoji: '🔥', nome: 'Em Chama',   desc: 'Sequência de 5+ apostas seguidas',check: (s) => s.streak >= 5 },
 ]
 
 function calcularBadges(stats) {
@@ -50,6 +51,18 @@ async function buscarPerfil(usuarioId) {
 
   const { pontos, placaresExatos, vencedoresAcertados } = calcularPontos(usuario.apostas);
 
+  const todasReveladas = await prisma.partida.findMany({
+    where: { status: { in: ['FINALIZADA', 'AO_VIVO'] } },
+    orderBy: { data: 'desc' },
+    select: { id: true },
+  });
+  const apostasSet = new Set(usuario.apostas.map((a) => a.partidaId));
+  let streak = 0;
+  for (const p of todasReveladas) {
+    if (apostasSet.has(p.id)) streak++;
+    else break;
+  }
+
   // Busca gols só das partidas que o usuário apostou em goleador
   let goleadoresAcertados = 0;
   const apostasGolFinalizadas = usuario.apostasGoleador.filter(
@@ -81,7 +94,7 @@ async function buscarPerfil(usuarioId) {
     })
   );
 
-  const stats = { placaresExatos, vencedoresAcertados, goleadoresAcertados, totalApostas: usuario.apostas.length }
+  const stats = { placaresExatos, vencedoresAcertados, goleadoresAcertados, totalApostas: usuario.apostas.length, streak }
   const badges = calcularBadges(stats)
 
   return {
@@ -94,6 +107,7 @@ async function buscarPerfil(usuarioId) {
     placaresExatos,
     vencedoresAcertados,
     goleadoresAcertados,
+    streak,
     badges,
     ligas: ligasComPosicao,
   };

@@ -7,7 +7,8 @@ const {
   listarSelecoes,
   atualizarSelecao,
 } = require('../services/partidaService');
-const { notificarResultadoPartida } = require('../services/pushService');
+const { notificarResultadoPartida, notificarMvpRodada } = require('../services/pushService');
+const { mvpRodadaSingle } = require('../services/mvpService');
 
 async function index(req, res) {
   try {
@@ -46,6 +47,15 @@ async function update(req, res) {
       notificarResultadoPartida(partida).catch((err) =>
         console.error('Erro ao notificar resultado:', err.message)
       );
+      // Notifica MVP se essa foi a última partida da rodada
+      const rodada = partida.rodada;
+      if (rodada) {
+        mvpRodadaSingle(rodada).then((mvpData) => {
+          if (mvpData.completa && mvpData.mvp) {
+            return notificarMvpRodada(rodada, mvpData.mvp);
+          }
+        }).catch((err) => console.error('Erro ao notificar MVP:', err.message));
+      }
     }
     res.json(partida);
   } catch (err) {

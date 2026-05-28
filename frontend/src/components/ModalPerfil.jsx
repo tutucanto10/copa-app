@@ -186,6 +186,7 @@ export default function ModalPerfil({ onClose }) {
                   { label: 'PLACARES EXATOS', valor: perfil.placaresExatos, cor: '#f5d000' },
                   { label: 'VENCEDORES', valor: perfil.vencedoresAcertados, cor: '#3b82f6' },
                   { label: 'GOLEADORES', valor: perfil.goleadoresAcertados, cor: '#8b9bb4' },
+                  { label: 'SEQUÊNCIA 🔥', valor: perfil.streak ?? 0, cor: '#f97316' },
                 ].map((s) => (
                   <div key={s.label} style={{
                     flex: 1, minWidth: 80,
