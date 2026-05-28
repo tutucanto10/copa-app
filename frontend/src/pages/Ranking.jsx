@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import { useAuth } from '../context/AuthContext'
@@ -39,6 +39,12 @@ export default function Ranking() {
   const { usuario } = useAuth()
   const navigate = useNavigate()
   const [ligas, setLigas] = useState([])
+  const [buscaAberta, setBuscaAberta] = useState(false)
+  const [query, setQuery] = useState('')
+  const [resultados, setResultados] = useState([])
+  const [buscando, setBuscando] = useState(false)
+  const buscaRef = useRef(null)
+  const debounceRef = useRef(null)
   const [ligaAtiva, setLigaAtiva] = useState(null)
   const [rankingBolao, setRankingBolao] = useState([])
   const [loading, setLoading] = useState(true)
@@ -70,6 +76,31 @@ export default function Ranking() {
       .catch(() => setErro('Erro ao carregar ranking. Tente novamente.'))
       .finally(() => setLoading(false))
   }, [ligaAtiva])
+
+  useEffect(() => {
+    clearTimeout(debounceRef.current)
+    if (query.length < 2) { setResultados([]); return }
+    setBuscando(true)
+    debounceRef.current = setTimeout(() => {
+      api.get(`/perfil/buscar?q=${encodeURIComponent(query)}`)
+        .then((r) => setResultados(r.data.filter((u) => u.id !== usuario?.id)))
+        .catch(() => setResultados([]))
+        .finally(() => setBuscando(false))
+    }, 300)
+    return () => clearTimeout(debounceRef.current)
+  }, [query])
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (buscaRef.current && !buscaRef.current.contains(e.target)) {
+        setBuscaAberta(false)
+        setQuery('')
+        setResultados([])
+      }
+    }
+    if (buscaAberta) document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [buscaAberta])
 
   function CardRanking({ user, index }) {
     return (
@@ -133,10 +164,87 @@ export default function Ranking() {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '2rem 1rem' }}>
-      <h1 style={{
-        fontFamily: 'var(--fonte-display)', fontSize: '2.5rem',
-        letterSpacing: '3px', marginBottom: '1.5rem', color: '#f0f4ff',
-      }}>RANKING</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        <h1 style={{
+          fontFamily: 'var(--fonte-display)', fontSize: '2.5rem',
+          letterSpacing: '3px', margin: 0, color: '#f0f4ff',
+        }}>RANKING</h1>
+
+        {/* Busca por usuário */}
+        <div ref={buscaRef} style={{ position: 'relative' }}>
+          {!buscaAberta ? (
+            <button
+              onClick={() => setBuscaAberta(true)}
+              title="Buscar jogador para comparar"
+              style={{
+                background: '#111827', border: '1px solid #1e2d45',
+                borderRadius: 10, width: 40, height: 40,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', fontSize: '1.1rem', color: '#8b9bb4',
+              }}
+            >🔍</button>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ position: 'relative' }}>
+                <input
+                  autoFocus
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar jogador..."
+                  style={{
+                    background: '#111827', border: '1px solid #00a651',
+                    borderRadius: 10, padding: '0.5rem 0.75rem',
+                    color: '#f0f4ff', fontSize: '0.9rem', outline: 'none',
+                    width: 200,
+                  }}
+                />
+                {/* Dropdown resultados */}
+                {(resultados.length > 0 || buscando) && (
+                  <div style={{
+                    position: 'absolute', top: '110%', left: 0, right: 0,
+                    background: '#111827', border: '1px solid #1e2d45',
+                    borderRadius: 10, zIndex: 50, overflow: 'hidden',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+                  }}>
+                    {buscando ? (
+                      <div style={{ padding: '0.75rem 1rem', color: '#8b9bb4', fontSize: '0.85rem' }}>Buscando...</div>
+                    ) : resultados.map((u) => (
+                      <button
+                        key={u.id}
+                        onClick={() => {
+                          navigate(`/comparativo/${usuario.id}/${u.id}`)
+                          setBuscaAberta(false)
+                          setQuery('')
+                          setResultados([])
+                        }}
+                        style={{
+                          width: '100%', background: 'none',
+                          border: 'none', borderBottom: '1px solid #1e2d45',
+                          padding: '0.75rem 1rem', textAlign: 'left',
+                          color: '#f0f4ff', fontSize: '0.9rem', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', gap: '0.5rem',
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#0a1a10'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                      >
+                        <span style={{ fontSize: '0.75rem', color: '#00a651' }}>⚖️</span>
+                        {u.nome}
+                      </button>
+                    ))}
+                    {!buscando && resultados.length === 0 && query.length >= 2 && (
+                      <div style={{ padding: '0.75rem 1rem', color: '#8b9bb4', fontSize: '0.85rem' }}>Nenhum jogador encontrado</div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => { setBuscaAberta(false); setQuery(''); setResultados([]) }}
+                style={{ background: 'none', border: 'none', color: '#8b9bb4', fontSize: '1.1rem', cursor: 'pointer' }}
+              >✕</button>
+            </div>
+          )}
+        </div>
+      </div>
 
       <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: 12 }}>
         <div style={{ padding: '1.5rem' }}>

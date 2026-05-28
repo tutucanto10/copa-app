@@ -41,4 +41,19 @@ async function foto(req, res) {
   }
 }
 
-module.exports = { show, apostas, update, foto };
+async function buscar(req, res) {
+  const q = (req.query.q || '').trim()
+  if (q.length < 2) return res.json([])
+  try {
+    const usuarios = await prisma.usuario.findMany({
+      where: { nome: { contains: q, mode: 'insensitive' } },
+      select: { id: true, nome: true },
+      take: 8,
+    })
+    res.json(usuarios)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
+
+module.exports = { show, apostas, update, foto, buscar };
