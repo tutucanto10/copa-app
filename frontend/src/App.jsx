@@ -209,6 +209,59 @@ function RotaAdmin({ children }) {
   return children
 }
 
+function BannerInstalar() {
+  const [prompt, setPrompt] = useState(null)
+  const [visivel, setVisivel] = useState(false)
+
+  useEffect(() => {
+    function handler(e) {
+      e.preventDefault()
+      setPrompt(e)
+      setVisivel(true)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  if (!visivel) return null
+
+  async function instalar() {
+    if (!prompt) return
+    prompt.prompt()
+    const { outcome } = await prompt.userChoice
+    if (outcome === 'accepted') setVisivel(false)
+  }
+
+  return (
+    <div style={{
+      position: 'fixed', bottom: 72, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 500, width: 'calc(100% - 2rem)', maxWidth: 400,
+      background: '#111827', border: '1px solid #00a651',
+      borderRadius: 14, padding: '0.9rem 1.1rem',
+      display: 'flex', alignItems: 'center', gap: '0.75rem',
+      boxShadow: '0 4px 24px #00a65133',
+    }}>
+      <img src="/icon-192.png" alt="" style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0 }} />
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f0f4ff' }}>Instalar o Bolão</div>
+        <div style={{ fontSize: '0.72rem', color: '#8b9bb4' }}>Adicione à tela inicial para acesso rápido</div>
+      </div>
+      <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>
+        <button onClick={instalar} style={{
+          background: '#00a651', color: '#fff', border: 'none',
+          borderRadius: 8, padding: '0.45rem 0.85rem',
+          fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer',
+        }}>Instalar</button>
+        <button onClick={() => setVisivel(false)} style={{
+          background: 'none', border: '1px solid #1e2d45',
+          borderRadius: 8, color: '#8b9bb4', padding: '0.45rem 0.6rem',
+          fontSize: '0.8rem', cursor: 'pointer',
+        }}>✕</button>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -218,6 +271,7 @@ export default function App() {
         <Route path="/*" element={
           <RotaProtegida>
             <Nav />
+            <BannerInstalar />
             <div className="main-content">
               <Routes>
                 <Route path="/" element={<Home />} />
