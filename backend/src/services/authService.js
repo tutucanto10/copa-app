@@ -1,31 +1,41 @@
 const prisma = require('../config/prisma');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const { uploadFoto } = require('../config/supabase');
 
 const SECRET = process.env.JWT_SECRET;
 
-async function login(nome) {
-  let usuario = await prisma.usuario.findUnique({ where: { nome } });
-
-  if (!usuario) {
-    throw new Error('Usuário não encontrado. Faça o cadastro primeiro.');
-  }
-
-  const token = jwt.sign(
+function gerarToken(usuario) {
+  return jwt.sign(
     { id: usuario.id, nome: usuario.nome, isAdmin: usuario.isAdmin },
     SECRET,
     { expiresIn: '7d' }
   );
-
-  return { token, usuario };
 }
 
-async function cadastro({ nome, foto_url }) {
+async function login(nome, senha) {
+  const usuario = await prisma.usuario.findUnique({ where: { nome } });
+  if (!usuario) throw new Error('Usuário não encontrado. Verifique o nome.');
+
+  if (usuario.senha) {
+    if (!senha) throw new Error('Digite sua senha.');
+    const ok = await bcrypt.compare(senha, usuario.senha);
+    if (!ok) throw new Error('Senha incorreta.');
+  }
+
+  const token = gerarToken(usuario);
+  return { token, usuario, precisaCriarSenha: !usuario.senha };
+}
+
+async function cadastro({ nome, foto_url, senha }) {
   const existe = await prisma.usuario.findUnique({ where: { nome } });
   if (existe) throw new Error('Esse nome já está em uso. Escolha outro.');
 
+  if (!senha) throw new Error('Senha obrigatória.');
+  const hash = await bcrypt.hash(senha, 10);
+
   const usuario = await prisma.usuario.create({
-    data: { nome, foto_url: null },
+    data: { nome, senha: hash, foto_url: null },
   });
 
   if (foto_url && foto_url.startsWith('data:')) {
@@ -34,13 +44,16 @@ async function cadastro({ nome, foto_url }) {
     usuario.foto_url = url;
   }
 
-  const token = jwt.sign(
-    { id: usuario.id, nome: usuario.nome, isAdmin: usuario.isAdmin },
-    SECRET,
-    { expiresIn: '7d' }
-  );
+  const token = gerarToken(usuario);
+  return { token, usuario, precisaCriarSenha: false };
+}
 
-  return { token, usuario };
+async function definirSenha(usuarioId, senha) {
+  const hash = await bcrypt.hash(senha, 10);
+  await prisma.usuario.update({
+    where: { id: Number(usuarioId) },
+    data: { senha: hash },
+  });
 }
 
 async function verificarToken(token) {
@@ -51,4 +64,4 @@ async function verificarToken(token) {
   }
 }
 
-module.exports = { login, cadastro, verificarToken };
+module.exports = { login, cadastro, definirSenha, verificarToken };

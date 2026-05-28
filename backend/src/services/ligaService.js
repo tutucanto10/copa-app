@@ -19,8 +19,8 @@ async function listarLigas() {
   });
 }
 
-async function criarLiga(nome) {
-  return prisma.liga.create({ data: { nome } });
+async function criarLiga(nome, logo_url) {
+  return prisma.liga.create({ data: { nome, logo_url: logo_url || null } });
 }
 
 async function adicionarMembro({ usuarioId, ligaId }) {

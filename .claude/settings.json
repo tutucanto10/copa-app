@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(git commit -m ' *)",
-      "Bash(node -e \"const wp = require\\('web-push'\\); const keys = wp.generateVAPIDKeys\\(\\); console.log\\(JSON.stringify\\(keys\\)\\)\")"
+      "Bash(node -e \"const wp = require\\('web-push'\\); const keys = wp.generateVAPIDKeys\\(\\); console.log\\(JSON.stringify\\(keys\\)\\)\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\copa-app\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(node scripts/limparEReimportarCopa.js)",
+      "Bash(node scripts/migrarFotos.js)"
     ]
   }
 }

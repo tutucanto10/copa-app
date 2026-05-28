@@ -18,25 +18,25 @@ export function AuthProvider({ children }) {
     setCarregando(false)
   }, [])
 
-  async function login(nome) {
-    const res = await api.post('/auth/login', { nome })
-    const { token, usuario } = res.data
+  function completarLogin(token, usuario) {
     localStorage.setItem('token', token)
     localStorage.setItem('usuario', JSON.stringify(usuario))
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`
     setUsuario(usuario)
     subscribePush(usuario.id)
-    return usuario
   }
 
-  async function cadastro(nome, foto_url) {
-    const res = await api.post('/auth/cadastro', { nome, foto_url })
+  async function login(nome, senha) {
+    const res = await api.post('/auth/login', { nome, senha })
+    const { token, usuario, precisaCriarSenha } = res.data
+    if (!precisaCriarSenha) completarLogin(token, usuario)
+    return { usuario, token, precisaCriarSenha }
+  }
+
+  async function cadastro(nome, foto_url, senha) {
+    const res = await api.post('/auth/cadastro', { nome, foto_url, senha })
     const { token, usuario } = res.data
-    localStorage.setItem('token', token)
-    localStorage.setItem('usuario', JSON.stringify(usuario))
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-    setUsuario(usuario)
-    subscribePush(usuario.id)
+    completarLogin(token, usuario)
     return usuario
   }
 
@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ usuario, login, cadastro, logout, atualizarUsuario, carregando }}>
+    <AuthContext.Provider value={{ usuario, login, cadastro, completarLogin, logout, atualizarUsuario, carregando }}>
       {children}
     </AuthContext.Provider>
   )

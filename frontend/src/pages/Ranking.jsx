@@ -262,9 +262,15 @@ export default function Ranking() {
                       background: ligaAtiva === l.id ? '#00a651' : '#0a0e1a',
                       border: `1px solid ${ligaAtiva === l.id ? '#00a651' : '#1e2d45'}`,
                       borderRadius: 8, color: ligaAtiva === l.id ? '#fff' : '#8b9bb4',
-                      padding: '0.5rem 1.25rem', fontWeight: 700,
+                      padding: '0.4rem 1rem', fontWeight: 700,
                       fontSize: '0.85rem', cursor: 'pointer',
-                    }}>{l.nome}</button>
+                      display: 'flex', alignItems: 'center', gap: '0.4rem',
+                    }}>
+                      {l.logo_url && (
+                        <img src={l.logo_url} alt="" style={{ height: 18, objectFit: 'contain', display: 'block' }} />
+                      )}
+                      {l.nome}
+                    </button>
                   ))}
                 </div>
               )}
