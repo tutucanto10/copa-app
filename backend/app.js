@@ -43,7 +43,7 @@ app.use('/aposta',          apostasRoutes);
 app.use('/apostas',         apostasRoutes);
 app.use('/aposta-goleador', goleadorRoutes);
 app.use('/ligas',           ligaRoutes);
-app.use('/comparativo',     comparativoRoutes);
+app.use('/duelo',           comparativoRoutes);
 app.use('/campeao',         campeaoRoutes);
 app.use('/push',            pushRoutes);
 

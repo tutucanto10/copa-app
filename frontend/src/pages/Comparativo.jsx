@@ -116,7 +116,7 @@ export default function Comparativo() {
 
   useEffect(() => {
     setLoading(true)
-    api.get(`/comparativo/${id1}/${id2}`)
+    api.get(`/duelo/${id1}/${id2}`)
       .then((r) => setDados(r.data))
       .catch(() => navigate('/ranking'))
       .finally(() => setLoading(false))
@@ -319,27 +319,28 @@ export default function Comparativo() {
                 padding: '0.75rem 0.75rem',
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
-                gap: '0.2rem', minWidth: 130,
+                gap: '0.3rem', minWidth: 130,
                 opacity: pendente ? 0.75 : 1,
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                {/* Times lado a lado */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'nowrap' }}>
                   {p.selecaoCasa.escudo_url && (
-                    <img src={p.selecaoCasa.escudo_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />
+                    <img src={p.selecaoCasa.escudo_url} alt="" style={{ width: 16, height: 16, objectFit: 'contain', flexShrink: 0 }} />
                   )}
-                  <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '0.75rem', color: '#f0f4ff', letterSpacing: 0.5 }}>
+                  <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '0.7rem', color: '#f0f4ff', letterSpacing: 0.5 }}>
                     {p.selecaoCasa.nome.substring(0, 3).toUpperCase()}
                   </span>
-                </div>
-                <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '0.85rem', color: pendente ? '#8b9bb4' : '#f5d000', letterSpacing: 1 }}>
-                  {pendente ? '⏳' : `${p.placarCasa} × ${p.placarFora}`}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  {p.selecaoFora.escudo_url && (
-                    <img src={p.selecaoFora.escudo_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />
-                  )}
-                  <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '0.75rem', color: '#f0f4ff', letterSpacing: 0.5 }}>
+                  <span style={{ fontSize: '0.65rem', color: '#8b9bb4' }}>×</span>
+                  <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '0.7rem', color: '#f0f4ff', letterSpacing: 0.5 }}>
                     {p.selecaoFora.nome.substring(0, 3).toUpperCase()}
                   </span>
+                  {p.selecaoFora.escudo_url && (
+                    <img src={p.selecaoFora.escudo_url} alt="" style={{ width: 16, height: 16, objectFit: 'contain', flexShrink: 0 }} />
+                  )}
+                </div>
+                {/* Placar ou pendente */}
+                <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '0.85rem', color: pendente ? '#8b9bb4' : '#f5d000', letterSpacing: 1 }}>
+                  {pendente ? '⏳' : `${p.placarCasa} × ${p.placarFora}`}
                 </div>
               </div>
 
