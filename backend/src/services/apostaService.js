@@ -75,7 +75,10 @@ async function buscarApostaUsuario({ usuarioId, partidaId }) {
 async function listarApostas(partidaId) {
   return prisma.aposta.findMany({
     where: { partidaId: Number(partidaId) },
-    include: { usuario: true },
+    include: {
+      usuario: { select: { id: true, nome: true, foto_url: true } },
+    },
+    orderBy: { id: 'asc' },
   });
 }
 

@@ -104,6 +104,28 @@ export default function ModalPerfilPublico({ usuarioId, onClose }) {
               ))}
             </div>
 
+            {/* Conquistas / Badges */}
+            {perfil.badges?.length > 0 && (
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 700 }}>
+                  🏅 Conquistas
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {perfil.badges.map((b) => (
+                    <div key={b.id} title={b.desc} style={{
+                      background: '#0a0e1a', border: '1px solid #1e2d45',
+                      borderRadius: 20, padding: '0.4rem 0.85rem',
+                      display: 'flex', alignItems: 'center', gap: '0.4rem',
+                      cursor: 'default',
+                    }}>
+                      <span style={{ fontSize: '1rem' }}>{b.emoji}</span>
+                      <span style={{ fontSize: '0.75rem', color: '#f0f4ff', fontWeight: 600 }}>{b.nome}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Histórico de apostas */}
             <div>
               <div style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 700 }}>

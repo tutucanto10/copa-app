@@ -237,6 +237,189 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
   )
 }
 
+function CardCampeao({ usuarioId }) {
+  const [minha, setMinha]           = useState(undefined) // undefined=carregando, null=sem aposta
+  const [todas, setTodas]           = useState([])
+  const [selecoes, setSelecoes]     = useState([])
+  const [selecionando, setSelecionando] = useState(false)
+  const [escolha, setEscolha]       = useState(null)
+  const [salvando, setSalvando]     = useState(false)
+  const [verTodas, setVerTodas]     = useState(false)
+  const [busca, setBusca]           = useState('')
+
+  useEffect(() => {
+    if (!usuarioId) return
+    Promise.all([
+      api.get(`/campeao/${usuarioId}`),
+      api.get('/campeao/todas'),
+      api.get('/partidas/selecoes'),
+    ]).then(([rMinha, rTodas, rSel]) => {
+      setMinha(rMinha.data)
+      setTodas(rTodas.data)
+      setSelecoes(rSel.data)
+    }).catch(() => setMinha(null))
+  }, [usuarioId])
+
+  async function confirmar() {
+    if (!escolha) return
+    setSalvando(true)
+    try {
+      const r = await api.post('/campeao', { usuarioId, selecaoId: escolha.id })
+      setMinha(r.data)
+      setTodas((prev) => {
+        const sem = prev.filter((a) => a.usuario.id !== usuarioId)
+        return [...sem, { usuario: { id: usuarioId }, selecao: r.data.selecao }]
+      })
+      setSelecionando(false)
+      setEscolha(null)
+    } catch (err) {
+      alert('Erro: ' + err.message)
+    } finally {
+      setSalvando(false)
+    }
+  }
+
+  const selecoesFiltradas = selecoes.filter((s) =>
+    s.nome.toLowerCase().includes(busca.toLowerCase())
+  )
+
+  // Agrupa apostas por seleção para mostrar contagem
+  const contagemPorSelecao = todas.reduce((acc, a) => {
+    const id = a.selecao.id
+    if (!acc[id]) acc[id] = { selecao: a.selecao, count: 0, nomes: [] }
+    acc[id].count++
+    acc[id].nomes.push(a.usuario.nome)
+    return acc
+  }, {})
+  const rankCampeao = Object.values(contagemPorSelecao).sort((a, b) => b.count - a.count)
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #0a1a10, #001a3d)',
+      border: '1px solid #00a651',
+      borderRadius: 16, padding: '1.25rem',
+      marginBottom: '1.75rem',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+        <div>
+          <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.1rem', letterSpacing: 2, color: '#f5d000' }}>
+            🏆 PALPITE DO CAMPEÃO
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#8b9bb4', marginTop: 2 }}>
+            {todas.length > 0 ? `${todas.length} palpite${todas.length > 1 ? 's' : ''} registrado${todas.length > 1 ? 's' : ''}` : 'Seja o primeiro a apostar!'}
+          </div>
+        </div>
+        {minha && !selecionando && (
+          <button onClick={() => setSelecionando(true)} style={{
+            background: 'none', border: '1px solid #1e2d45', borderRadius: 8,
+            color: '#8b9bb4', padding: '0.3rem 0.75rem', fontSize: '0.75rem', cursor: 'pointer',
+          }}>Alterar</button>
+        )}
+      </div>
+
+      {/* Minha aposta */}
+      {minha === undefined ? (
+        <div style={{ color: '#8b9bb4', fontSize: '0.85rem' }}>Carregando...</div>
+      ) : minha && !selecionando ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {minha.selecao.escudo_url && (
+            <img src={minha.selecao.escudo_url} alt="" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+          )}
+          <div>
+            <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.1rem', color: '#f0f4ff', letterSpacing: 1 }}>
+              {minha.selecao.nome}
+            </div>
+            <div style={{ fontSize: '0.7rem', color: '#00a651' }}>✅ Seu palpite</div>
+          </div>
+        </div>
+      ) : !selecionando ? (
+        <button onClick={() => setSelecionando(true)} style={{
+          width: '100%', background: '#00a651', color: '#fff', border: 'none',
+          borderRadius: 10, padding: '0.75rem', fontFamily: 'var(--fonte-display)',
+          fontSize: '0.95rem', letterSpacing: 1, cursor: 'pointer',
+        }}>ESCOLHER CAMPEÃO</button>
+      ) : null}
+
+      {/* Seletor de times */}
+      {selecionando && (
+        <div>
+          <input
+            autoFocus
+            placeholder="Filtrar seleção..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            style={{
+              width: '100%', boxSizing: 'border-box',
+              background: '#0a0e1a', border: '1px solid #1e2d45',
+              borderRadius: 8, padding: '0.5rem 0.75rem',
+              color: '#f0f4ff', fontSize: '0.85rem', outline: 'none',
+              marginBottom: '0.75rem',
+            }}
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', maxHeight: 260, overflowY: 'auto', marginBottom: '0.75rem' }}>
+            {selecoesFiltradas.map((s) => (
+              <button key={s.id} onClick={() => setEscolha(s)} style={{
+                background: escolha?.id === s.id ? '#0a1a10' : '#0a0e1a',
+                border: `2px solid ${escolha?.id === s.id ? '#00a651' : '#1e2d45'}`,
+                borderRadius: 10, padding: '0.5rem 0.25rem',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem',
+                cursor: 'pointer',
+              }}>
+                {s.escudo_url
+                  ? <img src={s.escudo_url} alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                  : <span style={{ fontSize: '1.2rem' }}>🏳</span>
+                }
+                <span style={{ fontSize: '0.6rem', color: '#f0f4ff', textAlign: 'center', lineHeight: 1.2 }}>
+                  {s.nome.substring(0, 9)}
+                </span>
+              </button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button onClick={confirmar} disabled={!escolha || salvando} style={{
+              flex: 1, background: escolha ? '#00a651' : '#1e2d45', color: '#fff',
+              border: 'none', borderRadius: 8, padding: '0.6rem',
+              fontWeight: 700, fontSize: '0.9rem', cursor: escolha ? 'pointer' : 'not-allowed',
+            }}>{salvando ? 'Salvando...' : 'CONFIRMAR'}</button>
+            <button onClick={() => { setSelecionando(false); setEscolha(null); setBusca('') }} style={{
+              background: 'none', border: '1px solid #1e2d45', borderRadius: 8,
+              color: '#8b9bb4', padding: '0.6rem 1rem', cursor: 'pointer',
+            }}>Cancelar</button>
+          </div>
+        </div>
+      )}
+
+      {/* Ver palpites de todos */}
+      {!selecionando && rankCampeao.length > 0 && (
+        <div style={{ marginTop: '1rem', borderTop: '1px solid #1e2d45', paddingTop: '0.75rem' }}>
+          <button onClick={() => setVerTodas(!verTodas)} style={{
+            background: 'none', border: 'none', color: '#8b9bb4',
+            fontSize: '0.78rem', cursor: 'pointer', padding: 0,
+          }}>
+            {verTodas ? '▲ Ocultar' : '▼ Ver palpites de todos'}
+          </button>
+          {verTodas && (
+            <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {rankCampeao.map(({ selecao, count, nomes }) => (
+                <div key={selecao.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  {selecao.escudo_url && <img src={selecao.escudo_url} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />}
+                  <span style={{ fontSize: '0.82rem', color: '#f0f4ff', flex: 1 }}>{selecao.nome}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#8b9bb4' }}>{nomes.join(', ')}</span>
+                  <span style={{
+                    background: '#0a1a10', border: '1px solid #00a651',
+                    borderRadius: 20, padding: '0.1rem 0.5rem',
+                    fontSize: '0.72rem', color: '#00a651', fontWeight: 700,
+                  }}>{count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Home() {
   const { usuario } = useAuth()
   const [rodadaAtiva, setRodadaAtiva] = useState(1) // Rodada da Copa: 1, 2 ou 3
@@ -296,6 +479,8 @@ export default function Home() {
           50% { opacity: 0.5; transform: scale(1.3); }
         }
       `}</style>
+
+      <CardCampeao usuarioId={usuario?.id} />
 
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{

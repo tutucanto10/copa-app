@@ -7,6 +7,7 @@ const {
   listarSelecoes,
   atualizarSelecao,
 } = require('../services/partidaService');
+const { notificarResultadoPartida } = require('../services/pushService');
 
 async function index(req, res) {
   try {
@@ -39,7 +40,13 @@ async function jogadores(req, res) {
 async function update(req, res) {
   try {
     const { status, placarCasa, placarFora } = req.body;
+    const anterior = await buscarPartida(req.params.id);
     const partida = await atualizarPartida(req.params.id, { status, placarCasa, placarFora });
+    if (status === 'FINALIZADA' && anterior?.status !== 'FINALIZADA') {
+      notificarResultadoPartida(partida).catch((err) =>
+        console.error('Erro ao notificar resultado:', err.message)
+      );
+    }
     res.json(partida);
   } catch (err) {
     res.status(500).json({ error: err.message });

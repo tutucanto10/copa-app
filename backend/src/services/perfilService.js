@@ -2,6 +2,20 @@ const prisma = require('../config/prisma');
 const { rankingPorLiga } = require('./ligaService');
 const { uploadFoto } = require('../config/supabase');
 
+const BADGES = [
+  { id: 'oraculo',   emoji: '🔮', nome: 'Oráculo',   desc: 'Primeiro placar exato acertado',  check: (s) => s.placaresExatos >= 1 },
+  { id: 'atirador',  emoji: '🎯', nome: 'Atirador',   desc: '5+ placares exatos',              check: (s) => s.placaresExatos >= 5 },
+  { id: 'lenda',     emoji: '⚡', nome: 'Lenda',      desc: '10+ placares exatos',             check: (s) => s.placaresExatos >= 10 },
+  { id: 'vidente',   emoji: '👁️', nome: 'Vidente',    desc: '3+ vencedores certos',            check: (s) => s.vencedoresAcertados >= 3 },
+  { id: 'analista',  emoji: '🧠', nome: 'Analista',   desc: '10+ vencedores certos',           check: (s) => s.vencedoresAcertados >= 10 },
+  { id: 'scout',     emoji: '🦅', nome: 'Scout',      desc: '3+ goleadores acertados',         check: (s) => s.goleadoresAcertados >= 3 },
+  { id: 'dedicado',  emoji: '💪', nome: 'Dedicado',   desc: 'Apostou em 50+ partidas',         check: (s) => s.totalApostas >= 50 },
+]
+
+function calcularBadges(stats) {
+  return BADGES.filter((b) => b.check(stats)).map(({ id, emoji, nome, desc }) => ({ id, emoji, nome, desc }))
+}
+
 function calcularPontos(apostas) {
   let pontos = 0, placaresExatos = 0, vencedoresAcertados = 0;
   for (const aposta of apostas) {
@@ -67,6 +81,9 @@ async function buscarPerfil(usuarioId) {
     })
   );
 
+  const stats = { placaresExatos, vencedoresAcertados, goleadoresAcertados, totalApostas: usuario.apostas.length }
+  const badges = calcularBadges(stats)
+
   return {
     id: usuario.id,
     nome: usuario.nome,
@@ -77,6 +94,7 @@ async function buscarPerfil(usuarioId) {
     placaresExatos,
     vencedoresAcertados,
     goleadoresAcertados,
+    badges,
     ligas: ligasComPosicao,
   };
 }

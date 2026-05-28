@@ -18,6 +18,7 @@ model Usuario {
   apostasGoleador   ApostaGoleador[]
   ligas             MembroLiga[]
   pushSubscriptions PushSubscription[]
+  apostaCampeao     ApostaCampeao?
 }
 
 model PushSubscription {
@@ -31,12 +32,13 @@ model PushSubscription {
 }
 
 model Selecao {
-  id         Int       @id @default(autoincrement())
-  nome       String
-  escudo_url String?
-  jogadores  Jogador[]
-  casas      Partida[] @relation("SelecaoCasa")
-  foras      Partida[] @relation("SelecaoFora")
+  id              Int             @id @default(autoincrement())
+  nome            String
+  escudo_url      String?
+  jogadores       Jogador[]
+  casas           Partida[]       @relation("SelecaoCasa")
+  foras           Partida[]       @relation("SelecaoFora")
+  apostasVencedor ApostaCampeao[]
 }
 
 model Jogador {
@@ -120,6 +122,14 @@ model MembroLiga {
   liga      Liga    @relation(fields: [ligaId], references: [id])
 
   @@unique([usuarioId, ligaId])
+}
+
+model ApostaCampeao {
+  id        Int     @id @default(autoincrement())
+  usuarioId Int     @unique
+  selecaoId Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  selecao   Selecao @relation(fields: [selecaoId], references: [id])
 }
 
 enum Status {

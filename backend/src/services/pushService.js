@@ -45,4 +45,71 @@ async function notificarTodos(titulo, corpo, url = '/') {
   return { enviadas, total: subs.length };
 }
 
-module.exports = { salvarSubscription, notificarTodos };
+async function notificarUsuario(usuarioId, titulo, corpo, url = '/') {
+  if (!vapidConfigurado) return
+  const subs = await prisma.pushSubscription.findMany({ where: { usuarioId: Number(usuarioId) } })
+  const payload = JSON.stringify({ titulo, corpo, url })
+  await Promise.allSettled(
+    subs.map((s) =>
+      webpush.sendNotification(
+        { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+        payload
+      ).catch(async (err) => {
+        if (err.statusCode === 410) await prisma.pushSubscription.delete({ where: { endpoint: s.endpoint } })
+      })
+    )
+  )
+}
+
+async function notificarResultadoPartida(partida) {
+  if (!vapidConfigurado) return
+  const { id, placarCasa, placarFora, selecaoCasa, selecaoFora } = partida
+  const nomes = `${selecaoCasa.nome} ${placarCasa}×${placarFora} ${selecaoFora.nome}`
+  const vencedorReal =
+    placarCasa > placarFora ? 'casa' :
+    placarFora > placarCasa ? 'fora' : 'empate'
+
+  const apostas = await prisma.aposta.findMany({
+    where: { partidaId: id },
+    select: { usuarioId: true, placarCasa: true, placarFora: true, vencedor: true },
+  })
+
+  const usuariosComAposta = new Set()
+  for (const a of apostas) {
+    usuariosComAposta.add(a.usuarioId)
+    let titulo, corpo
+    if (a.placarCasa === placarCasa && a.placarFora === placarFora) {
+      titulo = '🎯 Placar exato! +3pts'
+      corpo = nomes
+    } else if (a.vencedor && a.vencedor === vencedorReal) {
+      titulo = '✅ Vencedor certo! +1pt'
+      corpo = nomes
+    } else {
+      titulo = '❌ Errou essa'
+      corpo = nomes
+    }
+    await notificarUsuario(a.usuarioId, titulo, corpo, `/partida/${id}`)
+  }
+
+  // Notifica quem não apostou com o resultado apenas
+  const todasSubs = await prisma.pushSubscription.findMany({
+    where: { usuarioId: { notIn: [...usuariosComAposta] } },
+    select: { usuarioId: true },
+  })
+  const payload = JSON.stringify({ titulo: '⚽ Resultado final', corpo: nomes, url: `/partida/${id}` })
+  const subsRestantes = await prisma.pushSubscription.findMany({
+    where: { usuarioId: { notIn: [...usuariosComAposta] } },
+  })
+  await Promise.allSettled(
+    subsRestantes.map((s) =>
+      webpush.sendNotification(
+        { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+        payload
+      ).catch(async (err) => {
+        if (err.statusCode === 410) await prisma.pushSubscription.delete({ where: { endpoint: s.endpoint } })
+      })
+    )
+  )
+}
+
+module.exports = { salvarSubscription, notificarTodos, notificarUsuario, notificarResultadoPartida };

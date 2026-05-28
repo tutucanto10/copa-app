@@ -23,11 +23,13 @@ export default function Partida() {
   const [enviandoVencedor, setEnviandoVencedor] = useState(false)
   const [abaAtiva, setAbaAtiva] = useState('vencedor')
   const [rodadaAberta, setRodadaAberta] = useState(true)
+  const [feedApostas, setFeedApostas] = useState([])
 
   useEffect(() => {
     api.get(`/partidas/${id}`).then((r) => setPartida(r.data))
     api.get(`/eventos/${id}`).then((r) => setEventos(r.data))
     api.get(`/partidas/${id}/jogadores`).then((r) => setJogadores(r.data))
+    api.get(`/apostas/${id}`).then((r) => setFeedApostas(r.data)).catch(() => {})
 
     if (USUARIO_ID) {
       api.get(`/apostas/usuario/${USUARIO_ID}/${id}`)
@@ -497,6 +499,83 @@ export default function Partida() {
         </h2>
         <Timeline eventos={eventos} />
       </div>
+
+      {/* Feed de apostas reveladas */}
+      {!podeApostar && feedApostas.length > 0 && (
+        <div style={{
+          background: '#111827', border: '1px solid #1e2d45',
+          borderRadius: 12, padding: '1.5rem', marginTop: '1.5rem',
+        }}>
+          <h2 style={{
+            fontFamily: 'var(--fonte-display)', fontSize: '1.4rem',
+            letterSpacing: '2px', marginBottom: '1rem', color: '#f0f4ff',
+          }}>
+            👥 PALPITES DE TODOS
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {feedApostas.map((a) => {
+              const vencedorR = finalizada
+                ? partida.placarCasa > partida.placarFora ? 'casa'
+                : partida.placarFora > partida.placarCasa ? 'fora' : 'empate'
+                : null
+              const acertouP = finalizada &&
+                a.placarCasa === partida.placarCasa &&
+                a.placarFora === partida.placarFora
+              const vencedorAp = a.placarCasa > a.placarFora ? 'casa'
+                : a.placarFora > a.placarCasa ? 'fora' : 'empate'
+              const acertouV = finalizada && !acertouP && a.vencedor && a.vencedor === vencedorR
+              const errou = finalizada && !acertouP && !acertouV
+
+              const cor = finalizada
+                ? acertouP ? '#00a651' : acertouV ? '#3b82f6' : '#e8192c'
+                : '#f5a623'
+
+              const iniciais = a.usuario.nome.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+
+              return (
+                <div key={a.id} style={{
+                  background: '#0a0e1a',
+                  border: `1px solid ${finalizada ? cor + '44' : '#1e2d45'}`,
+                  borderRadius: 10, padding: '0.65rem 1rem',
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                }}>
+                  {/* Avatar */}
+                  {a.usuario.foto_url ? (
+                    <img src={a.usuario.foto_url} alt="" style={{
+                      width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
+                    }} />
+                  ) : (
+                    <div style={{
+                      width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                      background: '#0a1a10', border: '2px solid #1e2d45',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '0.7rem', fontWeight: 700, color: '#8b9bb4',
+                    }}>{iniciais}</div>
+                  )}
+
+                  {/* Nome */}
+                  <span style={{ fontSize: '0.85rem', color: '#f0f4ff', fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {a.usuario.nome}
+                  </span>
+
+                  {/* Placar apostado */}
+                  <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1rem', color: cor, whiteSpace: 'nowrap' }}>
+                    {a.placarCasa} × {a.placarFora}
+                  </span>
+
+                  {/* Badge resultado */}
+                  {finalizada && (
+                    <span style={{ fontSize: '1rem' }}>
+                      {acertouP ? '🎯' : acertouV ? '✅' : '❌'}
+                    </span>
+                  )}
+                  {!finalizada && <span style={{ fontSize: '0.8rem' }}>⏳</span>}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
