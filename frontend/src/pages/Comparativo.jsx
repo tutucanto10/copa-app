@@ -327,7 +327,7 @@ export default function Comparativo() {
                     <img src={p.selecaoCasa.escudo_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />
                   )}
                   <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '0.75rem', color: '#f0f4ff', letterSpacing: 0.5 }}>
-                    {p.selecaoCasa.nome.length > 6 ? p.selecaoCasa.nome.substring(0, 6) : p.selecaoCasa.nome}
+                    {p.selecaoCasa.nome.substring(0, 3).toUpperCase()}
                   </span>
                 </div>
                 <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '0.85rem', color: pendente ? '#8b9bb4' : '#f5d000', letterSpacing: 1 }}>
@@ -338,7 +338,7 @@ export default function Comparativo() {
                     <img src={p.selecaoFora.escudo_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />
                   )}
                   <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '0.75rem', color: '#f0f4ff', letterSpacing: 0.5 }}>
-                    {p.selecaoFora.nome.length > 6 ? p.selecaoFora.nome.substring(0, 6) : p.selecaoFora.nome}
+                    {p.selecaoFora.nome.substring(0, 3).toUpperCase()}
                   </span>
                 </div>
               </div>
