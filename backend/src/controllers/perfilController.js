@@ -21,8 +21,8 @@ async function apostas(req, res) {
 
 async function update(req, res) {
   try {
-    const { nome, foto_url } = req.body;
-    const usuario = await atualizarPerfil(req.params.usuarioId, { nome, foto_url });
+    const { nome, foto_url, email } = req.body;
+    const usuario = await atualizarPerfil(req.params.usuarioId, { nome, foto_url, email });
     res.json(usuario);
   } catch (err) {
     res.status(500).json({ error: err.message });
