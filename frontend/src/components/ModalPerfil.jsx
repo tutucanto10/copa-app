@@ -153,31 +153,7 @@ export default function ModalPerfil({ onClose }) {
                 outline: 'none', textAlign: 'center', width: '100%',
               }}
             />
-          ) : editando ? (
-            <input
-              value={telefoneEdit}
-              onChange={(e) => setTelefoneEdit(e.target.value)}
-              placeholder="seu@email.com"
-              type="email"
-              style={{
-                marginTop: '0.5rem',
-                background: '#0a0e1a', border: '1px solid #1e2d45',
-                borderRadius: 8, color: '#f0f4ff',
-                padding: '0.4rem 0.75rem', fontSize: '0.85rem',
-                outline: 'none', textAlign: 'center', width: '100%',
-              }}
-            />
-          ) : perfil?.email ? (
-            <div style={{ fontSize: '0.78rem', color: '#8b9bb4', marginTop: 4 }}>
-              ✉️ {perfil.email}
-            </div>
           ) : (
-            <div style={{ fontSize: '0.75rem', color: '#e8192c55', marginTop: 4 }}>
-              ⚠️ Sem email cadastrado
-            </div>
-          )}
-
-          {!editando && (
             <div style={{
               fontFamily: 'var(--fonte-display)', fontSize: '1.8rem',
               letterSpacing: '2px', color: '#f0f4ff', marginTop: '0.75rem',
@@ -272,6 +248,31 @@ export default function ModalPerfil({ onClose }) {
                       <span style={{ fontSize: '0.8rem', color: '#8b9bb4' }}>de {total} participantes</span>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Campo email (só no modo edição) */}
+            {editando && (
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 700 }}>
+                  ✉️ Email
+                </div>
+                <input
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={telefoneEdit}
+                  onChange={(e) => setTelefoneEdit(e.target.value)}
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    background: '#0a0e1a', border: '1px solid #1e2d45',
+                    borderRadius: 8, color: '#f0f4ff',
+                    padding: '0.65rem 1rem', fontSize: '0.9rem',
+                    outline: 'none',
+                  }}
+                />
+                <div style={{ fontSize: '0.7rem', color: '#8b9bb4', marginTop: 4 }}>
+                  Usado para recuperar sua senha caso esqueça.
                 </div>
               </div>
             )}

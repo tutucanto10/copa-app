@@ -435,7 +435,7 @@ export default function Login() {
                 <span>🔑</span>
                 <span style={{ fontSize: '0.78rem', color: '#8b9bb4', lineHeight: 1.5 }}>
                   <strong style={{ color: '#f0f4ff' }}>Primeira vez com senha?</strong>{' '}
-                  Se você já tinha conta antes desta atualização, deixe o campo senha em branco e clique em Entrar — você será redirecionado para criar uma senha nova.
+                  Se você já tinha conta antes desta atualização, entre com seu nome e <strong style={{ color: '#f0f4ff' }}>qualquer senha</strong> — você será redirecionado para criar uma nova.
                 </span>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
