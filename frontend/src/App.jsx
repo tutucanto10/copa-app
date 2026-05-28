@@ -6,6 +6,7 @@ import Partida from './pages/Partida'
 import Admin from './pages/Admin'
 import AdminLogin from './pages/AdminLogin'
 import Ranking from './pages/Ranking'
+import Comparativo from './pages/Comparativo'
 import Copa from './pages/Copa'
 import Login from './pages/Login'
 import ModalPerfil from './components/ModalPerfil'
@@ -223,6 +224,7 @@ export default function App() {
                 <Route path="/partida/:id" element={<Partida />} />
                 <Route path="/copa" element={<Copa />} />
                 <Route path="/ranking" element={<Ranking />} />
+                <Route path="/comparativo/:id1/:id2" element={<Comparativo />} />
                 <Route path="/admin" element={<RotaAdmin><Admin /></RotaAdmin>} />
               </Routes>
             </div>

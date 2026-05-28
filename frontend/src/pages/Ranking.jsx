@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import ModalPerfilPublico from '../components/ModalPerfilPublico'
@@ -36,6 +37,7 @@ function Avatar({ user, size = 44 }) {
 
 export default function Ranking() {
   const { usuario } = useAuth()
+  const navigate = useNavigate()
   const [ligas, setLigas] = useState([])
   const [ligaAtiva, setLigaAtiva] = useState(null)
   const [rankingBolao, setRankingBolao] = useState([])
@@ -105,12 +107,25 @@ export default function Ranking() {
             </span>
           </div>
         </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{
-            fontFamily: 'var(--fonte-display)', fontSize: '2.2rem',
-            color: index === 0 ? '#f5d000' : '#f0f4ff', lineHeight: 1,
-          }}>{user.pontos}</div>
-          <div style={{ fontSize: '0.65rem', color: '#8b9bb4', letterSpacing: 1, marginTop: 2 }}>PONTOS</div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              fontFamily: 'var(--fonte-display)', fontSize: '2.2rem',
+              color: index === 0 ? '#f5d000' : '#f0f4ff', lineHeight: 1,
+            }}>{user.pontos}</div>
+            <div style={{ fontSize: '0.65rem', color: '#8b9bb4', letterSpacing: 1, marginTop: 2 }}>PONTOS</div>
+          </div>
+          {user.id !== usuario?.id && (
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate(`/comparativo/${usuario.id}/${user.id}`) }}
+              title="Comparar comigo"
+              style={{
+                background: '#0a0e1a', border: '1px solid #1e2d45',
+                borderRadius: 8, color: '#8b9bb4', padding: '0.3rem 0.6rem',
+                fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap',
+              }}
+            >⚖️ vs mim</button>
+          )}
         </div>
       </div>
     )
