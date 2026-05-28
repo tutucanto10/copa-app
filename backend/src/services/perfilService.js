@@ -170,6 +170,7 @@ async function buscarApostasUsuario(usuarioId) {
         id: p.id,
         data: p.data,
         status: p.status,
+        rodada: p.rodada,
         placarCasa: p.placarCasa,
         placarFora: p.placarFora,
         selecaoCasa: { nome: p.selecaoCasa.nome, escudo_url: p.selecaoCasa.escudo_url },

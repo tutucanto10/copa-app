@@ -12,6 +12,7 @@ export default function ModalPerfilPublico({ usuarioId, onClose }) {
   const [perfil, setPerfil] = useState(null)
   const [apostas, setApostas] = useState([])
   const [loading, setLoading] = useState(true)
+  const [filtroRodada, setFiltroRodada] = useState('todas')
 
   useEffect(() => {
     Promise.all([
@@ -131,13 +132,33 @@ export default function ModalPerfilPublico({ usuarioId, onClose }) {
               <div style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 700 }}>
                 📋 Histórico de Apostas
               </div>
-              {apostas.length === 0 ? (
+
+              {/* Filtros de rodada */}
+              <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                {['todas', 1, 2, 3].map((r) => (
+                  <button key={r} onClick={() => setFiltroRodada(r)} style={{
+                    background: filtroRodada === r ? '#00a651' : '#0a0e1a',
+                    color: filtroRodada === r ? '#fff' : '#8b9bb4',
+                    border: `1px solid ${filtroRodada === r ? '#00a651' : '#1e2d45'}`,
+                    borderRadius: 20, padding: '0.3rem 0.85rem',
+                    fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
+                  }}>
+                    {r === 'todas' ? 'Todos' : `Rodada ${r}`}
+                  </button>
+                ))}
+              </div>
+
+              {(() => {
+                const lista = filtroRodada === 'todas'
+                  ? apostas
+                  : apostas.filter((a) => a.partida.rodada === filtroRodada)
+                return lista.length === 0 ? (
                 <div style={{ textAlign: 'center', color: '#8b9bb4', padding: '1.5rem' }}>
-                  Nenhuma aposta ainda.
+                  {filtroRodada === 'todas' ? 'Nenhuma aposta ainda.' : `Nenhuma aposta na rodada ${filtroRodada}.`}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                  {apostas.map((a) => {
+                  {lista.map((a) => {
                     const cfg = RESULTADO_CONFIG[a.resultado]
                     return (
                       <div key={a.id} style={{
@@ -190,7 +211,8 @@ export default function ModalPerfilPublico({ usuarioId, onClose }) {
                     )
                   })}
                 </div>
-              )}
+              )
+              })()}
             </div>
           </div>
         )}
