@@ -56,6 +56,20 @@ app.use('/push',            pushRoutes);
 app.use('/partidas',        partidaRoutes);  // Todos podem ver partidas
 app.use('/copa',            copaRoutes);     // Todos podem ver copa
 
+// Proxy de imagens — usado pelo share card para contornar CORS no html2canvas
+app.get('/proxy-image', async (req, res) => {
+  const { url } = req.query;
+  if (!url) return res.status(400).end();
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return res.status(r.status).end();
+    const buf = await r.arrayBuffer();
+    res.set('Content-Type', r.headers.get('content-type') || 'image/png');
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.send(Buffer.from(buf));
+  } catch { res.status(500).end(); }
+});
+
 // Rotas 100% protegidas (ADMIN apenas - criar/editar/deletar)
 app.use('/eventos',         verificarAdmin, eventoRoutes);
 app.use('/evento',          verificarAdmin, eventoRoutes);

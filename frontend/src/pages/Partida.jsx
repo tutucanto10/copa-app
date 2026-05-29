@@ -166,7 +166,10 @@ export default function Partida() {
   async function toDataURL(url) {
     if (!url) return null
     try {
-      const res = await fetch(url)
+      const API_URL = import.meta.env.VITE_API_URL || ''
+      const proxied = `${API_URL}/proxy-image?url=${encodeURIComponent(url)}`
+      const res = await fetch(proxied)
+      if (!res.ok) return null
       const blob = await res.blob()
       return new Promise((resolve) => {
         const reader = new FileReader()
