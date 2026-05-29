@@ -210,39 +210,60 @@ function RotaAdmin({ children }) {
 }
 
 function BannerLentidao() {
-  const [visivel, setVisivel] = useState(false)
+  const [estado, setEstado] = useState(null) // null | 'lenta' | 'refresh'
 
   useEffect(() => {
-    const onLenta = () => setVisivel(true)
-    const onOk    = () => setVisivel(false)
-    window.addEventListener('api-lenta', onLenta)
-    window.addEventListener('api-ok', onOk)
+    const onLenta   = () => setEstado('lenta')
+    const onRefresh = () => setEstado('refresh')
+    const onOk      = () => setEstado(null)
+    window.addEventListener('api-lenta',   onLenta)
+    window.addEventListener('api-refresh', onRefresh)
+    window.addEventListener('api-ok',      onOk)
     return () => {
-      window.removeEventListener('api-lenta', onLenta)
-      window.removeEventListener('api-ok', onOk)
+      window.removeEventListener('api-lenta',   onLenta)
+      window.removeEventListener('api-refresh', onRefresh)
+      window.removeEventListener('api-ok',      onOk)
     }
   }, [])
 
-  if (!visivel) return null
+  if (!estado) return null
+
+  const isRefresh = estado === 'refresh'
 
   return (
     <div style={{
       position: 'fixed', top: 68, left: '50%', transform: 'translateX(-50%)',
-      zIndex: 999, width: 'calc(100% - 2rem)', maxWidth: 420,
-      background: '#1a1200', border: '1px solid #f5a623',
+      zIndex: 999, width: 'calc(100% - 2rem)', maxWidth: 440,
+      background: isRefresh ? '#1f0a0a' : '#1a1200',
+      border: `1px solid ${isRefresh ? '#e8192c' : '#f5a623'}`,
       borderRadius: 10, padding: '0.65rem 1.1rem',
-      display: 'flex', alignItems: 'center', gap: '0.65rem',
+      display: 'flex', alignItems: 'center', gap: '0.75rem',
       boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
     }}>
-      <span style={{ fontSize: '1.2rem' }}>⏳</span>
-      <div>
-        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f5a623' }}>
-          Servidor iniciando...
+      <span style={{ fontSize: '1.3rem' }}>{isRefresh ? '😵' : '⏳'}</span>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: isRefresh ? '#e8192c' : '#f5a623' }}>
+          {isRefresh ? 'Algo deu errado...' : 'Aguenta aí, carregando...'}
         </div>
         <div style={{ fontSize: '0.75rem', color: '#8b9bb4', marginTop: 1 }}>
-          O servidor estava em repouso. Aguarde alguns instantes.
+          {isRefresh
+            ? 'Está demorando mais que o esperado.'
+            : 'O servidor pode estar saindo do modo de espera.'}
         </div>
       </div>
+      {isRefresh && (
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            background: '#e8192c', color: '#fff', border: 'none',
+            borderRadius: 8, padding: '0.4rem 0.85rem',
+            fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer',
+            whiteSpace: 'nowrap', flexShrink: 0,
+          }}
+        >
+          Recarregar
+        </button>
+      )}
     </div>
   )
 }

@@ -5,7 +5,8 @@ const api = axios.create({
 })
 
 let pendingCount = 0
-let slowTimer = null
+let timerLenta = null
+let timerRefresh = null
 
 function dispararEvento(nome) {
   window.dispatchEvent(new CustomEvent(nome))
@@ -13,10 +14,9 @@ function dispararEvento(nome) {
 
 api.interceptors.request.use((config) => {
   pendingCount++
-  if (!slowTimer) {
-    slowTimer = setTimeout(() => {
-      if (pendingCount > 0) dispararEvento('api-lenta')
-    }, 6000)
+  if (!timerLenta) {
+    timerLenta  = setTimeout(() => { if (pendingCount > 0) dispararEvento('api-lenta') }, 6000)
+    timerRefresh = setTimeout(() => { if (pendingCount > 0) dispararEvento('api-refresh') }, 20000)
   }
   return config
 })
@@ -24,8 +24,9 @@ api.interceptors.request.use((config) => {
 function onResposta() {
   pendingCount = Math.max(0, pendingCount - 1)
   if (pendingCount === 0) {
-    clearTimeout(slowTimer)
-    slowTimer = null
+    clearTimeout(timerLenta)
+    clearTimeout(timerRefresh)
+    timerLenta = timerRefresh = null
     dispararEvento('api-ok')
   }
 }
