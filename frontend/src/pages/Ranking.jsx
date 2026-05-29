@@ -71,6 +71,7 @@ export default function Ranking() {
     if (!ligaAtiva) return
     setLoading(true)
     setErro(null)
+    setRankingBolao([])
     api.get(`/ligas/${ligaAtiva}/ranking`)
       .then((r) => setRankingBolao(r.data.ranking))
       .catch(() => setErro('Erro ao carregar ranking. Tente novamente.'))

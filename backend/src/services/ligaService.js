@@ -16,6 +16,7 @@ async function listarLigas() {
         },
       },
     },
+    orderBy: { id: 'asc' },
   });
 }
 
