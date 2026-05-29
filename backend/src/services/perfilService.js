@@ -43,9 +43,19 @@ async function buscarPerfil(usuarioId) {
     prisma.usuario.findUnique({
       where: { id: Number(usuarioId) },
       include: {
-        apostas: { include: { partida: true } },
-        apostasGoleador: { include: { partida: true } },
-        ligas: { include: { liga: true } },
+        apostas: {
+          select: {
+            partidaId: true, placarCasa: true, placarFora: true, vencedor: true,
+            partida: { select: { placarCasa: true, placarFora: true, status: true } },
+          },
+        },
+        apostasGoleador: {
+          select: {
+            partidaId: true, jogadorId: true,
+            partida: { select: { status: true } },
+          },
+        },
+        ligas: { select: { ligaId: true, liga: true } },
         apostaCampeao: { include: { selecao: true } },
       },
     }),
@@ -128,7 +138,7 @@ async function buscarPerfil(usuarioId) {
 async function atualizarPerfil(usuarioId, { nome, foto_url, email }) {
   const data = {}
   if (nome) data.nome = nome
-  if (email !== undefined) data.email = email || null
+  if (email !== undefined) data.email = email ? email.trim().toLowerCase() : null
   if (foto_url !== undefined) {
     if (foto_url && foto_url.startsWith('data:')) {
       data.foto_url = await uploadFoto(Number(usuarioId), foto_url)

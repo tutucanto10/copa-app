@@ -57,8 +57,9 @@ async function definirSenha(usuarioId, senha) {
 }
 
 async function esqueceuSenha(nome, email) {
+  const emailNorm = email.trim().toLowerCase();
   const usuario = await prisma.usuario.findFirst({
-    where: { nome, email },
+    where: { nome: nome.trim(), email: { equals: emailNorm, mode: 'insensitive' } },
   });
 
   if (!usuario) throw new Error('Nome e email não coincidem. Verifique os dados.');

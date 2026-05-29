@@ -1,7 +1,7 @@
 const prisma = require('../config/prisma');
 
 const rankingCache = new Map();
-const CACHE_TTL = 2 * 60 * 1000;
+const CACHE_TTL = 5 * 60 * 1000;
 
 function limparCacheRanking() {
   rankingCache.clear();
