@@ -163,11 +163,38 @@ export default function Partida() {
     )
   }
 
+  async function toDataURL(url) {
+    if (!url) return null
+    try {
+      const res = await fetch(url)
+      const blob = await res.blob()
+      return new Promise((resolve) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = () => resolve(null)
+        reader.readAsDataURL(blob)
+      })
+    } catch { return null }
+  }
+
   async function handleCompartilhar() {
     if (!shareCardRef.current) return
     setCompartilhando(true)
     try {
+      // Converte todas as imagens do card para base64 antes do html2canvas
+      // (evita bloqueio de CORS para imagens externas — Supabase, Wikimedia etc.)
+      const imgs = shareCardRef.current.querySelectorAll('img')
+      const origSrcs = Array.from(imgs).map((img) => img.src)
+      await Promise.all(Array.from(imgs).map(async (img) => {
+        const b64 = await toDataURL(img.src)
+        if (b64) img.src = b64
+      }))
+
       const canvas = await html2canvas(shareCardRef.current, { backgroundColor: null, scale: 2 })
+
+      // Restaura os srcs originais para não sujar o DOM
+      Array.from(imgs).forEach((img, i) => { img.src = origSrcs[i] })
+
       canvas.toBlob(async (blob) => {
         if (navigator.share && navigator.canShare?.({ files: [new File([blob], 'palpite.png', { type: 'image/png' })] })) {
           await navigator.share({ files: [new File([blob], 'palpite.png', { type: 'image/png' })], title: 'Meu palpite — Bolão Copa 2026' })
