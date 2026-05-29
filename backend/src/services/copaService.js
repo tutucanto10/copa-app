@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
-const { buscarTopScorers, buscarTopAssists } = require('./apiFootballService')
+const { buscarTopScorers, buscarTopAssists, buscarStandings } = require('./apiFootballService')
  
 // Mapeamento dos grupos da Copa 2026
 const GRUPOS = {
@@ -66,8 +66,16 @@ async function buscarPartidasDoDia() {
   }
 }
  
-// Busca classificação dos grupos baseado nas partidas e placares
+// Busca classificação — usa API-Football se disponível, senão calcula da base local
 async function buscarClassificacao() {
+  if (process.env.APIFOOTBALL_KEY) {
+    try {
+      const grupos = await buscarStandings(1, 2026);
+      if (grupos && Object.keys(grupos).length > 0) return grupos;
+    } catch (e) {
+      console.warn('API-Football standings falhou, usando base local:', e.message);
+    }
+  }
   try {
     const selecoes = await prisma.selecao.findMany({
       include: {

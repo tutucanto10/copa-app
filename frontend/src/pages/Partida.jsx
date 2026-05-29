@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import Placar from '../components/Placar'
 import Timeline from '../components/Timeline'
+import confetti from 'canvas-confetti'
+import html2canvas from 'html2canvas'
 
 export default function Partida() {
   const { id } = useParams()
@@ -24,6 +26,9 @@ export default function Partida() {
   const [abaAtiva, setAbaAtiva] = useState('vencedor')
   const [rodadaAberta, setRodadaAberta] = useState(true)
   const [feedApostas, setFeedApostas] = useState([])
+  const [compartilhando, setCompartilhando] = useState(false)
+  const shareCardRef = useRef(null)
+  const confettiFired = useRef(false)
 
   useEffect(() => {
     api.get(`/partidas/${id}`).then((r) => setPartida(r.data))
@@ -58,6 +63,19 @@ export default function Partida() {
       if (rodada) setRodadaAberta(rodada.apostasAbertas)
     })
   }, [partida])
+
+  // Confetti quando acertou placar exato
+  useEffect(() => {
+    if (!partida || confettiFired.current) return
+    if (partida.status === 'FINALIZADA' && apostaFeita &&
+      apostaFeita.placarCasa === partida.placarCasa &&
+      apostaFeita.placarFora === partida.placarFora) {
+      confettiFired.current = true
+      setTimeout(() => {
+        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#00a651', '#f5d000', '#e8192c', '#fff'] })
+      }, 600)
+    }
+  }, [partida, apostaFeita])
 
   const finalizada = partida?.status === 'FINALIZADA'
   const aoVivo = partida?.status === 'AO_VIVO'
@@ -143,6 +161,28 @@ export default function Partida() {
     setGoleadoresSelecionados((prev) =>
       prev.includes(jogadorId) ? prev.filter((i) => i !== jogadorId) : [...prev, jogadorId]
     )
+  }
+
+  async function handleCompartilhar() {
+    if (!shareCardRef.current) return
+    setCompartilhando(true)
+    try {
+      const canvas = await html2canvas(shareCardRef.current, { backgroundColor: null, scale: 2 })
+      canvas.toBlob(async (blob) => {
+        if (navigator.share && navigator.canShare?.({ files: [new File([blob], 'palpite.png', { type: 'image/png' })] })) {
+          await navigator.share({ files: [new File([blob], 'palpite.png', { type: 'image/png' })], title: 'Meu palpite — Bolão Copa 2026' })
+        } else {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url; a.download = 'meu-palpite.png'; a.click()
+          URL.revokeObjectURL(url)
+        }
+      }, 'image/png')
+    } catch (err) {
+      console.error('Erro ao compartilhar:', err)
+    } finally {
+      setCompartilhando(false)
+    }
   }
 
   if (!partida) return (
@@ -264,6 +304,81 @@ export default function Partida() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Share card (invisível, usado pelo html2canvas) + botão */}
+      {finalizada && apostaFeita && (
+        <>
+          {/* Card de compartilhamento — renderizado fora da tela */}
+          <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+            <div ref={shareCardRef} style={{
+              width: 380, background: 'linear-gradient(135deg, #0a1a10, #001a3d)',
+              borderRadius: 20, padding: '2rem', fontFamily: 'sans-serif',
+              border: '1px solid #1e2d45',
+            }}>
+              {/* Header branding */}
+              <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+                <div style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 3, textTransform: 'uppercase' }}>Bolão Copa 2026</div>
+              </div>
+
+              {/* Perfil */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                {usuario?.foto_url ? (
+                  <img src={usuario.foto_url} alt="" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid #00a651' }} />
+                ) : (
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#0a1a10', border: '2px solid #00a651', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00a651', fontWeight: 700, fontSize: '1.1rem' }}>
+                    {usuario?.nome?.[0]?.toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <div style={{ color: '#f0f4ff', fontWeight: 700, fontSize: '1rem' }}>{usuario?.nome}</div>
+                  <div style={{ color: '#8b9bb4', fontSize: '0.75rem' }}>meu palpite</div>
+                </div>
+              </div>
+
+              {/* Times e placar real */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
+                  {partida.selecaoCasa?.escudo_url && <img src={partida.selecaoCasa.escudo_url} alt="" style={{ width: 44, height: 44, objectFit: 'contain' }} />}
+                  <span style={{ color: '#f0f4ff', fontSize: '0.8rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoCasa?.nome}</span>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#f0f4ff', fontSize: '2rem', fontWeight: 700 }}>{partida.placarCasa} × {partida.placarFora}</div>
+                  <div style={{ color: '#8b9bb4', fontSize: '0.65rem', letterSpacing: 1 }}>PLACAR FINAL</div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
+                  {partida.selecaoFora?.escudo_url && <img src={partida.selecaoFora.escudo_url} alt="" style={{ width: 44, height: 44, objectFit: 'contain' }} />}
+                  <span style={{ color: '#f0f4ff', fontSize: '0.8rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoFora?.nome}</span>
+                </div>
+              </div>
+
+              {/* Resultado do palpite */}
+              <div style={{
+                background: acertouPlacar ? '#022c1a' : acertouVencedor ? '#0a1a3d' : '#1f0a0a',
+                border: `1px solid ${acertouPlacar ? '#00a651' : acertouVencedor ? '#3b82f6' : '#e8192c'}`,
+                borderRadius: 12, padding: '0.85rem 1rem', textAlign: 'center',
+              }}>
+                <div style={{ color: acertouPlacar ? '#00a651' : acertouVencedor ? '#3b82f6' : '#e8192c', fontWeight: 700, fontSize: '1rem', marginBottom: 4 }}>
+                  {acertouPlacar ? '🎯 PLACAR EXATO! +3pts' : acertouVencedor ? '✅ VENCEDOR CERTO! +1pt' : '❌ DESSA VEZ NÃO...'}
+                </div>
+                <div style={{ color: '#8b9bb4', fontSize: '0.78rem' }}>
+                  Apostei: {apostaFeita.placarCasa} × {apostaFeita.placarFora}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Botão compartilhar */}
+          <button onClick={handleCompartilhar} disabled={compartilhando} style={{
+            width: '100%', background: '#1e2d45', color: '#f0f4ff',
+            border: '1px solid #1e2d45', borderRadius: 10, padding: '0.75rem',
+            fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+            marginBottom: '1.5rem', opacity: compartilhando ? 0.7 : 1,
+          }}>
+            {compartilhando ? '⏳ Gerando...' : '📤 Compartilhar palpite'}
+          </button>
+        </>
       )}
 
       {/* Abas de aposta */}

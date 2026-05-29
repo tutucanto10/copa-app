@@ -56,4 +56,29 @@ async function buscarTopAssists(leagueId = 1, season = 2026, limit = 5) {
   }));
 }
 
-module.exports = { buscarAoVivo, buscarPartidasLiga, buscarFixture, converterStatus, buscarTopScorers, buscarTopAssists };
+async function buscarStandings(leagueId = 1, season = 2026) {
+  const data = await apiFetch(`/standings?league=${leagueId}&season=${season}`);
+  if (!data?.[0]?.league?.standings) return null;
+
+  const grupos = {};
+  for (const grupo of data[0].league.standings) {
+    if (!grupo.length) continue;
+    const letra = grupo[0].group?.replace(/^Group\s*/i, '').trim();
+    if (!letra) continue;
+    grupos[letra] = grupo.map((t) => ({
+      nome: t.team.name,
+      escudo: t.team.logo,
+      jogos: t.all.played,
+      vitorias: t.all.win,
+      empates: t.all.draw,
+      derrotas: t.all.lose,
+      golsPro: t.all.goals.for,
+      golsContra: t.all.goals.against,
+      saldoGols: t.goalsDiff,
+      pontos: t.points,
+    }));
+  }
+  return grupos;
+}
+
+module.exports = { buscarAoVivo, buscarPartidasLiga, buscarFixture, converterStatus, buscarTopScorers, buscarTopAssists, buscarStandings };
