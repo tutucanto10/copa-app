@@ -38,62 +38,69 @@ function calcularPontos(apostas) {
 }
 
 async function buscarPerfil(usuarioId) {
-  const usuario = await prisma.usuario.findUnique({
-    where: { id: Number(usuarioId) },
-    include: {
-      apostas: { include: { partida: true } },
-      apostasGoleador: { include: { partida: true } },
-      ligas: { include: { liga: true } },
-      apostaCampeao: { include: { selecao: true } },
-    },
-  });
+  // 1. Query do usuário e das últimas 50 partidas reveladas em paralelo
+  const [usuario, ultimasReveladas] = await Promise.all([
+    prisma.usuario.findUnique({
+      where: { id: Number(usuarioId) },
+      include: {
+        apostas: { include: { partida: true } },
+        apostasGoleador: { include: { partida: true } },
+        ligas: { include: { liga: true } },
+        apostaCampeao: { include: { selecao: true } },
+      },
+    }),
+    prisma.partida.findMany({
+      where: { status: { in: ['FINALIZADA', 'AO_VIVO'] } },
+      orderBy: { data: 'desc' },
+      select: { id: true },
+      take: 50, // streak nunca vai passar de 50 partidas
+    }),
+  ]);
 
   if (!usuario) throw new Error('Usuário não encontrado');
 
   const { pontos, placaresExatos, vencedoresAcertados } = calcularPontos(usuario.apostas);
 
-  const todasReveladas = await prisma.partida.findMany({
-    where: { status: { in: ['FINALIZADA', 'AO_VIVO'] } },
-    orderBy: { data: 'desc' },
-    select: { id: true },
-  });
+  // Calcula streak com as últimas 50 partidas
   const apostasSet = new Set(usuario.apostas.map((a) => a.partidaId));
   let streak = 0;
-  for (const p of todasReveladas) {
+  for (const p of ultimasReveladas) {
     if (apostasSet.has(p.id)) streak++;
     else break;
   }
 
-  // Busca gols só das partidas que o usuário apostou em goleador
-  let goleadoresAcertados = 0;
   const apostasGolFinalizadas = usuario.apostasGoleador.filter(
     (ag) => ag.partida.status === 'FINALIZADA'
   );
-  if (apostasGolFinalizadas.length > 0) {
-    const eventosGol = await prisma.evento.findMany({
-      where: {
-        tipo: 'GOL',
-        OR: apostasGolFinalizadas.map((ag) => ({
-          partidaId: ag.partidaId,
-          jogadorId: ag.jogadorId,
-        })),
-      },
-      select: { partidaId: true, jogadorId: true },
-    });
-    const golSet = new Set(eventosGol.map((e) => `${e.partidaId}-${e.jogadorId}`));
-    for (const ag of apostasGolFinalizadas) {
-      if (golSet.has(`${ag.partidaId}-${ag.jogadorId}`)) goleadoresAcertados++;
-    }
-  }
 
-  // Usa o cache do rankingPorLiga para calcular posição sem refazer tudo do zero
-  const ligasComPosicao = await Promise.all(
-    usuario.ligas.map(async (ml) => {
-      const { ranking } = await rankingPorLiga(ml.ligaId);
-      const posicao = ranking.findIndex((r) => r.id === usuario.id) + 1;
-      return { liga: ml.liga, posicao, total: ranking.length };
-    })
-  );
+  // 2. Gol events + rankings das ligas em paralelo
+  const [eventosGol, ligasComPosicao] = await Promise.all([
+    apostasGolFinalizadas.length > 0
+      ? prisma.evento.findMany({
+          where: {
+            tipo: 'GOL',
+            OR: apostasGolFinalizadas.map((ag) => ({
+              partidaId: ag.partidaId,
+              jogadorId: ag.jogadorId,
+            })),
+          },
+          select: { partidaId: true, jogadorId: true },
+        })
+      : Promise.resolve([]),
+    Promise.all(
+      usuario.ligas.map(async (ml) => {
+        const { ranking } = await rankingPorLiga(ml.ligaId);
+        const posicao = ranking.findIndex((r) => r.id === usuario.id) + 1;
+        return { liga: ml.liga, posicao, total: ranking.length };
+      })
+    ),
+  ]);
+
+  const golSet = new Set(eventosGol.map((e) => `${e.partidaId}-${e.jogadorId}`));
+  let goleadoresAcertados = 0;
+  for (const ag of apostasGolFinalizadas) {
+    if (golSet.has(`${ag.partidaId}-${ag.jogadorId}`)) goleadoresAcertados++;
+  }
 
   const stats = { placaresExatos, vencedoresAcertados, goleadoresAcertados, totalApostas: usuario.apostas.length, streak }
   const badges = calcularBadges(stats)
