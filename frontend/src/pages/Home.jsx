@@ -9,6 +9,18 @@ function formatarHora(data) {
   })
 }
 
+function horarioFechamento(data) {
+  const fecha = new Date(new Date(data).getTime() - 60 * 60 * 1000)
+  const agora = new Date()
+  if (fecha <= agora) return null // já fechou
+  const hora = fecha.toLocaleTimeString('pt-BR', {
+    hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
+  })
+  const hoje = agora.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+  const diaFecha = fecha.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+  return diaFecha === hoje ? `⏰ Fecha às ${hora}` : `⏰ Fecha ${diaFecha} às ${hora}`
+}
+
 function formatarData(data) {
   return new Date(data).toLocaleDateString('pt-BR', {
     day: '2-digit', month: 'short', timeZone: 'America/Sao_Paulo',
@@ -226,11 +238,21 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
             </div>
           )
         })() : apostasAbertas && partida.status === 'AGENDADA' ? (
-          <span style={{ fontSize: 12, color: '#f5a623' }}>⚠ Você ainda não apostou</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <span style={{ fontSize: 12, color: '#f5a623' }}>⚠ Você ainda não apostou</span>
+            {horarioFechamento(partida.data) && (
+              <span style={{ fontSize: 11, color: '#8b9bb4' }}>{horarioFechamento(partida.data)}</span>
+            )}
+          </div>
         ) : partida.status === 'AGENDADA' ? (
-          <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>🔒 Apostas encerradas</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <span style={{ fontSize: 12, color: '#8b9bb4' }}>🔒 Apostas encerradas</span>
+            {horarioFechamento(partida.data) && (
+              <span style={{ fontSize: 11, color: '#8b9bb4' }}>{horarioFechamento(partida.data)}</span>
+            )}
+          </div>
         ) : (
-          <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>Sem aposta registrada</span>
+          <span style={{ fontSize: 12, color: '#8b9bb4' }}>Sem aposta registrada</span>
         )}
       </div>
     </div>
@@ -530,9 +552,9 @@ function CardRegras() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               {[
-                { icone: '🎯', label: 'Placar exato', desc: 'Acertou o placar certinho', pts: '+3 pts', cor: '#00a651' },
-                { icone: '✅', label: 'Vencedor certo', desc: 'Acertou quem ganhou (placar errado)', pts: '+1 pt', cor: '#3b82f6' },
-                { icone: '❌', label: 'Errou', desc: 'Não acertou nada', pts: '0 pts', cor: '#e8192c' },
+                { icone: '🎯', label: 'Placar exato', desc: 'Acertou o placar — ex: Brasil 2×1 México', pts: '+3 pts', cor: '#00a651' },
+                { icone: '✅', label: 'Vencedor certo', desc: 'Acertou quem ganhou mas errou o placar', pts: '+1 pt', cor: '#3b82f6' },
+                { icone: '❌', label: 'Errou', desc: 'Não acertou o resultado', pts: '0 pts', cor: '#e8192c' },
               ].map((r) => (
                 <div key={r.label} style={{
                   display: 'flex', alignItems: 'center', gap: '0.75rem',
@@ -556,10 +578,10 @@ function CardRegras() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               {[
-                { icone: '🏆', label: 'Quem vence?', desc: 'Escolha o time vencedor ou empate — vale +1pt se acertar com placar errado' },
-                { icone: '🎯', label: 'Placar exato', desc: 'Aposte no placar — vale +3pts se acertar exatamente' },
-                { icone: '⚽', label: 'Goleadores', desc: 'Escolha os jogadores que vão marcar gol na partida' },
-                { icone: '🏅', label: 'Palpite do campeão', desc: 'Aposte em qual seleção vai vencer a Copa 2026' },
+                { icone: '🏆', label: 'Quem vence?', desc: 'Escolha o vencedor ou empate. Vale +1pt mesmo que o placar esteja errado' },
+                { icone: '🎯', label: 'Placar exato', desc: 'Aposte no placar completo. Se acertar exatamente, leva +3pts' },
+                { icone: '⚽', label: 'Goleadores', desc: 'Escolha quais jogadores vão marcar gol na partida' },
+                { icone: '🏅', label: 'Palpite do campeão', desc: 'Uma aposta só — escolha a seleção campeã da Copa 2026' },
               ].map((t) => (
                 <div key={t.label} style={{
                   display: 'flex', alignItems: 'flex-start', gap: '0.75rem',
@@ -577,11 +599,19 @@ function CardRegras() {
 
           {/* Quando apostas fecham */}
           <div style={{
-            background: '#1f0a0a', border: '1px solid #e8192c44',
+            background: '#0a1a10', border: '1px solid #00a65144',
             borderRadius: 8, padding: '0.75rem 1rem',
-            fontSize: '0.8rem', color: '#8b9bb4',
+            display: 'flex', flexDirection: 'column', gap: '0.35rem',
           }}>
-            🔒 <strong style={{ color: '#f0f4ff' }}>Apostas fecham</strong> quando a partida entra em <strong style={{ color: '#00a651' }}>AO VIVO</strong>. Após isso não é possível apostar ou alterar.
+            <div style={{ fontSize: '0.82rem', color: '#f0f4ff', fontWeight: 600 }}>
+              ⏰ Quando as apostas fecham?
+            </div>
+            <div style={{ fontSize: '0.78rem', color: '#8b9bb4', lineHeight: 1.5 }}>
+              As apostas de cada jogo fecham <strong style={{ color: '#00a651' }}>1 hora antes do início</strong>. Cada partida tem seu próprio horário — você vê o tempo restante direto no card do jogo.
+            </div>
+            <div style={{ fontSize: '0.78rem', color: '#8b9bb4', lineHeight: 1.5 }}>
+              Você recebe uma notificação <strong style={{ color: '#f5a623' }}>2 horas antes</strong> de cada jogo lembrando de apostar — se ainda não tiver apostado.
+            </div>
           </div>
         </div>
       )}
