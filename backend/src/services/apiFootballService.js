@@ -36,4 +36,24 @@ function converterStatus(apiStatus) {
   return 'AGENDADA';
 }
 
-module.exports = { buscarAoVivo, buscarPartidasLiga, buscarFixture, converterStatus };
+async function buscarTopScorers(leagueId = 1, season = 2026, limit = 5) {
+  const data = await apiFetch(`/players/topscorers?league=${leagueId}&season=${season}`);
+  return data.slice(0, limit).map((item) => ({
+    nome: item.player.name,
+    foto_url: item.player.photo,
+    selecao: item.statistics[0]?.team?.name || '',
+    gols: item.statistics[0]?.goals?.total || 0,
+  }));
+}
+
+async function buscarTopAssists(leagueId = 1, season = 2026, limit = 5) {
+  const data = await apiFetch(`/players/topassists?league=${leagueId}&season=${season}`);
+  return data.slice(0, limit).map((item) => ({
+    nome: item.player.name,
+    foto_url: item.player.photo,
+    selecao: item.statistics[0]?.team?.name || '',
+    assistencias: item.statistics[0]?.goals?.assists || 0,
+  }));
+}
+
+module.exports = { buscarAoVivo, buscarPartidasLiga, buscarFixture, converterStatus, buscarTopScorers, buscarTopAssists };

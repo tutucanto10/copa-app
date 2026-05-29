@@ -310,54 +310,58 @@ export default function Copa() {
                 marginBottom: '1rem',
               }}>⚽ Artilheiros</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {artilheiros.map((jogador, index) => (
+                {artilheiros.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '2rem' }}>
+                    Disponível quando a Copa começar ⚽
+                  </div>
+                ) : artilheiros.map((jogador, index) => (
                   <div
                     key={index}
                     style={{
                       background: index === 0 ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' : 'var(--color-background-primary)',
                       border: '1px solid var(--color-border-tertiary)',
                       borderRadius: 12,
-                      padding: '1rem 1.25rem',
+                      padding: '0.75rem 1.25rem',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '1rem',
                     }}
                   >
-                    <div style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      background: index === 0 ? '#000' : '#00a651',
-                      color: '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 900,
-                      fontSize: 14,
+                    {/* Posição */}
+                    <span style={{
+                      fontWeight: 900, fontSize: 14, minWidth: 20, textAlign: 'center',
+                      color: index === 0 ? '#000' : 'var(--color-text-secondary)',
                     }}>
-                      {index + 1}
-                    </div>
-                    <div style={{ flex: 1 }}>
+                      {index + 1}º
+                    </span>
+                    {/* Foto */}
+                    {jogador.foto_url ? (
+                      <img src={jogador.foto_url} alt={jogador.nome} style={{
+                        width: 44, height: 44, borderRadius: '50%',
+                        objectFit: 'cover', flexShrink: 0,
+                        border: `2px solid ${index === 0 ? '#000' : '#1e2d45'}`,
+                      }} />
+                    ) : (
                       <div style={{
-                        fontSize: 15,
-                        fontWeight: 700,
-                        color: index === 0 ? '#000' : 'var(--color-text-primary)',
-                      }}>
+                        width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
+                        background: index === 0 ? '#000' : '#00a651',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 700, color: '#fff', fontSize: 16,
+                      }}>⚽</div>
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: index === 0 ? '#000' : 'var(--color-text-primary)' }}>
                         {jogador.nome}
                       </div>
-                      <div style={{
-                        fontSize: 12,
-                        color: index === 0 ? 'rgba(0,0,0,0.7)' : 'var(--color-text-secondary)',
-                      }}>
+                      <div style={{ fontSize: 12, color: index === 0 ? 'rgba(0,0,0,0.7)' : 'var(--color-text-secondary)' }}>
                         {jogador.selecao}
                       </div>
                     </div>
-                    <div style={{
-                      fontSize: 20,
-                      fontWeight: 900,
-                      color: index === 0 ? '#000' : '#00a651',
-                    }}>
-                      {jogador.gols}
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: index === 0 ? '#000' : '#00a651', lineHeight: 1 }}>
+                        {jogador.gols}
+                      </div>
+                      <div style={{ fontSize: 10, color: index === 0 ? 'rgba(0,0,0,0.6)' : 'var(--color-text-secondary)' }}>gols</div>
                     </div>
                   </div>
                 ))}
@@ -373,54 +377,56 @@ export default function Copa() {
                 marginBottom: '1rem',
               }}>🅰️ Assistências</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {assistentes.map((jogador, index) => (
+                {assistentes.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '2rem' }}>
+                    Disponível quando a Copa começar 🅰️
+                  </div>
+                ) : assistentes.map((jogador, index) => (
                   <div
                     key={index}
                     style={{
                       background: index === 0 ? 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)' : 'var(--color-background-primary)',
                       border: '1px solid var(--color-border-tertiary)',
                       borderRadius: 12,
-                      padding: '1rem 1.25rem',
+                      padding: '0.75rem 1.25rem',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '1rem',
                     }}
                   >
-                    <div style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      background: index === 0 ? '#000' : '#3b82f6',
-                      color: '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 900,
-                      fontSize: 14,
+                    <span style={{
+                      fontWeight: 900, fontSize: 14, minWidth: 20, textAlign: 'center',
+                      color: index === 0 ? '#fff' : 'var(--color-text-secondary)',
                     }}>
-                      {index + 1}
-                    </div>
-                    <div style={{ flex: 1 }}>
+                      {index + 1}º
+                    </span>
+                    {jogador.foto_url ? (
+                      <img src={jogador.foto_url} alt={jogador.nome} style={{
+                        width: 44, height: 44, borderRadius: '50%',
+                        objectFit: 'cover', flexShrink: 0,
+                        border: `2px solid ${index === 0 ? '#fff' : '#1e2d45'}`,
+                      }} />
+                    ) : (
                       <div style={{
-                        fontSize: 15,
-                        fontWeight: 700,
-                        color: index === 0 ? '#fff' : 'var(--color-text-primary)',
-                      }}>
+                        width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
+                        background: index === 0 ? '#fff' : '#3b82f6',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 700, color: index === 0 ? '#3b82f6' : '#fff', fontSize: 16,
+                      }}>🅰️</div>
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: index === 0 ? '#fff' : 'var(--color-text-primary)' }}>
                         {jogador.nome}
                       </div>
-                      <div style={{
-                        fontSize: 12,
-                        color: index === 0 ? 'rgba(255,255,255,0.8)' : 'var(--color-text-secondary)',
-                      }}>
+                      <div style={{ fontSize: 12, color: index === 0 ? 'rgba(255,255,255,0.8)' : 'var(--color-text-secondary)' }}>
                         {jogador.selecao}
                       </div>
                     </div>
-                    <div style={{
-                      fontSize: 20,
-                      fontWeight: 900,
-                      color: index === 0 ? '#fff' : '#3b82f6',
-                    }}>
-                      {jogador.assistencias}
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: index === 0 ? '#fff' : '#3b82f6', lineHeight: 1 }}>
+                        {jogador.assistencias}
+                      </div>
+                      <div style={{ fontSize: 10, color: index === 0 ? 'rgba(255,255,255,0.7)' : 'var(--color-text-secondary)' }}>asts</div>
                     </div>
                   </div>
                 ))}

@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
+const { buscarTopScorers, buscarTopAssists } = require('./apiFootballService')
  
 // Mapeamento dos grupos da Copa 2026
 const GRUPOS = {
@@ -151,64 +152,42 @@ async function buscarClassificacao() {
   }
 }
  
-// Busca artilheiros (jogadores com mais gols)
+// Busca artilheiros — usa API-Football se disponível, senão base local
 async function buscarArtilheiros(limit = 5) {
-  try {
-    const jogadores = await prisma.jogador.findMany({
-      include: {
-        selecao: true,
-        eventos: {
-          where: { tipo: 'GOL' }
-        }
-      }
-    })
- 
-    const artilheiros = jogadores
-      .map(jogador => ({
-        nome: jogador.nome,
-        selecao: jogador.selecao.nome,
-        foto_url: jogador.foto_url,
-        gols: jogador.eventos.length
-      }))
-      .filter(j => j.gols > 0)
-      .sort((a, b) => b.gols - a.gols)
-      .slice(0, limit)
- 
-    return artilheiros
-  } catch (error) {
-    console.error('Erro ao buscar artilheiros:', error)
-    throw error
+  if (process.env.APIFOOTBALL_KEY) {
+    try {
+      return await buscarTopScorers(1, 2026, limit)
+    } catch (e) {
+      console.warn('API-Football artilheiros falhou, usando base local:', e.message)
+    }
   }
+  const jogadores = await prisma.jogador.findMany({
+    include: { selecao: true, eventos: { where: { tipo: 'GOL' } } }
+  })
+  return jogadores
+    .map(j => ({ nome: j.nome, selecao: j.selecao.nome, foto_url: j.foto_url, gols: j.eventos.length }))
+    .filter(j => j.gols > 0)
+    .sort((a, b) => b.gols - a.gols)
+    .slice(0, limit)
 }
- 
-// Busca assistências (jogadores com mais assistências)
+
+// Busca assistências — usa API-Football se disponível, senão base local
 async function buscarAssistencias(limit = 5) {
-  try {
-    const jogadores = await prisma.jogador.findMany({
-      include: {
-        selecao: true,
-        eventos: {
-          where: { tipo: 'ASSISTENCIA' }
-        }
-      }
-    })
- 
-    const assistentes = jogadores
-      .map(jogador => ({
-        nome: jogador.nome,
-        selecao: jogador.selecao.nome,
-        foto_url: jogador.foto_url,
-        assistencias: jogador.eventos.length
-      }))
-      .filter(j => j.assistencias > 0)
-      .sort((a, b) => b.assistencias - a.assistencias)
-      .slice(0, limit)
- 
-    return assistentes
-  } catch (error) {
-    console.error('Erro ao buscar assistências:', error)
-    throw error
+  if (process.env.APIFOOTBALL_KEY) {
+    try {
+      return await buscarTopAssists(1, 2026, limit)
+    } catch (e) {
+      console.warn('API-Football assistências falhou, usando base local:', e.message)
+    }
   }
+  const jogadores = await prisma.jogador.findMany({
+    include: { selecao: true, eventos: { where: { tipo: 'ASSISTENCIA' } } }
+  })
+  return jogadores
+    .map(j => ({ nome: j.nome, selecao: j.selecao.nome, foto_url: j.foto_url, assistencias: j.eventos.length }))
+    .filter(j => j.assistencias > 0)
+    .sort((a, b) => b.assistencias - a.assistencias)
+    .slice(0, limit)
 }
  
 module.exports = { buscarClassificacao, buscarArtilheiros, buscarAssistencias, buscarPartidasDoDia }
