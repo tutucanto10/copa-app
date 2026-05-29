@@ -106,12 +106,28 @@ export default function ModalPerfilPublico({ usuarioId, onClose }) {
             </div>
 
             {/* Conquistas / Badges */}
-            {perfil.badges?.length > 0 && (
+            {(perfil.badges?.length > 0 || perfil.palpiteCampeao) && (
               <div>
                 <div style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 700 }}>
                   🏅 Conquistas
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {perfil.palpiteCampeao && (
+                    <div title="Palpite do Campeão" style={{
+                      background: 'linear-gradient(135deg, #1a1200, #0d1321)',
+                      border: '1px solid #f5d000',
+                      borderRadius: 20, padding: '0.4rem 0.85rem',
+                      display: 'flex', alignItems: 'center', gap: '0.4rem',
+                    }}>
+                      {perfil.palpiteCampeao.escudo_url && (
+                        <img src={perfil.palpiteCampeao.escudo_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />
+                      )}
+                      <span style={{ fontSize: '0.75rem', color: '#f5d000', fontWeight: 600 }}>
+                        {perfil.palpiteCampeao.nome}
+                      </span>
+                      <span style={{ fontSize: '0.65rem', color: '#8b9bb4' }}>🏆</span>
+                    </div>
+                  )}
                   {perfil.badges.map((b) => (
                     <div key={b.id} title={b.desc} style={{
                       background: '#0a0e1a', border: '1px solid #1e2d45',

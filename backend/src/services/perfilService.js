@@ -44,6 +44,7 @@ async function buscarPerfil(usuarioId) {
       apostas: { include: { partida: true } },
       apostasGoleador: { include: { partida: true } },
       ligas: { include: { liga: true } },
+      apostaCampeao: { include: { selecao: true } },
     },
   });
 
@@ -111,6 +112,9 @@ async function buscarPerfil(usuarioId) {
     streak,
     badges,
     ligas: ligasComPosicao,
+    palpiteCampeao: usuario.apostaCampeao
+      ? { nome: usuario.apostaCampeao.selecao.nome, escudo_url: usuario.apostaCampeao.selecao.escudo_url }
+      : null,
   };
 }
 
