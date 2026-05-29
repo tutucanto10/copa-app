@@ -220,11 +220,12 @@ export default function Partida() {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '2rem 1rem' }}>
-      <button onClick={() => navigate('/')} style={{
-        background: 'none', border: 'none', color: '#8b9bb4',
-        marginBottom: '1.5rem', fontSize: '0.85rem',
-        display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
-      }}>← Voltar</button>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <button onClick={() => navigate('/')} style={{
+          background: 'none', border: 'none', color: '#8b9bb4',
+          fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+        }}>← Voltar</button>
+      </div>
 
       {/* Placar */}
       <div style={{
@@ -306,79 +307,82 @@ export default function Partida() {
         </div>
       )}
 
-      {/* Share card (invisível, usado pelo html2canvas) + botão */}
-      {finalizada && apostaFeita && (
-        <>
-          {/* Card de compartilhamento — renderizado fora da tela */}
-          <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
-            <div ref={shareCardRef} style={{
-              width: 380, background: 'linear-gradient(135deg, #0a1a10, #001a3d)',
-              borderRadius: 20, padding: '2rem', fontFamily: 'sans-serif',
-              border: '1px solid #1e2d45',
-            }}>
-              {/* Header branding */}
-              <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-                <div style={{ fontSize: '0.75rem', color: '#8b9bb4', letterSpacing: 3, textTransform: 'uppercase' }}>Bolão Copa 2026</div>
+      {/* Share card (invisível, usado pelo html2canvas) */}
+      {apostaFeita && (
+        <div style={{ position: 'fixed', left: '-9999px', top: 0, pointerEvents: 'none' }}>
+          <div ref={shareCardRef} style={{
+            width: 400, background: 'linear-gradient(160deg, #0d1f14 0%, #050d1f 100%)',
+            fontFamily: 'Inter, sans-serif', overflow: 'hidden',
+          }}>
+            <div style={{ background: '#00a651', height: 6 }} />
+
+            <div style={{ padding: '1.75rem 1.75rem 1.5rem' }}>
+              <div style={{ fontSize: '0.65rem', color: '#00a651', letterSpacing: 3, textTransform: 'uppercase', marginBottom: '1.25rem', fontWeight: 700 }}>
+                🏆 Bolão Copa 2026
               </div>
 
-              {/* Perfil */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.75rem' }}>
                 {usuario?.foto_url ? (
-                  <img src={usuario.foto_url} alt="" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid #00a651' }} />
+                  <img src={usuario.foto_url} alt="" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid #00a651' }} />
                 ) : (
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#0a1a10', border: '2px solid #00a651', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00a651', fontWeight: 700, fontSize: '1.1rem' }}>
+                  <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#0a1a10', border: '2px solid #00a651', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00a651', fontWeight: 700, fontSize: '1.2rem' }}>
                     {usuario?.nome?.[0]?.toUpperCase()}
                   </div>
                 )}
                 <div>
-                  <div style={{ color: '#f0f4ff', fontWeight: 700, fontSize: '1rem' }}>{usuario?.nome}</div>
-                  <div style={{ color: '#8b9bb4', fontSize: '0.75rem' }}>meu palpite</div>
+                  <div style={{ color: '#f0f4ff', fontWeight: 700, fontSize: '1.05rem' }}>{usuario?.nome}</div>
+                  <div style={{ color: '#8b9bb4', fontSize: '0.72rem', marginTop: 2 }}>meu palpite</div>
                 </div>
               </div>
 
-              {/* Times e placar real */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
-                  {partida.selecaoCasa?.escudo_url && <img src={partida.selecaoCasa.escudo_url} alt="" style={{ width: 44, height: 44, objectFit: 'contain' }} />}
-                  <span style={{ color: '#f0f4ff', fontSize: '0.8rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoCasa?.nome}</span>
+                  {partida.selecaoCasa?.escudo_url && <img src={partida.selecaoCasa.escudo_url} alt="" style={{ width: 52, height: 52, objectFit: 'contain' }} />}
+                  <span style={{ color: '#f0f4ff', fontSize: '0.78rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoCasa?.nome}</span>
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ color: '#f0f4ff', fontSize: '2rem', fontWeight: 700 }}>{partida.placarCasa} × {partida.placarFora}</div>
-                  <div style={{ color: '#8b9bb4', fontSize: '0.65rem', letterSpacing: 1 }}>PLACAR FINAL</div>
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <div style={{ color: '#f0f4ff', fontSize: '2.4rem', fontWeight: 800, lineHeight: 1 }}>
+                    {apostaFeita.placarCasa} × {apostaFeita.placarFora}
+                  </div>
+                  <div style={{ color: '#8b9bb4', fontSize: '0.6rem', letterSpacing: 2, marginTop: 4 }}>
+                    {finalizada ? 'RESULTADO FINAL' : 'MEU PALPITE'}
+                  </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
-                  {partida.selecaoFora?.escudo_url && <img src={partida.selecaoFora.escudo_url} alt="" style={{ width: 44, height: 44, objectFit: 'contain' }} />}
-                  <span style={{ color: '#f0f4ff', fontSize: '0.8rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoFora?.nome}</span>
+                  {partida.selecaoFora?.escudo_url && <img src={partida.selecaoFora.escudo_url} alt="" style={{ width: 52, height: 52, objectFit: 'contain' }} />}
+                  <span style={{ color: '#f0f4ff', fontSize: '0.78rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoFora?.nome}</span>
                 </div>
               </div>
 
-              {/* Resultado do palpite */}
-              <div style={{
-                background: acertouPlacar ? '#022c1a' : acertouVencedor ? '#0a1a3d' : '#1f0a0a',
-                border: `1px solid ${acertouPlacar ? '#00a651' : acertouVencedor ? '#3b82f6' : '#e8192c'}`,
-                borderRadius: 12, padding: '0.85rem 1rem', textAlign: 'center',
-              }}>
-                <div style={{ color: acertouPlacar ? '#00a651' : acertouVencedor ? '#3b82f6' : '#e8192c', fontWeight: 700, fontSize: '1rem', marginBottom: 4 }}>
-                  {acertouPlacar ? '🎯 PLACAR EXATO! +3pts' : acertouVencedor ? '✅ VENCEDOR CERTO! +1pt' : '❌ DESSA VEZ NÃO...'}
+              {finalizada ? (
+                <div style={{
+                  background: acertouPlacar ? '#022c1a' : acertouVencedor ? '#05153d' : '#1f0a0a',
+                  border: `1.5px solid ${acertouPlacar ? '#00a651' : acertouVencedor ? '#3b82f6' : '#e8192c'}`,
+                  borderRadius: 14, padding: '1rem', textAlign: 'center',
+                }}>
+                  <div style={{ color: acertouPlacar ? '#00a651' : acertouVencedor ? '#60a5fa' : '#e8192c', fontWeight: 800, fontSize: '1.15rem', letterSpacing: 1 }}>
+                    {acertouPlacar ? '🎯 PLACAR EXATO!' : acertouVencedor ? '✅ VENCEDOR CERTO!' : '❌ DESSA VEZ NÃO...'}
+                  </div>
+                  <div style={{ color: '#8b9bb4', fontSize: '0.8rem', marginTop: 6 }}>
+                    Resultado: <strong style={{ color: '#f0f4ff' }}>{partida.placarCasa} × {partida.placarFora}</strong>
+                    {acertouPlacar && <span style={{ color: '#00a651', marginLeft: 8, fontWeight: 700 }}>+3 pts</span>}
+                    {acertouVencedor && !acertouPlacar && <span style={{ color: '#60a5fa', marginLeft: 8, fontWeight: 700 }}>+1 pt</span>}
+                  </div>
                 </div>
-                <div style={{ color: '#8b9bb4', fontSize: '0.78rem' }}>
-                  Apostei: {apostaFeita.placarCasa} × {apostaFeita.placarFora}
+              ) : (
+                <div style={{
+                  background: '#05153d', border: '1.5px solid #3b82f6',
+                  borderRadius: 14, padding: '1rem', textAlign: 'center',
+                }}>
+                  <div style={{ color: '#60a5fa', fontWeight: 800, fontSize: '1.15rem', letterSpacing: 1 }}>⏳ AGUARDANDO O JOGO</div>
+                  <div style={{ color: '#8b9bb4', fontSize: '0.8rem', marginTop: 6 }}>Esse é o meu palpite — e o seu?</div>
                 </div>
-              </div>
+              )}
             </div>
-          </div>
 
-          {/* Botão compartilhar */}
-          <button onClick={handleCompartilhar} disabled={compartilhando} style={{
-            width: '100%', background: '#1e2d45', color: '#f0f4ff',
-            border: '1px solid #1e2d45', borderRadius: 10, padding: '0.75rem',
-            fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-            marginBottom: '1.5rem', opacity: compartilhando ? 0.7 : 1,
-          }}>
-            {compartilhando ? '⏳ Gerando...' : '📤 Compartilhar palpite'}
-          </button>
-        </>
+            <div style={{ background: 'linear-gradient(90deg, #f5d000, #f59e0b)', height: 4 }} />
+          </div>
+        </div>
       )}
 
       {/* Abas de aposta */}
@@ -475,9 +479,30 @@ export default function Partida() {
                     background: '#0a1a10', border: '1px solid #00a651',
                     borderRadius: 8, padding: '0.75rem 1rem',
                     color: '#00a651', fontWeight: 600,
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem',
                   }}>
-                    ✅ Aposta: {apostaFeita.placarCasa} × {apostaFeita.placarFora}
-                    {!finalizada && podeApostar && ' — aguardando resultado'}
+                    <span>✅ Aposta: {apostaFeita.placarCasa} × {apostaFeita.placarFora}
+                    {!finalizada && podeApostar && ' — aguardando resultado'}</span>
+                    <button
+                      onClick={handleCompartilhar}
+                      disabled={compartilhando}
+                      title="Compartilhar palpite"
+                      style={{
+                        background: 'none', border: '1px solid #1e4d30', borderRadius: 8,
+                        color: '#00a651', padding: '0.3rem 0.65rem',
+                        display: 'flex', alignItems: 'center', gap: 5,
+                        fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer',
+                        opacity: compartilhando ? 0.5 : 1, flexShrink: 0,
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                        <polyline points="16 6 12 2 8 6"/>
+                        <line x1="12" y1="2" x2="12" y2="15"/>
+                      </svg>
+                      {compartilhando ? 'Gerando...' : 'Compartilhar'}
+                    </button>
                   </div>
                   {podeApostar && (
                     <form onSubmit={handleAposta} style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
