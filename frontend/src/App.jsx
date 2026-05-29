@@ -209,6 +209,44 @@ function RotaAdmin({ children }) {
   return children
 }
 
+function BannerLentidao() {
+  const [visivel, setVisivel] = useState(false)
+
+  useEffect(() => {
+    const onLenta = () => setVisivel(true)
+    const onOk    = () => setVisivel(false)
+    window.addEventListener('api-lenta', onLenta)
+    window.addEventListener('api-ok', onOk)
+    return () => {
+      window.removeEventListener('api-lenta', onLenta)
+      window.removeEventListener('api-ok', onOk)
+    }
+  }, [])
+
+  if (!visivel) return null
+
+  return (
+    <div style={{
+      position: 'fixed', top: 68, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 999, width: 'calc(100% - 2rem)', maxWidth: 420,
+      background: '#1a1200', border: '1px solid #f5a623',
+      borderRadius: 10, padding: '0.65rem 1.1rem',
+      display: 'flex', alignItems: 'center', gap: '0.65rem',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+    }}>
+      <span style={{ fontSize: '1.2rem' }}>⏳</span>
+      <div>
+        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f5a623' }}>
+          Servidor iniciando...
+        </div>
+        <div style={{ fontSize: '0.75rem', color: '#8b9bb4', marginTop: 1 }}>
+          O servidor estava em repouso. Aguarde alguns instantes.
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function BannerInstalar() {
   const [prompt, setPrompt] = useState(null)
   const [visivel, setVisivel] = useState(false)
@@ -266,11 +304,12 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<><BannerLentidao /><Login /></>} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/*" element={
           <RotaProtegida>
             <Nav />
+            <BannerLentidao />
             <BannerInstalar />
             <div className="main-content">
               <Routes>
