@@ -110,8 +110,8 @@ export default function Ranking() {
         style={{
           background: index === 0 ? '#1a1500' : '#111827',
           border: `1px solid ${index === 0 ? '#f5d000' : index === 1 ? '#9ca3af' : index === 2 ? '#92400e' : '#1e2d45'}`,
-          borderRadius: 12, padding: '1.25rem 1.5rem',
-          display: 'flex', alignItems: 'center', gap: '1rem',
+          borderRadius: 12, padding: '1rem',
+          display: 'flex', alignItems: 'center', gap: '0.65rem',
           cursor: 'pointer', transition: 'opacity 0.15s',
         }}
         onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
