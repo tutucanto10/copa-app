@@ -129,7 +129,7 @@ export default function Ranking() {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
             fontWeight: 700, fontSize: '1rem', color: '#f0f4ff', marginBottom: 4,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            wordBreak: 'break-word',
           }}>
             {user.nome}
           </div>
