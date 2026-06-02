@@ -126,11 +126,14 @@ export default function Ranking() {
           {index < 3 ? MEDALHAS[index] : `${index + 1}º`}
         </div>
         <Avatar user={user} size={44} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: '1rem', color: '#f0f4ff', marginBottom: 4 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontWeight: 700, fontSize: '1rem', color: '#f0f4ff', marginBottom: 4,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
             {user.nome}
           </div>
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.75rem', color: user.placaresExatos > 0 ? '#00a651' : '#8b9bb4' }}>
               🎯 {user.placaresExatos} exato{user.placaresExatos !== 1 ? 's' : ''}
             </span>
@@ -139,10 +142,10 @@ export default function Ranking() {
             </span>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{
-              fontFamily: 'var(--fonte-display)', fontSize: '2.2rem',
+              fontFamily: 'var(--fonte-display)', fontSize: '1.8rem',
               color: index === 0 ? '#f5d000' : '#f0f4ff', lineHeight: 1,
             }}>{user.pontos}</div>
             <div style={{ fontSize: '0.65rem', color: '#8b9bb4', letterSpacing: 1, marginTop: 2 }}>PONTOS</div>
