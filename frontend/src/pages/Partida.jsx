@@ -115,13 +115,15 @@ export default function Partida() {
   async function handleAposta(e) {
     e.preventDefault()
     if (aposta.placarCasa === '' || aposta.placarFora === '') return
+    const placarCasa = Math.max(0, Number(aposta.placarCasa))
+    const placarFora = Math.max(0, Number(aposta.placarFora))
     setEnviando(true)
     try {
       await api.post('/aposta', {
         usuarioId: USUARIO_ID,
         partidaId: Number(id),
-        placarCasa: Number(aposta.placarCasa),
-        placarFora: Number(aposta.placarFora),
+        placarCasa,
+        placarFora,
       })
       const feita = {
         placarCasa: Number(aposta.placarCasa),
@@ -539,11 +541,11 @@ export default function Partida() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{partida.selecaoCasa?.nome}</span>
                         <input type="number" min={0} value={aposta.placarCasa}
-                          onChange={(e) => setAposta({ ...aposta, placarCasa: e.target.value })}
+                          onChange={(e) => setAposta({ ...aposta, placarCasa: Math.max(0, Number(e.target.value)) })}
                           style={inputStyle} />
                         <span style={{ color: '#8b9bb4' }}>×</span>
                         <input type="number" min={0} value={aposta.placarFora}
-                          onChange={(e) => setAposta({ ...aposta, placarFora: e.target.value })}
+                          onChange={(e) => setAposta({ ...aposta, placarFora: Math.max(0, Number(e.target.value)) })}
                           style={inputStyle} />
                         <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{partida.selecaoFora?.nome}</span>
                       </div>
@@ -563,11 +565,11 @@ export default function Partida() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{partida.selecaoCasa?.nome}</span>
                     <input type="number" min={0} value={aposta.placarCasa}
-                      onChange={(e) => setAposta({ ...aposta, placarCasa: e.target.value })}
+                      onChange={(e) => setAposta({ ...aposta, placarCasa: Math.max(0, Number(e.target.value)) })}
                       style={inputStyle} />
                     <span style={{ color: '#8b9bb4' }}>×</span>
                     <input type="number" min={0} value={aposta.placarFora}
-                      onChange={(e) => setAposta({ ...aposta, placarFora: e.target.value })}
+                      onChange={(e) => setAposta({ ...aposta, placarFora: Math.max(0, Number(e.target.value)) })}
                       style={inputStyle} />
                     <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{partida.selecaoFora?.nome}</span>
                   </div>

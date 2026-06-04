@@ -6,6 +6,9 @@ async function store(req, res) {
     if (!usuarioId || !partidaId || placarCasa === undefined || placarFora === undefined) {
       return res.status(400).json({ error: 'Campos obrigatórios faltando' });
     }
+    if (Number(placarCasa) < 0 || Number(placarFora) < 0) {
+      return res.status(400).json({ error: 'Placar não pode ser negativo' });
+    }
     const aposta = await criarAposta({ usuarioId, partidaId, placarCasa, placarFora });
     res.status(201).json(aposta);
   } catch (err) {
