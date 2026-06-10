@@ -495,6 +495,76 @@ export default function Partida() {
                   </div>
                 </>
               )}
+
+              {/* Consenso do bolão */}
+              {(() => {
+                const comVoto = feedApostas.filter(a => a.vencedor)
+                if (comVoto.length < 2) return null
+                const total = comVoto.length
+                const nCasa   = comVoto.filter(a => a.vencedor === 'casa').length
+                const nEmpate = comVoto.filter(a => a.vencedor === 'empate').length
+                const nFora   = comVoto.filter(a => a.vencedor === 'fora').length
+                const pCasa   = Math.round(nCasa   / total * 100)
+                const pEmpate = Math.round(nEmpate / total * 100)
+                const pFora   = 100 - pCasa - pEmpate
+
+                const opcoes = [
+                  { key: 'casa',   label: partida.selecaoCasa?.nome,  pct: pCasa,   flag: partida.selecaoCasa?.escudo_url,  cor: '#00a651' },
+                  { key: 'empate', label: 'Empate',                   pct: pEmpate, flag: null,                             cor: '#6b7280' },
+                  { key: 'fora',   label: partida.selecaoFora?.nome,  pct: pFora,   flag: partida.selecaoFora?.escudo_url,  cor: '#3b82f6' },
+                ]
+                const lider = opcoes.reduce((a, b) => a.pct >= b.pct ? a : b)
+
+                return (
+                  <div style={{ marginTop: '1.5rem', borderTop: '1px solid #1e2d45', paddingTop: '1.25rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#8b9bb4', letterSpacing: 2, textTransform: 'uppercase' }}>
+                        O que o bolão acha
+                      </span>
+                      <span style={{ fontSize: '0.7rem', color: '#8b9bb4' }}>{total} votos</span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                      {opcoes.map(op => (
+                        <div key={op.key} style={{
+                          flex: 1, textAlign: 'center',
+                          background: op.key === lider.key ? op.cor + '15' : 'transparent',
+                          border: `1px solid ${op.key === lider.key ? op.cor + '50' : '#1e2d45'}`,
+                          borderRadius: 10, padding: '0.75rem 0.25rem',
+                          transition: 'all 0.2s',
+                        }}>
+                          {op.flag
+                            ? <img src={op.flag} alt={op.label} style={{ width: 30, height: 30, objectFit: 'contain' }} />
+                            : <span style={{ fontSize: '1.4rem' }}>🤝</span>
+                          }
+                          <div style={{
+                            fontFamily: 'var(--fonte-display)',
+                            fontSize: op.key === lider.key ? '1.6rem' : '1.3rem',
+                            color: op.pct > 0 ? op.cor : '#3a4a5a',
+                            lineHeight: 1, marginTop: 6,
+                          }}>{op.pct}%</div>
+                          <div style={{
+                            fontSize: '0.68rem', color: '#8b9bb4',
+                            marginTop: 4, whiteSpace: 'nowrap',
+                            overflow: 'hidden', textOverflow: 'ellipsis',
+                            maxWidth: '100%', padding: '0 4px',
+                          }}>{op.label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Barra segmentada */}
+                    <div style={{ display: 'flex', height: 5, borderRadius: 99, overflow: 'hidden', gap: 2 }}>
+                      {opcoes.map(op => op.pct > 0 && (
+                        <div key={op.key} style={{
+                          width: `${op.pct}%`, background: op.cor,
+                          borderRadius: 99, transition: 'width 0.6s ease',
+                        }} />
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
             </>
           )}
 
