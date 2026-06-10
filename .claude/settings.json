@@ -12,7 +12,12 @@
       "Bash(node -e \"require\\('dotenv'\\).config\\(\\); const {buscarPartidasLiga} = require\\('./src/services/apiFootballService'\\); buscarPartidasLiga\\(1, 2026\\).then\\(r => console.log\\(r?.length, 'fixtures:', JSON.stringify\\(r?.slice\\(0,2\\), null, 2\\)\\)\\).catch\\(console.error\\)\")",
       "Bash(APIFOOTBALL_KEY=54d742fe720be266ac24965e15264fa9 node -e \"require\\('dotenv'\\).config\\(\\); const {buscarPartidasLiga} = require\\('./src/services/apiFootballService'\\); buscarPartidasLiga\\(1, 2026\\).then\\(r => console.log\\(r?.length + ' fixtures encontrados'\\)\\).catch\\(console.error\\)\")",
       "Bash(APIFOOTBALL_KEY=54d742fe720be266ac24965e15264fa9 node -e ' *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git -C c:\\\\copa-app status)",
+      "Bash(git -C c:\\\\copa-app diff frontend/src/pages/Partida.jsx)",
+      "WebSearch",
+      "Bash(node scripts/criarNovasLigas.js)",
+      "Bash(node scripts/mapearPartidas.js)"
     ]
   }
 }

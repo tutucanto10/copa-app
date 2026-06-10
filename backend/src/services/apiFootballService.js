@@ -81,4 +81,19 @@ async function buscarStandings(leagueId = 1, season = 2026) {
   return grupos;
 }
 
-module.exports = { buscarAoVivo, buscarPartidasLiga, buscarFixture, converterStatus, buscarTopScorers, buscarTopAssists, buscarStandings };
+async function buscarEventosFixture(fixtureId) {
+  const data = await apiFetch(`/fixtures/events?fixture=${fixtureId}`);
+  return (data || []).filter((e) => {
+    const tipo = e.type?.toLowerCase();
+    const detalhe = e.detail?.toLowerCase();
+    return tipo === 'goal' || (tipo === 'card' && (detalhe === 'yellow card' || detalhe === 'red card'));
+  }).map((e) => ({
+    minuto: e.time?.elapsed ?? 0,
+    nomeJogador: e.player?.name || null,
+    nomeTime: e.team?.name || null,
+    tipo: e.type?.toLowerCase() === 'goal' ? 'GOL'
+      : e.detail?.toLowerCase() === 'yellow card' ? 'AMARELO' : 'VERMELHO',
+  }));
+}
+
+module.exports = { buscarAoVivo, buscarPartidasLiga, buscarFixture, converterStatus, buscarTopScorers, buscarTopAssists, buscarStandings, buscarEventosFixture };

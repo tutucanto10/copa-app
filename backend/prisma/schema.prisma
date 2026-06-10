@@ -73,13 +73,15 @@ model Partida {
 }
 
 model Evento {
-  id        Int        @id @default(autoincrement())
-  partidaId Int
-  jogadorId Int
-  tipo      TipoEvento
-  minuto    Int
-  partida   Partida    @relation(fields: [partidaId], references: [id])
-  jogador   Jogador    @relation(fields: [jogadorId], references: [id])
+  id           Int        @id @default(autoincrement())
+  partidaId    Int
+  jogadorId    Int?
+  nomeExterno  String?
+  timeExterno  String?
+  tipo         TipoEvento
+  minuto       Int
+  partida      Partida    @relation(fields: [partidaId], references: [id])
+  jogador      Jogador?   @relation(fields: [jogadorId], references: [id])
 }
 
 model Aposta {

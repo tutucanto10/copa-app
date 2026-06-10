@@ -32,10 +32,10 @@ export default function Timeline({ eventos }) {
             <span style={{ fontSize: '1.25rem' }}>{cfg.icon}</span>
             <div style={{ flex: 1 }}>
               <span style={{ fontWeight: 600, color: '#f0f4ff' }}>
-                {ev.jogador?.nome}
+                {ev.jogador?.nome || ev.nomeExterno || '—'}
               </span>
               <span style={{ color: '#8b9bb4', fontSize: '0.8rem', marginLeft: 8 }}>
-                {ev.jogador?.selecao?.nome}
+                {ev.jogador?.selecao?.nome || ev.timeExterno || ''}
               </span>
             </div>
             <span style={{

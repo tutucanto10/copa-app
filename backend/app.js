@@ -22,7 +22,7 @@ const pushRoutes = require('./src/routes/pushRoutes');
 const prisma = require('./src/config/prisma');
 const { limparCacheRanking } = require('./src/services/ligaService');
 const { notificarLembretes, notificarResultadoPartida, notificarMvpRodada } = require('./src/services/pushService');
-const { buscarAoVivo, converterStatus } = require('./src/services/apiFootballService');
+const { buscarAoVivo, converterStatus, buscarEventosFixture } = require('./src/services/apiFootballService');
 const { mvpRodadaSingle } = require('./src/services/mvpService');
 
 const app = express();
@@ -127,6 +127,31 @@ setInterval(async () => {
 
       limparCacheRanking();
       console.log(`⚽ Placar atualizado: ${partida.selecaoCasa.nome} ${novoPlacarCasa}×${novoPlacarFora} ${partida.selecaoFora.nome} [${novoStatus}]`);
+
+      // Sincroniza eventos (gols, cartões) da partida ao vivo
+      try {
+        const eventosApi = await buscarEventosFixture(partida.externalId);
+        const eventosExistentes = await prisma.evento.findMany({ where: { partidaId: partida.id } });
+        for (const ev of eventosApi) {
+          const jaExiste = eventosExistentes.some(
+            (e) => e.minuto === ev.minuto && e.tipo === ev.tipo && e.nomeExterno === ev.nomeJogador
+          );
+          if (!jaExiste) {
+            await prisma.evento.create({
+              data: {
+                partidaId: partida.id,
+                tipo: ev.tipo,
+                minuto: ev.minuto,
+                nomeExterno: ev.nomeJogador,
+                timeExterno: ev.nomeTime,
+              },
+            });
+            console.log(`  📋 Evento: ${ev.tipo} ${ev.minuto}' — ${ev.nomeJogador} (${ev.nomeTime})`);
+          }
+        }
+      } catch (e) {
+        console.error('Erro sync eventos:', e.message);
+      }
 
       // Se acabou de finalizar, dispara notificações
       if (novoStatus === 'FINALIZADA' && partida.status !== 'FINALIZADA') {
