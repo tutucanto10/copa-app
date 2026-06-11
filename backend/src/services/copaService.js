@@ -21,10 +21,14 @@ const GRUPOS = {
 // Busca partidas do dia atual
 async function buscarPartidasDoDia() {
   try {
-    // Pega o início e fim do dia atual (00:00:00 até 23:59:59)
-    const hoje = new Date()
-    const inicioDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0)
-    const fimDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59)
+    // Calcula início e fim do dia em BRT (UTC-3) para não perder jogos noturnos
+    const BRT = 3 * 60 * 60 * 1000
+    const hojeEmBRT = new Date(Date.now() - BRT)
+    const ano = hojeEmBRT.getUTCFullYear()
+    const mes = hojeEmBRT.getUTCMonth()
+    const dia = hojeEmBRT.getUTCDate()
+    const inicioDia = new Date(Date.UTC(ano, mes, dia,      3,  0,  0)) // 00:00 BRT
+    const fimDia    = new Date(Date.UTC(ano, mes, dia + 1,  2, 59, 59)) // 23:59 BRT
  
     const partidas = await prisma.partida.findMany({
       where: {
