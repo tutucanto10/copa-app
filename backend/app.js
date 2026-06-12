@@ -56,16 +56,20 @@ app.use('/push',            pushRoutes);
 app.use('/partidas',        partidaRoutes);  // Todos podem ver partidas
 app.use('/copa',            copaRoutes);     // Todos podem ver copa
 
-// Proxy de imagens — usado pelo share card para contornar CORS no html2canvas
+// Proxy de imagens — usado pelo share card (html2canvas) e fotos de jogadores (API-Sports)
 app.get('/proxy-image', async (req, res) => {
   const { url } = req.query;
   if (!url) return res.status(400).end();
   try {
-    const r = await fetch(url);
+    const headers = {};
+    if (url.includes('media.api-sports.io') && process.env.APIFOOTBALL_KEY) {
+      headers['x-apisports-key'] = process.env.APIFOOTBALL_KEY;
+    }
+    const r = await fetch(url, { headers });
     if (!r.ok) return res.status(r.status).end();
     const buf = await r.arrayBuffer();
     res.set('Content-Type', r.headers.get('content-type') || 'image/png');
-    res.set('Cache-Control', 'public, max-age=3600');
+    res.set('Cache-Control', 'public, max-age=86400');
     res.send(Buffer.from(buf));
   } catch { res.status(500).end(); }
 });
