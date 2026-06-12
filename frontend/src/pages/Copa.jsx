@@ -1,6 +1,31 @@
 import { useEffect, useState } from 'react'
 import api from '../api/api'
 
+function PlayerAvatar({ nome, foto_url, tamanho = 42, borda, bg = '#1e2d45', corTexto = '#cbd5e1' }) {
+  const [erro, setErro] = useState(false)
+  const iniciais = nome.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+  return (
+    <div style={{
+      width: tamanho, height: tamanho, borderRadius: '50%', flexShrink: 0,
+      background: bg, border: borda ? `2px solid ${borda}` : 'none',
+      overflow: 'hidden', position: 'relative',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      {foto_url && !erro ? (
+        <img
+          src={foto_url} alt={nome}
+          onError={() => setErro(true)}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
+        />
+      ) : (
+        <span style={{ fontSize: tamanho * 0.31, fontWeight: 700, color: corTexto, lineHeight: 1 }}>
+          {iniciais}
+        </span>
+      )}
+    </div>
+  )
+}
+
 const GRUPOS_COPA = {
   A: [
     { nome: 'México', escudo: 'https://upload.wikimedia.org/wikipedia/pt/f/f3/Mexico_national_football_team_crest_%282022%29.png' },
@@ -284,19 +309,13 @@ export default function Copa() {
                     color: index === 0 ? '#78350f' : 'var(--color-text-secondary)',
                   }}>#{index + 1}</span>
 
-                  {jogador.foto_url ? (
-                    <img src={jogador.foto_url} alt={jogador.nome} style={{
-                      width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
-                      border: `2px solid ${index === 0 ? '#92400e' : '#1e2d45'}`,
-                    }} />
-                  ) : (
-                    <div style={{
-                      width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
-                      background: index === 0 ? '#92400e' : '#1e2d45',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 18,
-                    }}>⚽</div>
-                  )}
+                  <PlayerAvatar
+                    nome={jogador.nome}
+                    foto_url={jogador.foto_url}
+                    borda={index === 0 ? '#92400e' : '#2d3f55'}
+                    bg={index === 0 ? '#92400e' : '#1e2d45'}
+                    corTexto={index === 0 ? '#fbbf24' : '#94a3b8'}
+                  />
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
@@ -350,19 +369,13 @@ export default function Copa() {
                     color: index === 0 ? '#fff' : 'var(--color-text-secondary)',
                   }}>#{index + 1}</span>
 
-                  {jogador.foto_url ? (
-                    <img src={jogador.foto_url} alt={jogador.nome} style={{
-                      width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
-                      border: `2px solid ${index === 0 ? 'rgba(255,255,255,0.4)' : '#1e2d45'}`,
-                    }} />
-                  ) : (
-                    <div style={{
-                      width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
-                      background: index === 0 ? 'rgba(255,255,255,0.2)' : '#1e2d45',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 18,
-                    }}>🅰️</div>
-                  )}
+                  <PlayerAvatar
+                    nome={jogador.nome}
+                    foto_url={jogador.foto_url}
+                    borda={index === 0 ? 'rgba(255,255,255,0.4)' : '#2d3f55'}
+                    bg={index === 0 ? 'rgba(255,255,255,0.2)' : '#1e2d45'}
+                    corTexto={index === 0 ? '#fff' : '#94a3b8'}
+                  />
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
