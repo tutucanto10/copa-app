@@ -7,6 +7,7 @@ import { subscribePush } from '../utils/push'
 function NotifBanner({ usuarioId }) {
   const [visivel, setVisivel] = useState(false)
   const [ativando, setAtivando] = useState(false)
+  const [ativado, setAtivado] = useState(false)
 
   useEffect(() => {
     if (!usuarioId) return
@@ -28,7 +29,9 @@ function NotifBanner({ usuarioId }) {
   async function ativar() {
     setAtivando(true)
     await subscribePush(usuarioId)
-    setVisivel(false)
+    setAtivando(false)
+    setAtivado(true)
+    setTimeout(() => setVisivel(false), 2500)
   }
 
   function dispensar() {
@@ -40,35 +43,42 @@ function NotifBanner({ usuarioId }) {
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #0a1a10, #001a3d)',
-      border: '1px solid #00a65155',
+      background: ativado ? 'linear-gradient(135deg, #0a1a10, #003320)' : 'linear-gradient(135deg, #0a1a10, #001a3d)',
+      border: `1px solid ${ativado ? '#00a651' : '#00a65155'}`,
       borderRadius: 12, padding: '0.75rem 1rem',
       display: 'flex', alignItems: 'center', gap: '0.75rem',
       marginBottom: '1rem',
+      transition: 'border-color 0.3s',
     }}>
-      <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>🔔</span>
-      <span style={{ flex: 1, fontSize: 13, color: '#cbd5e1', lineHeight: 1.4 }}>
-        Ative as notificações para receber lembretes 1h antes das apostas fecharem
+      <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>{ativado ? '✅' : '🔔'}</span>
+      <span style={{ flex: 1, fontSize: 13, color: ativado ? '#00a651' : '#cbd5e1', lineHeight: 1.4, fontWeight: ativado ? 700 : 400 }}>
+        {ativado
+          ? 'Notificações ativas! Você receberá uma confirmação agora.'
+          : 'Ative as notificações para receber lembretes 1h antes das apostas fecharem'}
       </span>
-      <button
-        onClick={ativar}
-        disabled={ativando}
-        style={{
-          background: '#00a651', color: '#fff', border: 'none',
-          borderRadius: 8, padding: '0.45rem 0.9rem',
-          fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0,
-          opacity: ativando ? 0.7 : 1,
-        }}
-      >
-        {ativando ? '...' : 'Ativar'}
-      </button>
-      <button
-        onClick={dispensar}
-        style={{
-          background: 'none', border: 'none', color: '#8b9bb4',
-          fontSize: '1rem', cursor: 'pointer', flexShrink: 0, padding: 4,
-        }}
-      >✕</button>
+      {!ativado && (
+        <>
+          <button
+            onClick={ativar}
+            disabled={ativando}
+            style={{
+              background: '#00a651', color: '#fff', border: 'none',
+              borderRadius: 8, padding: '0.45rem 0.9rem',
+              fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0,
+              opacity: ativando ? 0.7 : 1,
+            }}
+          >
+            {ativando ? '...' : 'Ativar'}
+          </button>
+          <button
+            onClick={dispensar}
+            style={{
+              background: 'none', border: 'none', color: '#8b9bb4',
+              fontSize: '1rem', cursor: 'pointer', flexShrink: 0, padding: 4,
+            }}
+          >✕</button>
+        </>
+      )}
     </div>
   )
 }
