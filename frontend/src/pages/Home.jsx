@@ -2,6 +2,76 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import { useAuth } from '../context/AuthContext'
+import { subscribePush } from '../utils/push'
+
+function NotifBanner({ usuarioId }) {
+  const [visivel, setVisivel] = useState(false)
+  const [ativando, setAtivando] = useState(false)
+
+  useEffect(() => {
+    if (!usuarioId) return
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) return
+    if (Notification.permission === 'denied') return
+    if (localStorage.getItem('notif_dispensado') === '1') return
+
+    if (Notification.permission !== 'granted') {
+      setVisivel(true)
+      return
+    }
+    navigator.serviceWorker.ready.then((reg) =>
+      reg.pushManager.getSubscription().then((sub) => {
+        if (!sub) setVisivel(true)
+      })
+    )
+  }, [usuarioId])
+
+  async function ativar() {
+    setAtivando(true)
+    await subscribePush(usuarioId)
+    setVisivel(false)
+  }
+
+  function dispensar() {
+    localStorage.setItem('notif_dispensado', '1')
+    setVisivel(false)
+  }
+
+  if (!visivel) return null
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #0a1a10, #001a3d)',
+      border: '1px solid #00a65155',
+      borderRadius: 12, padding: '0.75rem 1rem',
+      display: 'flex', alignItems: 'center', gap: '0.75rem',
+      marginBottom: '1rem',
+    }}>
+      <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>🔔</span>
+      <span style={{ flex: 1, fontSize: 13, color: '#cbd5e1', lineHeight: 1.4 }}>
+        Ative as notificações para receber lembretes 1h antes das apostas fecharem
+      </span>
+      <button
+        onClick={ativar}
+        disabled={ativando}
+        style={{
+          background: '#00a651', color: '#fff', border: 'none',
+          borderRadius: 8, padding: '0.45rem 0.9rem',
+          fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0,
+          opacity: ativando ? 0.7 : 1,
+        }}
+      >
+        {ativando ? '...' : 'Ativar'}
+      </button>
+      <button
+        onClick={dispensar}
+        style={{
+          background: 'none', border: 'none', color: '#8b9bb4',
+          fontSize: '1rem', cursor: 'pointer', flexShrink: 0, padding: 4,
+        }}
+      >✕</button>
+    </div>
+  )
+}
 
 function formatarHora(data) {
   return new Date(data).toLocaleTimeString('pt-BR', {
@@ -603,6 +673,7 @@ export default function Home() {
         }
       `}</style>
 
+      <NotifBanner usuarioId={usuario?.id} />
       <CardCampeao usuarioId={usuario?.id} />
       <CardRegras />
 
