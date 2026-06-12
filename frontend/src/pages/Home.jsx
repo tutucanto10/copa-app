@@ -223,7 +223,7 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
                 <span style={{ fontSize: 13, fontWeight: 700, color: corAposta }}>
                   {aposta.placarCasa} × {aposta.placarFora}
                   {finalizada && acertouPlacar && ' ✓ +3pts'}
-                  {finalizada && acertouVencedor && ' ✓ +1pt'}
+                  {finalizada && acertouVencedor && ' ✗ +1pt'}
                   {finalizada && !acertouPlacar && !acertouVencedor && ' ✗'}
                 </span>
               </div>
@@ -441,85 +441,6 @@ function CardCampeao({ usuarioId }) {
   )
 }
 
-function MvpRow({ rodada, mvp, completa }) {
-  const iniciais = mvp.usuario.nome.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
-  return (
-    <div style={{
-      background: '#0a0e1a',
-      border: `1px solid ${completa ? '#f5d00044' : '#1e2d45'}`,
-      borderRadius: 10, padding: '0.65rem 1rem',
-      display: 'flex', alignItems: 'center', gap: '0.75rem',
-    }}>
-      <span style={{ fontSize: '0.7rem', color: '#8b9bb4', fontWeight: 700, minWidth: 64 }}>
-        RODADA {rodada}{!completa && ' ⏳'}
-      </span>
-      {mvp.usuario.foto_url ? (
-        <img src={mvp.usuario.foto_url} alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-      ) : (
-        <div style={{
-          width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-          background: '#1a1200', border: '2px solid #f5d000',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '0.7rem', fontWeight: 700, color: '#f5d000',
-        }}>{iniciais}</div>
-      )}
-      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f0f4ff', flex: 1 }}>
-        {mvp.usuario.nome}
-      </span>
-      <div style={{ textAlign: 'right' }}>
-        <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.2rem', color: '#f5d000', lineHeight: 1 }}>
-          {mvp.pontos}pts
-        </div>
-        {mvp.exatos > 0 && (
-          <div style={{ fontSize: '0.65rem', color: '#8b9bb4', marginTop: 1 }}>
-            {mvp.exatos} exato{mvp.exatos > 1 ? 's' : ''}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function CardMvp({ usuarioId }) {
-  const [ligas, setLigas] = useState([])
-
-  useEffect(() => {
-    if (!usuarioId) return
-    api.get(`/mvp?usuarioId=${usuarioId}`).then((r) => setLigas(r.data)).catch(() => {})
-  }, [usuarioId])
-
-  if (ligas.length === 0) return null
-
-  return (
-    <div style={{
-      background: 'linear-gradient(135deg, #1a1200, #0d1321)',
-      border: '1px solid #f5d000',
-      borderRadius: 16, padding: '1.25rem',
-      marginBottom: '1.75rem',
-    }}>
-      <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.1rem', letterSpacing: 2, color: '#f5d000', marginBottom: '1rem' }}>
-        🏅 MVP DAS RODADAS
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {ligas.map(({ liga, rodadas }) => (
-          <div key={liga.id}>
-            {ligas.length > 1 && (
-              <div style={{ fontSize: '0.7rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.4rem' }}>
-                {liga.nome}
-              </div>
-            )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {rodadas.map(({ rodada, mvp, completa }) => (
-                <MvpRow key={rodada} rodada={rodada} mvp={mvp} completa={completa} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 function CardRegras() {
   const [aberto, setAberto] = useState(false)
 
@@ -680,7 +601,6 @@ export default function Home() {
       `}</style>
 
       <CardCampeao usuarioId={usuario?.id} />
-      <CardMvp usuarioId={usuario?.id} />
       <CardRegras />
 
       <div style={{ marginBottom: '1.5rem' }}>

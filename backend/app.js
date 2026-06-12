@@ -70,6 +70,10 @@ app.get('/proxy-image', async (req, res) => {
   } catch { res.status(500).end(); }
 });
 
+// Eventos: leitura pública (usuários veem a timeline), escrita protegida
+const { index: listarEventos } = require('./src/controllers/eventoController');
+app.get('/eventos/:partidaId', listarEventos);
+
 // Rotas 100% protegidas (ADMIN apenas - criar/editar/deletar)
 app.use('/eventos',         verificarAdmin, eventoRoutes);
 app.use('/evento',          verificarAdmin, eventoRoutes);
