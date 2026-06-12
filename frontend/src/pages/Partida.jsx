@@ -308,7 +308,7 @@ export default function Partida() {
             </div>
           )}
 
-          {apostaFeita && (
+          {apostaFeita && apostaFeita.placarCasa >= 0 && apostaFeita.placarFora >= 0 && (
             <div style={{
               background: acertouPlacar ? '#022c1a' : '#1f0a0a',
               border: `1px solid ${acertouPlacar ? '#00a651' : '#e8192c'}`,
@@ -379,7 +379,7 @@ export default function Partida() {
                 </div>
                 <div style={{ textAlign: 'center', flex: 1 }}>
                   <div style={{ color: '#f0f4ff', fontSize: '2.4rem', fontWeight: 800, lineHeight: 1 }}>
-                    {apostaFeita.placarCasa} × {apostaFeita.placarFora}
+                    {apostaFeita.placarCasa >= 0 ? `${apostaFeita.placarCasa} × ${apostaFeita.placarFora}` : '– × –'}
                   </div>
                   <div style={{ color: '#8b9bb4', fontSize: '0.6rem', letterSpacing: 2, marginTop: 4 }}>
                     {finalizada ? 'RESULTADO FINAL' : 'MEU PALPITE'}
@@ -588,7 +588,7 @@ export default function Partida() {
                     color: '#00a651', fontWeight: 600,
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem',
                   }}>
-                    <span>✅ Aposta: {apostaFeita.placarCasa} × {apostaFeita.placarFora}
+                    <span>✅ {apostaFeita.placarCasa >= 0 ? `Aposta: ${apostaFeita.placarCasa} × ${apostaFeita.placarFora}` : 'Vencedor apostado'}
                     {!finalizada && podeApostar && ' — aguardando resultado'}</span>
                     <button
                       onClick={handleCompartilhar}

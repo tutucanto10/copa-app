@@ -214,16 +214,20 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
             : aposta.vencedor === 'empate' ? 'Empate'
             : null
 
+          const temPlacar = aposta.placarCasa >= 0 && aposta.placarFora >= 0
+
           return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>Placar:</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: finalizada ? acertouPlacar ? '#00a651' : '#e24b4a' : '#f5a623' }}>
-                  {aposta.placarCasa} × {aposta.placarFora}
-                  {finalizada && acertouPlacar && ' ✓ +3pts'}
-                  {finalizada && !acertouPlacar && ' ✗'}
-                </span>
-              </div>
+              {temPlacar && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>Placar:</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: finalizada ? acertouPlacar ? '#00a651' : '#e24b4a' : '#f5a623' }}>
+                    {aposta.placarCasa} × {aposta.placarFora}
+                    {finalizada && acertouPlacar && ' ✓ +3pts'}
+                    {finalizada && !acertouPlacar && ' ✗'}
+                  </span>
+                </div>
+              )}
               {nomeVencedor && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>Vencedor:</span>
