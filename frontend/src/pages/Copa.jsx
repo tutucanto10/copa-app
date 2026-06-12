@@ -81,67 +81,76 @@ export default function Copa() {
   const [classificacao, setClassificacao] = useState({})
   const [artilheiros, setArtilheiros] = useState([])
   const [assistentes, setAssistentes] = useState([])
-  const [partidasDoDia, setPartidasDoDia] = useState([])
 
-  useEffect(() => {
-    carregarDadosCopa()
-  }, [])
+  useEffect(() => { carregarDadosCopa() }, [])
 
   async function carregarDadosCopa() {
     try {
-      // Busca classificação dos grupos
-      const resClassificacao = await api.get('/copa/classificacao')
-      setClassificacao(resClassificacao.data)
-
-      // Busca artilheiros
-      const resArtilheiros = await api.get('/copa/artilheiros?limit=5')
-      setArtilheiros(resArtilheiros.data)
-
-      // Busca assistências
-      const resAssistencias = await api.get('/copa/assistencias?limit=5')
-      setAssistentes(resAssistencias.data)
+      const [resClass, resArt, resAss] = await Promise.all([
+        api.get('/copa/classificacao'),
+        api.get('/copa/artilheiros?limit=5'),
+        api.get('/copa/assistencias?limit=5'),
+      ])
+      setClassificacao(resClass.data)
+      setArtilheiros(resArt.data)
+      setAssistentes(resAss.data)
     } catch (error) {
       console.error('Erro ao carregar dados da Copa:', error)
-      // Em caso de erro, mantém dados vazios
-      const classifVazia = {}
-      Object.keys(GRUPOS_COPA).forEach((grupo) => {
-        classifVazia[grupo] = GRUPOS_COPA[grupo].map((selecao) => ({
-          ...selecao,
-          jogos: 0,
-          vitorias: 0,
-          empates: 0,
-          derrotas: 0,
-          golsPro: 0,
-          golsContra: 0,
-          saldoGols: 0,
-          pontos: 0,
+      const vazio = {}
+      Object.keys(GRUPOS_COPA).forEach((g) => {
+        vazio[g] = GRUPOS_COPA[g].map((s) => ({
+          ...s, jogos: 0, vitorias: 0, empates: 0, derrotas: 0,
+          golsPro: 0, golsContra: 0, saldoGols: 0, pontos: 0,
         }))
       })
-      setClassificacao(classifVazia)
-      setArtilheiros([])
-      setAssistentes([])
+      setClassificacao(vazio)
     }
   }
 
   return (
-    <div style={{ padding: '2rem 1rem', maxWidth: 1400, margin: '0 auto' }}>
+    <div style={{ padding: '1.5rem 1rem', maxWidth: 1400, margin: '0 auto' }}>
+      <style>{`
+        .copa-grupos-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.65rem;
+        }
+        @media (min-width: 640px) {
+          .copa-grupos-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        }
+        @media (min-width: 1024px) {
+          .copa-grupos-grid { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+        }
+        .copa-stats-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+        @media (min-width: 640px) {
+          .copa-stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+      `}</style>
+
       {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{
-          fontSize: '2rem',
-          fontWeight: 700,
-          color: 'var(--color-text-primary)',
-          margin: '0 0 0.5rem',
+          fontSize: '1.75rem', fontWeight: 700,
+          color: 'var(--color-text-primary)', margin: '0 0 0.3rem',
+          fontFamily: 'var(--fonte-display)', letterSpacing: '2px',
         }}>
-          Copa do Mundo 2026 🏆
+          COPA 2026 🏆
         </h1>
-        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
-          Acompanhe grupos, artilheiros e mata-mata em tempo real
+        <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: 0 }}>
+          Grupos, artilheiros e mata-mata em tempo real
         </p>
       </div>
 
       {/* Abas */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--color-border-tertiary)' }}>
+      <div style={{
+        display: 'flex', marginBottom: '1.5rem',
+        borderBottom: '1px solid var(--color-border-tertiary)',
+        overflowX: 'auto',
+      }}>
         {[
           { id: 'grupos', label: '📊 Grupos' },
           { id: 'artilheiros', label: '⚽ Artilheiros' },
@@ -151,14 +160,12 @@ export default function Copa() {
             key={aba.id}
             onClick={() => setAbaAtiva(aba.id)}
             style={{
-              padding: '0.75rem 1.5rem',
-              border: 'none',
-              background: 'transparent',
+              padding: '0.65rem 1.1rem', border: 'none', background: 'transparent',
               color: abaAtiva === aba.id ? '#00a651' : 'var(--color-text-secondary)',
-              fontWeight: abaAtiva === aba.id ? 700 : 500,
-              cursor: 'pointer',
+              fontWeight: abaAtiva === aba.id ? 700 : 500, cursor: 'pointer',
               borderBottom: abaAtiva === aba.id ? '3px solid #00a651' : '3px solid transparent',
-              transition: 'all 0.2s',
+              whiteSpace: 'nowrap', fontSize: 14, transition: 'all 0.15s',
+              flexShrink: 0,
             }}
           >
             {aba.label}
@@ -166,286 +173,231 @@ export default function Copa() {
         ))}
       </div>
 
-      {/* Conteúdo - Grupos - VISUALIZAÇÃO COMPLETA */}
+      {/* ── GRUPOS ── */}
       {abaAtiva === 'grupos' && (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '1.5rem',
-          maxWidth: 1600,
-          margin: '0 auto',
-        }}>
-          {Object.keys(GRUPOS_COPA).map((letra) => (
-            <div
-              key={letra}
-              style={{
-                background: 'linear-gradient(135deg, #1a4d2e 0%, #0d2b1a 100%)',
-                borderRadius: 12,
-                padding: '1rem',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-              }}
-            >
-              <div style={{
-                background: 'rgba(255,255,255,0.1)',
-                borderRadius: 8,
-                padding: '1rem',
-                backdropFilter: 'blur(10px)',
+        <div className="copa-grupos-grid">
+          {Object.keys(GRUPOS_COPA).map((letra) => {
+            const times = classificacao[letra] || GRUPOS_COPA[letra].map((s) => ({
+              nome: s.nome, escudo: s.escudo,
+              jogos: 0, saldoGols: 0, pontos: 0,
+            }))
+
+            return (
+              <div key={letra} style={{
+                background: 'linear-gradient(160deg, #1a4d2e 0%, #0d2316 100%)',
+                borderRadius: 10, overflow: 'hidden',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.35)',
               }}>
-                {/* Header do Grupo */}
+                {/* Cabeçalho do grupo */}
                 <div style={{
-                  textAlign: 'center',
-                  marginBottom: '0.75rem',
-                  paddingBottom: '0.5rem',
-                  borderBottom: '2px solid rgba(255,255,255,0.2)',
+                  padding: '0.45rem 0.65rem',
+                  background: 'rgba(0,0,0,0.25)',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }}>
-                  <h3 style={{
-                    fontSize: '1.1rem',
-                    fontWeight: 700,
-                    color: '#fff',
-                    margin: 0,
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
-                  }}>
-                    Grupo {letra}
-                  </h3>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#fff', letterSpacing: '1px' }}>
+                    GRUPO {letra}
+                  </span>
+                  <div style={{ display: 'flex', gap: 2 }}>
+                    {['J', 'SG', 'PTS'].map((col) => (
+                      <span key={col} style={{
+                        fontSize: 9, color: 'rgba(255,255,255,0.35)', fontWeight: 700,
+                        width: col === 'J' ? 16 : 22, textAlign: 'center',
+                      }}>{col}</span>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Seleções */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  {GRUPOS_COPA[letra]?.map((selecao, index) => {
-                    const dados = classificacao[letra]?.[index]
-                    return (
-                      <div
-                        key={index}
-                        style={{
-                          background: 'rgba(255,255,255,0.98)',
-                          borderRadius: 6,
-                          padding: '0.5rem 0.75rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.75rem',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                          borderLeft: index === 0 ? '3px solid #fbbf24' : '3px solid transparent',
-                        }}
-                      >
-                        {/* Escudo */}
-                        <div style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 4,
-                          flexShrink: 0,
-                          background: '#f9fafb',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: 2,
-                        }}>
-                          <img
-                            src={selecao.escudo}
-                            alt={selecao.nome}
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'contain',
-                            }}
-                          />
-                        </div>
-
-                        {/* Nome */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{
-                            fontSize: 11,
-                            fontWeight: 700,
-                            color: '#1f2937',
-                            textTransform: 'uppercase',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}>
-                            {selecao.nome}
-                          </div>
-                          {dados && (
-                            <div style={{
-                              fontSize: 9,
-                              color: '#6b7280',
-                              marginTop: '0.1rem',
-                            }}>
-                              {dados.jogos}J • {dados.vitorias}V • {dados.empates}E
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Pontos */}
-                        {dados && (
-                          <div style={{
-                            fontSize: 20,
-                            fontWeight: 900,
-                            color: index === 0 ? '#fbbf24' : '#00a651',
-                            minWidth: 28,
-                            textAlign: 'right',
-                          }}>
-                            {dados.pontos}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
+                {/* Times */}
+                <div style={{ padding: '0.35rem 0.4rem', display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {times.map((time, index) => (
+                    <div key={index} style={{
+                      display: 'flex', alignItems: 'center', gap: 5,
+                      padding: '0.28rem 0.45rem', borderRadius: 5,
+                      background: index < 2 ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)',
+                      borderLeft: `2px solid ${index === 0 ? '#fbbf24' : index === 1 ? 'rgba(255,255,255,0.25)' : 'transparent'}`,
+                    }}>
+                      <img
+                        src={time.escudo}
+                        alt={time.nome}
+                        style={{ width: 18, height: 14, objectFit: 'contain', flexShrink: 0 }}
+                        onError={(e) => { e.target.style.display = 'none' }}
+                      />
+                      <span style={{
+                        flex: 1, minWidth: 0, fontSize: 10,
+                        fontWeight: index < 2 ? 700 : 400,
+                        color: index < 2 ? '#fff' : 'rgba(255,255,255,0.5)',
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      }}>
+                        {time.nome}
+                      </span>
+                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', width: 16, textAlign: 'center' }}>
+                        {time.jogos ?? 0}
+                      </span>
+                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', width: 22, textAlign: 'center' }}>
+                        {time.saldoGols != null
+                          ? time.saldoGols > 0 ? `+${time.saldoGols}` : time.saldoGols
+                          : 0}
+                      </span>
+                      <span style={{
+                        fontSize: 12, fontWeight: 900, width: 22, textAlign: 'center',
+                        color: index === 0 ? '#fbbf24' : index === 1 ? '#86efac' : '#00a651',
+                      }}>
+                        {time.pontos ?? 0}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
-      {/* Conteúdo - Artilheiros */}
+      {/* ── ARTILHEIROS ── */}
       {abaAtiva === 'artilheiros' && (
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-            {/* Top Artilheiros */}
-            <div>
-              <h3 style={{
-                fontSize: '1.25rem',
-                fontWeight: 700,
-                color: 'var(--color-text-primary)',
-                marginBottom: '1rem',
-              }}>⚽ Artilheiros</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {artilheiros.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '2rem' }}>
-                    Disponível quando a Copa começar ⚽
-                  </div>
-                ) : artilheiros.map((jogador, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      background: index === 0 ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' : 'var(--color-background-primary)',
-                      border: '1px solid var(--color-border-tertiary)',
-                      borderRadius: 12,
-                      padding: '0.75rem 1.25rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1rem',
-                    }}
-                  >
-                    {/* Posição */}
-                    <span style={{
-                      fontWeight: 900, fontSize: 14, minWidth: 20, textAlign: 'center',
-                      color: index === 0 ? '#000' : 'var(--color-text-secondary)',
-                    }}>
-                      {index + 1}º
-                    </span>
-                    {/* Foto */}
-                    {jogador.foto_url ? (
-                      <img src={jogador.foto_url} alt={jogador.nome} style={{
-                        width: 44, height: 44, borderRadius: '50%',
-                        objectFit: 'cover', flexShrink: 0,
-                        border: `2px solid ${index === 0 ? '#000' : '#1e2d45'}`,
-                      }} />
-                    ) : (
-                      <div style={{
-                        width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                        background: index === 0 ? '#000' : '#00a651',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 700, color: '#fff', fontSize: 16,
-                      }}>⚽</div>
-                    )}
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: index === 0 ? '#000' : 'var(--color-text-primary)' }}>
-                        {jogador.nome}
-                      </div>
-                      <div style={{ fontSize: 12, color: index === 0 ? 'rgba(0,0,0,0.7)' : 'var(--color-text-secondary)' }}>
-                        {jogador.selecao}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: index === 0 ? '#000' : '#00a651', lineHeight: 1 }}>
-                        {jogador.gols}
-                      </div>
-                      <div style={{ fontSize: 10, color: index === 0 ? 'rgba(0,0,0,0.6)' : 'var(--color-text-secondary)' }}>gols</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <div className="copa-stats-grid">
+          {/* Artilheiros */}
+          <div>
+            <div style={{
+              fontSize: '0.7rem', fontWeight: 800, letterSpacing: 1.5,
+              color: 'var(--color-text-secondary)', textTransform: 'uppercase',
+              marginBottom: '0.75rem',
+            }}>⚽ Artilheiros</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {artilheiros.length === 0 ? (
+                <div style={{
+                  textAlign: 'center', color: 'var(--color-text-secondary)',
+                  padding: '2rem', background: 'var(--color-background-secondary)', borderRadius: 12,
+                }}>
+                  Disponível quando a Copa começar ⚽
+                </div>
+              ) : artilheiros.map((jogador, index) => (
+                <div key={index} style={{
+                  background: index === 0
+                    ? 'linear-gradient(135deg, #fbbf24, #f59e0b)'
+                    : 'var(--color-background-secondary)',
+                  borderRadius: 12, padding: '0.65rem 1rem',
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                }}>
+                  <span style={{
+                    fontWeight: 900, fontSize: 12, minWidth: 20, textAlign: 'center',
+                    color: index === 0 ? '#78350f' : 'var(--color-text-secondary)',
+                  }}>#{index + 1}</span>
 
-            {/* Top Assistências */}
-            <div>
-              <h3 style={{
-                fontSize: '1.25rem',
-                fontWeight: 700,
-                color: 'var(--color-text-primary)',
-                marginBottom: '1rem',
-              }}>🅰️ Assistências</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {assistentes.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '2rem' }}>
-                    Disponível quando a Copa começar 🅰️
-                  </div>
-                ) : assistentes.map((jogador, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      background: index === 0 ? 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)' : 'var(--color-background-primary)',
-                      border: '1px solid var(--color-border-tertiary)',
-                      borderRadius: 12,
-                      padding: '0.75rem 1.25rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1rem',
-                    }}
-                  >
-                    <span style={{
-                      fontWeight: 900, fontSize: 14, minWidth: 20, textAlign: 'center',
-                      color: index === 0 ? '#fff' : 'var(--color-text-secondary)',
-                    }}>
-                      {index + 1}º
-                    </span>
-                    {jogador.foto_url ? (
-                      <img src={jogador.foto_url} alt={jogador.nome} style={{
-                        width: 44, height: 44, borderRadius: '50%',
-                        objectFit: 'cover', flexShrink: 0,
-                        border: `2px solid ${index === 0 ? '#fff' : '#1e2d45'}`,
-                      }} />
-                    ) : (
-                      <div style={{
-                        width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                        background: index === 0 ? '#fff' : '#3b82f6',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 700, color: index === 0 ? '#3b82f6' : '#fff', fontSize: 16,
-                      }}>🅰️</div>
-                    )}
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: index === 0 ? '#fff' : 'var(--color-text-primary)' }}>
-                        {jogador.nome}
-                      </div>
-                      <div style={{ fontSize: 12, color: index === 0 ? 'rgba(255,255,255,0.8)' : 'var(--color-text-secondary)' }}>
-                        {jogador.selecao}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: index === 0 ? '#fff' : '#3b82f6', lineHeight: 1 }}>
-                        {jogador.assistencias}
-                      </div>
-                      <div style={{ fontSize: 10, color: index === 0 ? 'rgba(255,255,255,0.7)' : 'var(--color-text-secondary)' }}>asts</div>
+                  {jogador.foto_url ? (
+                    <img src={jogador.foto_url} alt={jogador.nome} style={{
+                      width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
+                      border: `2px solid ${index === 0 ? '#92400e' : '#1e2d45'}`,
+                    }} />
+                  ) : (
+                    <div style={{
+                      width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
+                      background: index === 0 ? '#92400e' : '#1e2d45',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18,
+                    }}>⚽</div>
+                  )}
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: 13, fontWeight: 700,
+                      color: index === 0 ? '#1c0a00' : 'var(--color-text-primary)',
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>{jogador.nome}</div>
+                    <div style={{ fontSize: 11, color: index === 0 ? '#78350f' : 'var(--color-text-secondary)' }}>
+                      {jogador.selecao}
                     </div>
                   </div>
-                ))}
-              </div>
+
+                  <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: index === 0 ? '#1c0a00' : '#00a651', lineHeight: 1 }}>
+                      {jogador.gols}
+                    </div>
+                    <div style={{ fontSize: 9, color: index === 0 ? '#92400e' : 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                      gols
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Assistências */}
+          <div>
+            <div style={{
+              fontSize: '0.7rem', fontWeight: 800, letterSpacing: 1.5,
+              color: 'var(--color-text-secondary)', textTransform: 'uppercase',
+              marginBottom: '0.75rem',
+            }}>🅰️ Assistências</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {assistentes.length === 0 ? (
+                <div style={{
+                  textAlign: 'center', color: 'var(--color-text-secondary)',
+                  padding: '2rem', background: 'var(--color-background-secondary)', borderRadius: 12,
+                }}>
+                  Disponível quando a Copa começar 🅰️
+                </div>
+              ) : assistentes.map((jogador, index) => (
+                <div key={index} style={{
+                  background: index === 0
+                    ? 'linear-gradient(135deg, #60a5fa, #3b82f6)'
+                    : 'var(--color-background-secondary)',
+                  borderRadius: 12, padding: '0.65rem 1rem',
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                }}>
+                  <span style={{
+                    fontWeight: 900, fontSize: 12, minWidth: 20, textAlign: 'center',
+                    color: index === 0 ? '#fff' : 'var(--color-text-secondary)',
+                  }}>#{index + 1}</span>
+
+                  {jogador.foto_url ? (
+                    <img src={jogador.foto_url} alt={jogador.nome} style={{
+                      width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
+                      border: `2px solid ${index === 0 ? 'rgba(255,255,255,0.4)' : '#1e2d45'}`,
+                    }} />
+                  ) : (
+                    <div style={{
+                      width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
+                      background: index === 0 ? 'rgba(255,255,255,0.2)' : '#1e2d45',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18,
+                    }}>🅰️</div>
+                  )}
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: 13, fontWeight: 700,
+                      color: index === 0 ? '#fff' : 'var(--color-text-primary)',
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>{jogador.nome}</div>
+                    <div style={{ fontSize: 11, color: index === 0 ? 'rgba(255,255,255,0.75)' : 'var(--color-text-secondary)' }}>
+                      {jogador.selecao}
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: index === 0 ? '#fff' : '#3b82f6', lineHeight: 1 }}>
+                      {jogador.assistencias}
+                    </div>
+                    <div style={{ fontSize: 9, color: index === 0 ? 'rgba(255,255,255,0.7)' : 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                      asts
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* Conteúdo - Mata-Mata */}
+      {/* ── MATA-MATA ── */}
       {abaAtiva === 'matamata' && (
         <div style={{
           background: 'var(--color-background-secondary)',
-          borderRadius: 12,
-          padding: '2rem',
-          textAlign: 'center',
+          borderRadius: 12, padding: '2rem', textAlign: 'center',
         }}>
-          <p style={{ fontSize: 16, color: 'var(--color-text-secondary)' }}>
-            Chaveamento do mata-mata será exibido após a conclusão da fase de grupos
+          <p style={{ fontSize: 15, color: 'var(--color-text-secondary)', margin: 0 }}>
+            Chaveamento será exibido após a fase de grupos
           </p>
         </div>
       )}
