@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../api/api'
+import BadgePill from './BadgePill'
 
 const RESULTADO_CONFIG = {
   placar_exato: { cor: '#00a651', icone: '🎯', label: 'Placar exato', pts: '+3pts' },
@@ -129,15 +130,7 @@ export default function ModalPerfilPublico({ usuarioId, onClose }) {
                     </div>
                   )}
                   {perfil.badges.map((b) => (
-                    <div key={b.id} title={b.desc} style={{
-                      background: '#0a0e1a', border: '1px solid #1e2d45',
-                      borderRadius: 20, padding: '0.4rem 0.85rem',
-                      display: 'flex', alignItems: 'center', gap: '0.4rem',
-                      cursor: 'default',
-                    }}>
-                      <span style={{ fontSize: '1rem' }}>{b.emoji}</span>
-                      <span style={{ fontSize: '0.75rem', color: '#f0f4ff', fontWeight: 600 }}>{b.nome}</span>
-                    </div>
+                    <BadgePill key={b.id} badge={b} />
                   ))}
                 </div>
               </div>
