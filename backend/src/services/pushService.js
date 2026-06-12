@@ -146,7 +146,7 @@ async function notificarLembretes() {
   if (!vapidConfigurado) return
 
   const agora = new Date()
-  // Janela de 30 min centrada em 2h antes do jogo — cada partida cai aqui só uma vez por execução
+  // Janela de 30 min centrada em 2h antes do jogo = 1h antes de fechar apostas
   const min = new Date(agora.getTime() + 105 * 60 * 1000) // 1h45
   const max = new Date(agora.getTime() + 135 * 60 * 1000) // 2h15
 
@@ -157,23 +157,18 @@ async function notificarLembretes() {
 
   if (partidas.length === 0) return
 
+  // Busca todas as subscrições — avisa todo mundo, independente de já ter apostado
+  const subs = await prisma.pushSubscription.findMany()
+  if (subs.length === 0) return
+
   for (const partida of partidas) {
-    const jaApostaram = await prisma.aposta.findMany({
-      where: { partidaId: partida.id },
-      select: { usuarioId: true },
-    })
-    const jaIds = new Set(jaApostaram.map((a) => a.usuarioId))
-
-    const subs = await prisma.pushSubscription.findMany({
-      where: { usuarioId: { notIn: [...jaIds] } },
+    const hora = new Date(partida.data).toLocaleTimeString('pt-BR', {
+      hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
     })
 
-    if (subs.length === 0) continue
-
-    const horasRestantes = Math.round((new Date(partida.data) - agora) / 3600000)
     const payload = JSON.stringify({
-      titulo: '⚠️ Você ainda não apostou!',
-      corpo: `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} começa em ${horasRestantes}h`,
+      titulo: '⏰ Apostas fechando em 1h!',
+      corpo: `Falta 1h para as apostas de ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} (${hora}) fecharem — já fez as suas?`,
       url: `/partida/${partida.id}`,
     })
 
@@ -188,7 +183,7 @@ async function notificarLembretes() {
       )
     )
 
-    console.log(`🔔 Lembrete enviado para ${subs.length} usuário(s) — ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`)
+    console.log(`🔔 Lembrete (${hora}) enviado para ${subs.length} usuário(s) — ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`)
   }
 }
 
