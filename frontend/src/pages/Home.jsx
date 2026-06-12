@@ -207,9 +207,7 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
         borderTop: '0.5px solid var(--color-border-tertiary)',
       }}>
         {aposta ? (() => {
-          const corAposta = finalizada
-            ? acertouPlacar ? '#00a651' : acertouVencedor ? '#3b82f6' : '#e24b4a'
-            : '#f5a623'
+          const vencedorCerto = finalizada && aposta.vencedor && aposta.vencedor === vencedorReal
 
           const nomeVencedor = aposta.vencedor === 'casa' ? partida.selecaoCasa?.nome
             : aposta.vencedor === 'fora' ? partida.selecaoFora?.nome
@@ -220,18 +218,19 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>Placar:</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: corAposta }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: finalizada ? acertouPlacar ? '#00a651' : '#e24b4a' : '#f5a623' }}>
                   {aposta.placarCasa} × {aposta.placarFora}
                   {finalizada && acertouPlacar && ' ✓ +3pts'}
-                  {finalizada && acertouVencedor && ' ✗ +1pt'}
-                  {finalizada && !acertouPlacar && !acertouVencedor && ' ✗'}
+                  {finalizada && !acertouPlacar && ' ✗'}
                 </span>
               </div>
               {nomeVencedor && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>Vencedor:</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: corAposta }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: finalizada ? vencedorCerto ? '#3b82f6' : '#e24b4a' : '#f5a623' }}>
                     {nomeVencedor}
+                    {finalizada && vencedorCerto && ' +1pt'}
+                    {finalizada && !vencedorCerto && ' ✗'}
                   </span>
                 </div>
               )}
