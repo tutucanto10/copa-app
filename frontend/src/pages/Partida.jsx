@@ -44,6 +44,11 @@ export default function Partida() {
               placarCasa: r.data.placarCasa,
               placarFora: r.data.placarFora,
             })
+            // DB é fonte de verdade — sincroniza localStorage
+            if (r.data.vencedor) {
+              setVencedorFeito(r.data.vencedor)
+              localStorage.setItem(`vencedor_${id}`, r.data.vencedor)
+            }
           }
         })
         .catch(() => {})
