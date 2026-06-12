@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import api from '../api/api'
 
+const API_URL = import.meta.env.VITE_API_URL || ''
+
 function PlayerAvatar({ nome, foto_url, tamanho = 42, borda, bg = '#1e2d45', corTexto = '#cbd5e1' }) {
-  const [erro, setErro] = useState(false)
   const iniciais = nome.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+  const proxied = foto_url ? `${API_URL}/proxy-image?url=${encodeURIComponent(foto_url)}` : null
   return (
     <div style={{
       width: tamanho, height: tamanho, borderRadius: '50%', flexShrink: 0,
@@ -11,16 +13,15 @@ function PlayerAvatar({ nome, foto_url, tamanho = 42, borda, bg = '#1e2d45', cor
       overflow: 'hidden', position: 'relative',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      {foto_url && !erro ? (
+      <span style={{ fontSize: tamanho * 0.31, fontWeight: 700, color: corTexto, lineHeight: 1 }}>
+        {iniciais}
+      </span>
+      {proxied && (
         <img
-          src={foto_url} alt={nome}
-          onError={() => setErro(true)}
+          src={proxied} alt={nome}
+          onError={(e) => { e.currentTarget.style.display = 'none' }}
           style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
         />
-      ) : (
-        <span style={{ fontSize: tamanho * 0.31, fontWeight: 700, color: corTexto, lineHeight: 1 }}>
-          {iniciais}
-        </span>
       )}
     </div>
   )
