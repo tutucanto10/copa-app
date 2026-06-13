@@ -109,7 +109,7 @@ async function rankingPorLiga(ligaId) {
         aposta.placarCasa >= 0;
 
       if (acertouPlacar) { pontos += 3; placaresExatos++; }
-      if (aposta.vencedor && aposta.vencedor === vencedorReal) { pontos += 1; vencedoresAcertados++; }
+      else if (aposta.vencedor && aposta.vencedor === vencedorReal) { pontos += 1; vencedoresAcertados++; }
     }
 
     for (const apostaGol of usuario.apostasGoleador) {
