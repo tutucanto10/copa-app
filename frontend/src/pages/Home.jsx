@@ -163,19 +163,21 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
   const agendada = partida.status === 'AGENDADA'
 
   const acertouPlacar = aposta && finalizada &&
+    aposta.placarCasa >= 0 &&
     aposta.placarCasa === partida.placarCasa &&
     aposta.placarFora === partida.placarFora
 
   const vencedorReal = partida.placarCasa > partida.placarFora ? 'casa'
     : partida.placarFora > partida.placarCasa ? 'fora' : 'empate'
   const vencedorAposta = aposta
-    ? aposta.placarCasa > aposta.placarFora ? 'casa'
-    : aposta.placarFora > aposta.placarCasa ? 'fora' : 'empate'
+    ? (aposta.vencedor || (aposta.placarCasa >= 0
+        ? (aposta.placarCasa > aposta.placarFora ? 'casa'
+          : aposta.placarFora > aposta.placarCasa ? 'fora' : 'empate')
+        : null))
     : null
-  const acertouVencedor = aposta && finalizada && !acertouPlacar &&
-    vencedorReal === vencedorAposta
+  const acertouVencedor = aposta && finalizada && vencedorReal === vencedorAposta
 
-  const pontosAposta = acertouPlacar ? 3 : acertouVencedor ? 1 : 0
+  const pontosAposta = (acertouPlacar ? 3 : 0) + (acertouVencedor ? 1 : 0)
 
   // Define a cor da borda baseado no status
   const getBorderStyle = () => {

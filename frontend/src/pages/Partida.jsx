@@ -296,7 +296,7 @@ export default function Partida() {
                   Resultado: {vencedorReal === 'casa' ? partida.selecaoCasa?.nome : vencedorReal === 'fora' ? partida.selecaoFora?.nome : 'Empate'}
                 </div>
               </div>
-              {acertouVencedor && !acertouPlacar && (
+              {acertouVencedor && (
                 <div style={{
                   background: '#00a651', borderRadius: 8,
                   padding: '0.4rem 0.75rem', textAlign: 'center',
@@ -403,7 +403,7 @@ export default function Partida() {
                   <div style={{ color: '#8b9bb4', fontSize: '0.8rem', marginTop: 6 }}>
                     Resultado: <strong style={{ color: '#f0f4ff' }}>{partida.placarCasa} × {partida.placarFora}</strong>
                     {acertouPlacar && <span style={{ color: '#00a651', marginLeft: 8, fontWeight: 700 }}>+3 pts</span>}
-                    {acertouVencedor && !acertouPlacar && <span style={{ color: '#60a5fa', marginLeft: 8, fontWeight: 700 }}>+1 pt</span>}
+                    {acertouVencedor && <span style={{ color: '#60a5fa', marginLeft: 8, fontWeight: 700 }}>+1 pt</span>}
                   </div>
                 </div>
               ) : (

@@ -26,11 +26,18 @@ function calcularPontos(apostas) {
       partida.placarCasa > partida.placarFora ? 'casa' :
       partida.placarFora > partida.placarCasa ? 'fora' : 'empate';
     if (
+      aposta.placarCasa >= 0 &&
       aposta.placarCasa === partida.placarCasa &&
       aposta.placarFora === partida.placarFora
     ) {
       pontos += 3; placaresExatos++;
-    } else if (aposta.vencedor && aposta.vencedor === vencedorReal) {
+    }
+    const vAposta = aposta.vencedor ||
+      (aposta.placarCasa >= 0
+        ? (aposta.placarCasa > aposta.placarFora ? 'casa'
+          : aposta.placarFora > aposta.placarCasa ? 'fora' : 'empate')
+        : null);
+    if (vAposta && vAposta === vencedorReal) {
       pontos += 1; vencedoresAcertados++;
     }
   }

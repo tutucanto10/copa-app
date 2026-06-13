@@ -109,7 +109,13 @@ async function rankingPorLiga(ligaId) {
         aposta.placarCasa >= 0;
 
       if (acertouPlacar) { pontos += 3; placaresExatos++; }
-      else if (aposta.vencedor && aposta.vencedor === vencedorReal) { pontos += 1; vencedoresAcertados++; }
+
+      const vAposta = aposta.vencedor ||
+        (aposta.placarCasa >= 0
+          ? (aposta.placarCasa > aposta.placarFora ? 'casa'
+            : aposta.placarFora > aposta.placarCasa ? 'fora' : 'empate')
+          : null);
+      if (vAposta && vAposta === vencedorReal) { pontos += 1; vencedoresAcertados++; }
     }
 
     for (const apostaGol of usuario.apostasGoleador) {
