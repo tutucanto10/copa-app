@@ -27,10 +27,17 @@ export default function Partida() {
   const [rodadaAberta, setRodadaAberta] = useState(true)
   const [feedApostas, setFeedApostas] = useState([])
   const [compartilhando, setCompartilhando] = useState(false)
+  const [todasPartidas, setTodasPartidas] = useState([])
   const shareCardRef = useRef(null)
   const confettiFired = useRef(false)
 
   useEffect(() => {
+    api.get('/partidas').then((r) => {
+      const copa = r.data
+        .filter((p) => p.rodada >= 1 && p.rodada <= 3)
+        .sort((a, b) => new Date(a.data) - new Date(b.data))
+      setTodasPartidas(copa)
+    })
     api.get(`/partidas/${id}`).then((r) => setPartida(r.data))
     api.get(`/eventos/${id}`).then((r) => setEventos(r.data))
     api.get(`/partidas/${id}/jogadores`).then((r) => setJogadores(r.data))
@@ -85,6 +92,10 @@ export default function Partida() {
   const finalizada = partida?.status === 'FINALIZADA'
   const aoVivo = partida?.status === 'AO_VIVO'
   const podeApostar = !finalizada && !aoVivo
+
+  const idxAtual = todasPartidas.findIndex((p) => p.id === Number(id))
+  const partidaAnterior = idxAtual > 0 ? todasPartidas[idxAtual - 1] : null
+  const proximaPartida = idxAtual >= 0 && idxAtual < todasPartidas.length - 1 ? todasPartidas[idxAtual + 1] : null
 
   const acertouPlacar = apostaFeita && finalizada &&
     apostaFeita.placarCasa === partida?.placarCasa &&
@@ -257,11 +268,35 @@ export default function Partida() {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '2rem 1rem' }}>
-      <div style={{ marginBottom: '1.5rem' }}>
+      <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
         <button onClick={() => navigate('/')} style={{
-          background: 'none', border: 'none', color: '#8b9bb4',
-          fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
-        }}>← Voltar</button>
+          background: 'none', border: '1px solid #1e2d45', color: '#8b9bb4',
+          fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4,
+          cursor: 'pointer', borderRadius: 8, padding: '0.4rem 0.75rem',
+        }}>← Início</button>
+
+        <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
+          {partidaAnterior && (
+            <button onClick={() => navigate(`/partida/${partidaAnterior.id}`)} style={{
+              background: '#0a0e1a', border: '1px solid #1e2d45', color: '#8b9bb4',
+              fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4,
+              cursor: 'pointer', borderRadius: 8, padding: '0.4rem 0.75rem',
+              whiteSpace: 'nowrap',
+            }}>
+              ← {partidaAnterior.selecaoCasa?.nome?.split(' ')[0]} × {partidaAnterior.selecaoFora?.nome?.split(' ')[0]}
+            </button>
+          )}
+          {proximaPartida && (
+            <button onClick={() => navigate(`/partida/${proximaPartida.id}`)} style={{
+              background: '#00a651', border: 'none', color: '#fff',
+              fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4,
+              cursor: 'pointer', borderRadius: 8, padding: '0.4rem 0.75rem',
+              fontWeight: 700, whiteSpace: 'nowrap',
+            }}>
+              {proximaPartida.selecaoCasa?.nome?.split(' ')[0]} × {proximaPartida.selecaoFora?.nome?.split(' ')[0]} →
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Placar */}
