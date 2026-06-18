@@ -3,6 +3,12 @@ import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react
 import { useAuth } from './context/AuthContext'
 import Home from './pages/Home'
 import Partida from './pages/Partida'
+import { useParams } from 'react-router-dom'
+
+function PartidaWrapper() {
+  const { id } = useParams()
+  return <Partida key={id} />
+}
 import Admin from './pages/Admin'
 import AdminLogin from './pages/AdminLogin'
 import Ranking from './pages/Ranking'
@@ -335,7 +341,7 @@ export default function App() {
             <div className="main-content">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/partida/:id" element={<Partida />} />
+                <Route path="/partida/:id" element={<PartidaWrapper />} />
                 <Route path="/copa" element={<Copa />} />
                 <Route path="/ranking" element={<Ranking />} />
                 <Route path="/comparativo/:id1/:id2" element={<Comparativo />} />
