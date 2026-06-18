@@ -269,7 +269,7 @@ export default function Partida() {
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '2rem 1rem' }}>
       <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <button onClick={() => navigate('/')} style={{
+        <button onClick={() => navigate('/', { state: { rodada: partida?.rodada } })} style={{
           background: 'none', border: '1px solid #1e2d45', color: '#8b9bb4',
           fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4,
           cursor: 'pointer', borderRadius: 8, padding: '0.4rem 0.75rem',

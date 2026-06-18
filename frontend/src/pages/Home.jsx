@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import api from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import { subscribePush } from '../utils/push'
@@ -627,7 +627,8 @@ function CardRegras() {
 
 export default function Home() {
   const { usuario } = useAuth()
-  const [rodadaAtiva, setRodadaAtiva] = useState(1) // Rodada da Copa: 1, 2 ou 3
+  const location = useLocation()
+  const [rodadaAtiva, setRodadaAtiva] = useState(location.state?.rodada || 1)
   const [apostas, setApostas] = useState({})
   const [loading, setLoading] = useState(true)
   const [mostrarHoje, setMostrarHoje] = useState(false)
