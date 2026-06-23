@@ -4,6 +4,98 @@ import api from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import { subscribePush } from '../utils/push'
 
+// Expira 17/06/2026 às 00h BRT (UTC-3)
+const ANUNCIO_EXPIRY = new Date('2026-06-17T03:00:00.000Z').getTime()
+const ANUNCIO_KEY = 'anuncio_30min_v1'
+
+function AnuncioBanner() {
+  const [visivel, setVisivel] = useState(() =>
+    Date.now() < ANUNCIO_EXPIRY && localStorage.getItem(ANUNCIO_KEY) !== '1'
+  )
+
+  if (!visivel) return null
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #7c4f00, #b87200)',
+      border: '2px solid #f5d000',
+      borderRadius: 16,
+      padding: '1.25rem 1.5rem',
+      marginBottom: '1.25rem',
+      position: 'relative',
+    }}>
+      <button
+        onClick={() => { localStorage.setItem(ANUNCIO_KEY, '1'); setVisivel(false) }}
+        style={{
+          position: 'absolute', top: 10, right: 12,
+          background: 'none', border: 'none', color: '#f5d000',
+          fontSize: '1.1rem', cursor: 'pointer', lineHeight: 1,
+        }}
+      >✕</button>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.6rem' }}>
+        <span style={{ fontSize: '1.6rem' }}>⏱️</span>
+        <span style={{
+          fontFamily: 'var(--fonte-display)', fontSize: '1.1rem',
+          letterSpacing: '1.5px', color: '#f5d000',
+        }}>NOVIDADE NO BOLÃO</span>
+      </div>
+
+      <p style={{ margin: 0, fontSize: '1rem', color: '#fff', lineHeight: 1.55, fontWeight: 500 }}>
+        As apostas agora fecham <strong style={{ color: '#f5d000' }}>30 minutos</strong> antes
+        do apito inicial — você ganhou <strong style={{ color: '#f5d000' }}>30 minutos a mais</strong> para
+        analisar, checar o time e decidir o palpite!
+      </p>
+      <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: 'rgba(255,255,255,0.65)' }}>
+        Antes o prazo era de 1 hora antes do jogo.
+      </p>
+    </div>
+  )
+}
+
+function MinhaPosicao({ usuarioId }) {
+  const [info, setInfo] = useState(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!usuarioId) return
+    api.get('/ranking').then((r) => {
+      const idx = r.data.findIndex((u) => u.id === usuarioId)
+      if (idx >= 0) setInfo({ posicao: idx + 1, total: r.data.length, pontos: r.data[idx].pontos })
+    }).catch(() => {})
+  }, [usuarioId])
+
+  if (!info) return null
+
+  const medalha = info.posicao === 1 ? '🥇' : info.posicao === 2 ? '🥈' : info.posicao === 3 ? '🥉' : null
+
+  return (
+    <div
+      onClick={() => navigate('/ranking')}
+      title="Ver ranking completo"
+      style={{
+        position: 'fixed', bottom: 80, right: 16, zIndex: 90,
+        background: '#111827', border: '1.5px solid #00a651',
+        borderRadius: 40, padding: '0.5rem 1rem',
+        display: 'flex', alignItems: 'center', gap: '0.5rem',
+        cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,166,81,0.25)',
+        userSelect: 'none',
+      }}
+    >
+      {medalha
+        ? <span style={{ fontSize: '1.2rem' }}>{medalha}</span>
+        : <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#8b9bb4' }}>#{info.posicao}</span>
+      }
+      <div style={{ lineHeight: 1.2 }}>
+        <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#00a651' }}>
+          {info.posicao}º <span style={{ color: '#8b9bb4', fontWeight: 400, fontSize: '0.7rem' }}>de {info.total}</span>
+        </div>
+        <div style={{ fontSize: '0.65rem', color: '#8b9bb4' }}>{info.pontos} pts</div>
+      </div>
+    </div>
+  )
+}
+
 function NotifBanner({ usuarioId }) {
   const [visivel, setVisivel] = useState(false)
   const [ativando, setAtivando] = useState(false)
@@ -90,7 +182,7 @@ function formatarHora(data) {
 }
 
 function horarioFechamento(data) {
-  const fecha = new Date(new Date(data).getTime() - 60 * 60 * 1000)
+  const fecha = new Date(new Date(data).getTime() - 30 * 60 * 1000)
   const agora = new Date()
   if (fecha <= agora) return null // já fechou
   const hora = fecha.toLocaleTimeString('pt-BR', {
@@ -686,7 +778,9 @@ export default function Home() {
         }
       `}</style>
 
+      <AnuncioBanner />
       <NotifBanner usuarioId={usuario?.id} />
+      <MinhaPosicao usuarioId={usuario?.id} />
       <CardCampeao usuarioId={usuario?.id} />
       <CardRegras />
 
