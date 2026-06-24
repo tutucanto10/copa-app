@@ -1,4 +1,4 @@
-const CACHE_NAME = 'copa-bolao-v2'
+const CACHE_NAME = 'copa-bolao-v3'
 
 self.addEventListener('install', (event) => {
   self.skipWaiting()

@@ -1,59 +1,47 @@
-// Registrar Service Worker
 export function register() {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      const swUrl = `/service-worker.js`
- 
-      navigator.serviceWorker
-        .register(swUrl)
-        .then((registration) => {
-          console.log('✅ Service Worker registrado:', registration)
- 
-          // Verificar atualizações a cada 1 hora
-          setInterval(() => {
-            registration.update()
-          }, 60 * 60 * 1000)
- 
-          registration.onupdatefound = () => {
-            const installingWorker = registration.installing
-            if (installingWorker == null) {
-              return
-            }
- 
-            installingWorker.onstatechange = () => {
-              if (installingWorker.state === 'installed') {
-                if (navigator.serviceWorker.controller) {
-                  // Nova versão disponível
-                  console.log('🔄 Nova versão disponível! Recarregue a página.')
-                  
-                  // Mostrar notificação para o usuário
-                  if (window.confirm('Nova versão disponível! Deseja atualizar agora?')) {
-                    installingWorker.postMessage({ type: 'SKIP_WAITING' })
-                    window.location.reload()
-                  }
-                } else {
-                  // Conteúdo cacheado para uso offline
-                  console.log('✅ Conteúdo cacheado para uso offline.')
-                }
-              }
-            }
+  if (!('serviceWorker' in navigator)) return
+
+  window.addEventListener('load', () => {
+    const swUrl = '/service-worker.js'
+
+    navigator.serviceWorker.register(swUrl).then((registration) => {
+
+      // Checa atualização a cada 5 minutos
+      setInterval(() => registration.update(), 5 * 60 * 1000)
+
+      // Checa quando o usuário volta pro app
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') registration.update()
+      })
+
+      registration.onupdatefound = () => {
+        const sw = registration.installing
+        if (!sw) return
+
+        sw.onstatechange = () => {
+          if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+            // Nova versão pronta — ativa e recarrega silenciosamente
+            sw.postMessage({ type: 'SKIP_WAITING' })
           }
-        })
-        .catch((error) => {
-          console.error('❌ Erro ao registrar Service Worker:', error)
-        })
+        }
+      }
+    }).catch((err) => console.error('SW erro:', err))
+
+    // Quando o SW assume o controle, recarrega a página
+    let refreshing = false
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true
+        window.location.reload()
+      }
     })
-  }
+  })
 }
- 
+
 export function unregister() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready
-      .then((registration) => {
-        registration.unregister()
-      })
-      .catch((error) => {
-        console.error(error.message)
-      })
+      .then((r) => r.unregister())
+      .catch((e) => console.error(e.message))
   }
 }
