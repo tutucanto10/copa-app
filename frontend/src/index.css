@@ -76,31 +76,11 @@ html[data-theme="brasil"] {
 }
 
 html[data-theme="brasil"] body {
-  background-image: repeating-linear-gradient(
-    -5deg,
-    transparent        0px,
-    transparent        5px,
-    rgba(30,75,210,.22) 5px,
-    rgba(30,75,210,.22) 8px,
-    transparent        8px,
-    transparent       15px,
-    rgba(25,60,195,.14) 15px,
-    rgba(25,60,195,.14) 17px,
-    transparent       17px,
-    transparent       26px,
-    rgba(30,75,210,.28) 26px,
-    rgba(30,75,210,.28) 32px,
-    transparent       32px,
-    transparent       39px,
-    rgba(25,60,195,.14) 39px,
-    rgba(25,60,195,.14) 41px,
-    transparent       41px,
-    transparent       49px,
-    rgba(30,75,210,.20) 49px,
-    rgba(30,75,210,.20) 52px,
-    transparent       52px,
-    transparent       62px
-  );
+  background-image:
+    linear-gradient(rgba(7, 20, 42, 0.25), rgba(7, 20, 42, 0.25)),
+    url('/7cfd149a-894a-4325-95bd-633afe719aba.png');
+  background-size: auto;
+  background-repeat: repeat;
 }
 
 /* ── TEMA RETRÔ ───────────────────────────────────────────── */
