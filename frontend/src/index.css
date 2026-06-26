@@ -77,7 +77,7 @@ html[data-theme="brasil"] {
 
 html[data-theme="brasil"] body {
   background-image: url('/bg-brasil.svg');
-  background-size: 280px 280px;
+  background-size: 320px 320px;
   background-repeat: repeat;
 }
 

@@ -1,58 +1,59 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280" viewBox="0 0 280 280">
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
   <defs>
     <style>
-      .bd { fill: none; stroke: #f5d000; stroke-width: 1.3; opacity: 0.18; }
-      .st { fill: #f5d000; opacity: 0.14; }
-      .nm { fill: #f5d000; opacity: 0.11; font-family: Arial, sans-serif; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; }
+      .bd { fill: none; stroke: #f5d000; stroke-width: 1.3; opacity: 0.17; }
+      .st { fill: #f5d000; opacity: 0.13; font-family: Arial, sans-serif; }
+      .nm { fill: #f5d000; opacity: 0.10; font-family: Arial, sans-serif; font-weight: 800; letter-spacing: 2.5px; }
     </style>
   </defs>
 
-  <!-- Bandeira do Brasil (topo esquerda) -->
-  <g transform="translate(8, 12)">
-    <rect class="bd" x="0" y="0" width="78" height="52" rx="2"/>
-    <polygon class="bd" points="39,5 75,26 39,47 3,26"/>
-    <circle class="bd" cx="39" cy="26" r="14"/>
+  <!-- Bandeira 1 — topo esquerda -->
+  <g transform="translate(10, 14)">
+    <rect class="bd" x="0" y="0" width="82" height="54" rx="2"/>
+    <polygon class="bd" points="41,5 79,27 41,49 3,27"/>
+    <circle class="bd" cx="41" cy="27" r="15"/>
   </g>
 
-  <!-- 5 estrelas (topo direita) -->
-  <text class="st" x="148" y="36" font-size="13" font-family="Arial">★  ★  ★  ★  ★</text>
+  <!-- 5 estrelas — topo direita -->
+  <text class="st" x="162" y="34" font-size="13">★  ★  ★  ★  ★</text>
 
-  <!-- Escudo CBF (centro esquerda) -->
-  <g transform="translate(14, 88)">
-    <path class="bd" d="M32,0 C50,4 64,14 64,28 L64,50 C64,70 32,84 32,84 C32,84 0,70 0,50 L0,28 C0,14 14,4 32,0 Z"/>
-    <text x="32" y="36" text-anchor="middle" font-size="7.5" font-family="Arial" font-weight="800" fill="#f5d000" opacity="0.16" letter-spacing="1.5">CBF</text>
-    <text x="32" y="54" text-anchor="middle" font-size="9" font-family="Arial" fill="#f5d000" opacity="0.14">★ ★ ★ ★ ★</text>
+  <!-- Nome: PELÉ -->
+  <text class="nm" x="14" y="87" font-size="9" transform="rotate(-12, 14, 87)">PELÉ</text>
+
+  <!-- Escudo CBF — meio esquerda -->
+  <g transform="translate(12, 106)">
+    <path class="bd" d="M34,0 C53,5 67,16 67,32 L67,56 C67,78 34,92 34,92 C34,92 1,78 1,56 L1,32 C1,16 15,5 34,0 Z"/>
+    <text x="34" y="42" text-anchor="middle" font-size="8" font-family="Arial" font-weight="800" fill="#f5d000" opacity="0.15" letter-spacing="1.5">CBF</text>
+    <text x="34" y="60" text-anchor="middle" font-size="9" font-family="Arial" fill="#f5d000" opacity="0.12">★ ★ ★ ★ ★</text>
   </g>
 
-  <!-- Nomes — coluna direita topo -->
-  <text class="nm" x="122" y="78" font-size="8.5" transform="rotate(-14, 122, 78)">PELÉ</text>
-  <text class="nm" x="185" y="100" font-size="7.5" transform="rotate(-14, 185, 100)">RONALDO</text>
-  <text class="nm" x="105" y="120" font-size="7" transform="rotate(-14, 105, 120)">RONALDINHO</text>
-  <text class="nm" x="180" y="148" font-size="7.5" transform="rotate(-14, 180, 148)">ZICO</text>
+  <!-- Nomes à direita do escudo -->
+  <text class="nm" x="108" y="122" font-size="8" transform="rotate(-12, 108, 122)">RONALDO</text>
+  <text class="nm" x="240" y="130" font-size="8" transform="rotate(-12, 240, 130)">ZICO</text>
 
-  <!-- Bandeira do Brasil (meio direita) -->
-  <g transform="translate(175, 155)">
-    <rect class="bd" x="0" y="0" width="78" height="52" rx="2"/>
-    <polygon class="bd" points="39,5 75,26 39,47 3,26"/>
-    <circle class="bd" cx="39" cy="26" r="14"/>
+  <text class="nm" x="104" y="160" font-size="7.5" transform="rotate(-12, 104, 160)">RONALDINHO</text>
+  <text class="nm" x="210" y="168" font-size="8" transform="rotate(-12, 210, 168)">ROMÁRIO</text>
+
+  <text class="nm" x="104" y="200" font-size="8" transform="rotate(-12, 104, 200)">GARRINCHA</text>
+
+  <!-- Bandeira 2 — meio direita -->
+  <g transform="translate(192, 206)">
+    <rect class="bd" x="0" y="0" width="82" height="54" rx="2"/>
+    <polygon class="bd" points="41,5 79,27 41,49 3,27"/>
+    <circle class="bd" cx="41" cy="27" r="15"/>
   </g>
 
-  <!-- Mais nomes -->
-  <text class="nm" x="18" y="195" font-size="7.5" transform="rotate(-14, 18, 195)">ROMÁRIO</text>
-  <text class="nm" x="110" y="175" font-size="7" transform="rotate(-14, 110, 175)">GARRINCHA</text>
-  <text class="nm" x="88" y="218" font-size="8" transform="rotate(-14, 88, 218)">NEYMAR</text>
-  <text class="nm" x="195" y="230" font-size="7.5" transform="rotate(-14, 195, 230)">VINI JR</text>
+  <!-- 5 estrelas — base esquerda -->
+  <text class="st" x="10" y="258" font-size="11">★  ★  ★  ★  ★</text>
 
-  <!-- 5 estrelas (base esquerda) -->
-  <text class="st" x="12" y="256" font-size="11" font-family="Arial">★  ★  ★  ★  ★</text>
+  <!-- Nomes base -->
+  <text class="nm" x="104" y="238" font-size="8" transform="rotate(-12, 104, 238)">NEYMAR</text>
+  <text class="nm" x="14" y="285" font-size="8" transform="rotate(-12, 14, 285)">CAFU</text>
+  <text class="nm" x="142" y="280" font-size="7.5" transform="rotate(-12, 142, 280)">VINI JR</text>
 
-  <!-- Escudo CBF pequeno (base direita) -->
-  <g transform="translate(195, 210) scale(0.65)">
-    <path class="bd" d="M32,0 C50,4 64,14 64,28 L64,50 C64,70 32,84 32,84 C32,84 0,70 0,50 L0,28 C0,14 14,4 32,0 Z"/>
-    <text x="32" y="36" text-anchor="middle" font-size="7.5" font-family="Arial" font-weight="800" fill="#f5d000" opacity="0.16" letter-spacing="1.5">CBF</text>
+  <!-- Escudo CBF pequeno — base direita -->
+  <g transform="translate(238, 258) scale(0.62)">
+    <path class="bd" d="M34,0 C53,5 67,16 67,32 L67,56 C67,78 34,92 34,92 C34,92 1,78 1,56 L1,32 C1,16 15,5 34,0 Z"/>
+    <text x="34" y="42" text-anchor="middle" font-size="8" font-family="Arial" font-weight="800" fill="#f5d000" opacity="0.15" letter-spacing="1.5">CBF</text>
   </g>
-
-  <!-- Cafu e Roberto Carlos no canto -->
-  <text class="nm" x="105" y="260" font-size="7" transform="rotate(-14, 105, 260)">CAFU</text>
-  <text class="nm" x="10" y="275" font-size="6.5" transform="rotate(-14, 10, 275)">R. CARLOS</text>
 </svg>
