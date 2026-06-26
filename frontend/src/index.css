@@ -79,8 +79,9 @@ html[data-theme="brasil"] body {
   background-image:
     linear-gradient(rgba(7, 20, 42, 0.25), rgba(7, 20, 42, 0.25)),
     url('/7cfd149a-894a-4325-95bd-633afe719aba.png');
-  background-size: auto;
-  background-repeat: repeat;
+  background-size: 100% auto, 100% auto;
+  background-repeat: no-repeat, repeat-y;
+  background-position: top center, top center;
 }
 
 /* ── TEMA RETRÔ ───────────────────────────────────────────── */

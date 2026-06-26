@@ -413,19 +413,19 @@ export default function Partida() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
                   {partida.selecaoCasa?.escudo_url && <img src={partida.selecaoCasa.escudo_url} alt="" style={{ width: 52, height: 52, objectFit: 'contain' }} />}
-                  <span style={{ color: '#f0f4ff', fontSize: '0.78rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoCasa?.nome}</span>
+                  <span style={{ color: 'var(--color-text)', fontSize: '0.78rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoCasa?.nome}</span>
                 </div>
                 <div style={{ textAlign: 'center', flex: 1 }}>
-                  <div style={{ color: '#f0f4ff', fontSize: '2.4rem', fontWeight: 800, lineHeight: 1 }}>
+                  <div style={{ color: 'var(--color-text)', fontFamily: 'var(--fonte-display)', fontSize: '2.4rem', fontWeight: 800, lineHeight: 1 }}>
                     {apostaFeita.placarCasa >= 0 ? `${apostaFeita.placarCasa} × ${apostaFeita.placarFora}` : '– × –'}
                   </div>
-                  <div style={{ color: '#8b9bb4', fontSize: '0.6rem', letterSpacing: 2, marginTop: 4 }}>
+                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.6rem', letterSpacing: 2, marginTop: 4 }}>
                     {finalizada ? 'RESULTADO FINAL' : 'MEU PALPITE'}
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
                   {partida.selecaoFora?.escudo_url && <img src={partida.selecaoFora.escudo_url} alt="" style={{ width: 52, height: 52, objectFit: 'contain' }} />}
-                  <span style={{ color: '#f0f4ff', fontSize: '0.78rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoFora?.nome}</span>
+                  <span style={{ color: 'var(--color-text)', fontSize: '0.78rem', fontWeight: 600, textAlign: 'center' }}>{partida.selecaoFora?.nome}</span>
                 </div>
               </div>
 

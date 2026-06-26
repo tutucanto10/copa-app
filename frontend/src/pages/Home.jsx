@@ -330,7 +330,7 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
               fontSize: 11, color: 'var(--color-text-secondary)',
             }}>🏳</div>
           )}
-          <span style={{ fontSize: 13, fontWeight: 600, fontFamily: 'var(--fonte-display)', letterSpacing: '0.5px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)', textAlign: 'center' }}>
             {partida.selecaoCasa?.nome}
           </span>
         </div>
@@ -375,7 +375,7 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
               fontSize: 11, color: 'var(--color-text-secondary)',
             }}>🏳</div>
           )}
-          <span style={{ fontSize: 13, fontWeight: 600, fontFamily: 'var(--fonte-display)', letterSpacing: '0.5px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)', textAlign: 'center' }}>
             {partida.selecaoFora?.nome}
           </span>
         </div>
