@@ -330,7 +330,7 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
               fontSize: 11, color: 'var(--color-text-secondary)',
             }}>🏳</div>
           )}
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)', textAlign: 'center' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, fontFamily: 'var(--fonte-display)', letterSpacing: '0.5px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
             {partida.selecaoCasa?.nome}
           </span>
         </div>
@@ -340,13 +340,15 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{
               fontSize: '2.5rem', fontWeight: 700, lineHeight: 1,
+              fontFamily: 'var(--fonte-display)',
               color: finalizada || aoVivo ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
             }}>
               {finalizada || aoVivo ? partida.placarCasa : '–'}
             </span>
-            <span style={{ fontSize: '1rem', color: 'var(--color-text-secondary)' }}>×</span>
+            <span style={{ fontSize: '1rem', fontFamily: 'var(--fonte-display)', color: 'var(--color-text-secondary)' }}>×</span>
             <span style={{
               fontSize: '2.5rem', fontWeight: 700, lineHeight: 1,
+              fontFamily: 'var(--fonte-display)',
               color: finalizada || aoVivo ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
             }}>
               {finalizada || aoVivo ? partida.placarFora : '–'}
@@ -373,7 +375,7 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
               fontSize: 11, color: 'var(--color-text-secondary)',
             }}>🏳</div>
           )}
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)', textAlign: 'center' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, fontFamily: 'var(--fonte-display)', letterSpacing: '0.5px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
             {partida.selecaoFora?.nome}
           </span>
         </div>
