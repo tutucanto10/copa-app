@@ -75,6 +75,12 @@ html[data-theme="brasil"] {
   --color-accent-glow:  rgba(245,208,0,0.25);
 }
 
+html[data-theme="brasil"] body {
+  background-image: url('/bg-brasil.svg');
+  background-size: 280px 280px;
+  background-repeat: repeat;
+}
+
 /* ── TEMA RETRÔ ───────────────────────────────────────────── */
 html[data-theme="retro"] {
   --color-bg:           #f2ead8;
