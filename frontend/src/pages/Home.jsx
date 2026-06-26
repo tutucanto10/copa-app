@@ -253,6 +253,7 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
   const aoVivo = partida.status === 'AO_VIVO'
   const finalizada = partida.status === 'FINALIZADA'
   const agendada = partida.status === 'AGENDADA'
+  const isBrasil = partida.selecaoCasa?.nome === 'Brasil' || partida.selecaoFora?.nome === 'Brasil'
 
   const acertouPlacar = aposta && finalizada &&
     aposta.placarCasa >= 0 &&
@@ -283,8 +284,11 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
     <div
       onClick={onClick}
       style={{
-        background: 'var(--color-background-primary)',
-        border: getBorderStyle(),
+        background: isBrasil
+          ? 'linear-gradient(var(--color-background-primary), var(--color-background-primary)) padding-box, linear-gradient(135deg, #009c3b 0%, #ffdf00 50%, #002776 100%) border-box'
+          : 'var(--color-background-primary)',
+        border: isBrasil ? '2px solid transparent' : getBorderStyle(),
+        boxShadow: isBrasil ? '0 0 18px rgba(0,156,59,0.3), 0 0 36px rgba(255,223,0,0.1)' : undefined,
         borderRadius: 12,
         overflow: 'hidden',
         cursor: 'pointer',

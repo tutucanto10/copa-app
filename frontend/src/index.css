@@ -76,8 +76,23 @@ html[data-theme="brasil"] {
 }
 
 html[data-theme="brasil"] body {
-  background-image: url('/bg-brasil.svg');
-  background-size: 320px 320px;
+  background-image:
+    url('/bg-brasil.svg'),
+    repeating-linear-gradient(
+      135deg,
+      transparent 0px,
+      transparent 12px,
+      rgba(20, 60, 180, 0.09) 12px,
+      rgba(20, 60, 180, 0.09) 14px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 12px,
+      rgba(20, 60, 180, 0.09) 12px,
+      rgba(20, 60, 180, 0.09) 14px
+    );
+  background-size: 320px 320px, 20px 20px, 20px 20px;
   background-repeat: repeat;
 }
 

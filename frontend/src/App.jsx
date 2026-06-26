@@ -75,9 +75,14 @@ function Nav() {
         zIndex: 100,
       }}>
         <div className="nav-inner">
-          <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.6rem', letterSpacing: '2px', color: '#00a651', marginRight: !isMobile ? 'auto' : undefined }}>
-            <img src="/bola-copa.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain', verticalAlign: 'middle', marginRight: 6 }} />
-            BOLÃO
+          <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.6rem', letterSpacing: '2px', marginRight: !isMobile ? 'auto' : undefined, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <img src="/bola-copa.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />
+            <span style={{
+              background: 'linear-gradient(90deg, #009c3b 0%, #ffdf00 50%, #3b82f6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>BOLÃO</span>
           </span>
 
           {!isMobile && <>
