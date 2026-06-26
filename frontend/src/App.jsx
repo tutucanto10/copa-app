@@ -68,8 +68,10 @@ function Nav() {
       <nav style={{
         background: 'var(--color-bg-nav)',
         borderBottom: '1px solid var(--color-border)',
-        padding: '0 1.5rem',
-        height: '60px',
+        paddingLeft: '1.5rem',
+        paddingRight: '1.5rem',
+        paddingTop: 'env(safe-area-inset-top)',
+        minHeight: 'calc(60px + env(safe-area-inset-top))',
         position: 'sticky',
         top: 0,
         zIndex: 100,

@@ -181,10 +181,13 @@ export default function Copa() {
       {abaAtiva === 'grupos' && (
         <div className="copa-grupos-grid">
           {Object.keys(GRUPOS_COPA).map((letra) => {
-            const times = classificacao[letra] || GRUPOS_COPA[letra].map((s) => ({
+            const raw = classificacao[letra] || GRUPOS_COPA[letra].map((s) => ({
               nome: s.nome, escudo: s.escudo,
               jogos: 0, saldoGols: 0, pontos: 0,
             }))
+            const times = raw
+              .filter((t, i, arr) => arr.findIndex((x) => x.nome === t.nome) === i)
+              .slice(0, 4)
 
             return (
               <div key={letra} style={{
