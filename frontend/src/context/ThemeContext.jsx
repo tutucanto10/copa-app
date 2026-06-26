@@ -5,7 +5,7 @@ const THEMES = [
   { id: 'light',   label: 'Claro',   icon: '☀️' },
   { id: 'brasil',  label: 'Brasil',  icon: '🇧🇷' },
   { id: 'retro',   label: 'Retrô',   icon: '📰' },
-  { id: 'estadio', label: 'Estádio', icon: '🏟' },
+  { id: 'estadio', label: 'Estádio Anos 80', icon: '🏟' },
   { id: 'ouro',    label: 'Ouro',    icon: '🏆' },
 ]
 

@@ -4,9 +4,18 @@ import api from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import { subscribePush } from '../utils/push'
 
-// Expira sábado 28/06/2026 às 12h BRT (15h UTC)
-const ANUNCIO_EXPIRY = new Date('2026-06-28T15:00:00.000Z').getTime()
-const ANUNCIO_KEY = 'anuncio_30min_v2'
+// Expira domingo 05/07/2026 às 12h BRT (15h UTC)
+const ANUNCIO_EXPIRY = new Date('2026-07-05T15:00:00.000Z').getTime()
+const ANUNCIO_KEY = 'anuncio_temas_v1'
+
+const TEMAS_INFO = [
+  { icon: '🌙', nome: 'Escuro',          desc: 'Tema padrão. Fundo escuro clássico.' },
+  { icon: '☀️', nome: 'Claro',           desc: 'Fundo branco, ideal para uso na luz do sol.' },
+  { icon: '🇧🇷', nome: 'Brasil',         desc: 'Ilustrações dos craques (Pelé, Ronaldo, Neymar...) no fundo, cores da bandeira.' },
+  { icon: '📰', nome: 'Retrô',           desc: 'Visual de jornal antigo. Fontes clássicas com fundo bege.' },
+  { icon: '🏟', nome: 'Estádio Anos 80', desc: 'Placar digital de LED, fonte de estádio, fundo com scanlines.' },
+  { icon: '🏆', nome: 'Ouro',            desc: 'Preto e dourado. Para quem joga pra ganhar.' },
+]
 
 function AnuncioBanner() {
   const [visivel, setVisivel] = useState(() =>
@@ -33,22 +42,28 @@ function AnuncioBanner() {
         }}
       >✕</button>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.6rem' }}>
-        <span style={{ fontSize: '1.6rem' }}>⏱️</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+        <span style={{ fontSize: '1.5rem' }}>🎨</span>
         <span style={{
           fontFamily: 'var(--fonte-display)', fontSize: '1.1rem',
           letterSpacing: '1.5px', color: '#f5d000',
-        }}>NOVIDADE NO BOLÃO</span>
+        }}>NOVOS TEMAS NO BOLÃO</span>
       </div>
 
-      <p style={{ margin: 0, fontSize: '1rem', color: '#fff', lineHeight: 1.55, fontWeight: 500 }}>
-        As apostas agora fecham <strong style={{ color: '#f5d000' }}>30 minutos</strong> antes
-        do apito inicial — você ganhou <strong style={{ color: '#f5d000' }}>30 minutos a mais</strong> para
-        analisar, checar o time e decidir o palpite!
+      <p style={{ margin: '0 0 0.75rem', fontSize: '0.85rem', color: '#fff', lineHeight: 1.5 }}>
+        Clique no ícone ao lado do seu perfil para trocar o visual. São <strong style={{ color: '#f5d000' }}>6 temas</strong> disponíveis:
       </p>
-      <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: 'rgba(255,255,255,0.65)' }}>
-        Antes o prazo era de 1 hora antes do jogo.
-      </p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        {TEMAS_INFO.map(({ icon, nome, desc }) => (
+          <div key={nome} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.8rem' }}>
+            <span style={{ fontSize: '1rem', flexShrink: 0, lineHeight: 1.4 }}>{icon}</span>
+            <span style={{ color: 'rgba(255,255,255,0.9)', lineHeight: 1.4 }}>
+              <strong style={{ color: '#f5d000' }}>{nome}</strong> — {desc}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
