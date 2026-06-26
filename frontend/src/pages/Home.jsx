@@ -4,9 +4,9 @@ import api from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import { subscribePush } from '../utils/push'
 
-// Expira 17/06/2026 às 00h BRT (UTC-3)
-const ANUNCIO_EXPIRY = new Date('2026-06-17T03:00:00.000Z').getTime()
-const ANUNCIO_KEY = 'anuncio_30min_v1'
+// Expira sábado 28/06/2026 às 12h BRT (15h UTC)
+const ANUNCIO_EXPIRY = new Date('2026-06-28T15:00:00.000Z').getTime()
+const ANUNCIO_KEY = 'anuncio_30min_v2'
 
 function AnuncioBanner() {
   const [visivel, setVisivel] = useState(() =>
@@ -146,7 +146,7 @@ function NotifBanner({ usuarioId }) {
       <span style={{ flex: 1, fontSize: 13, color: ativado ? '#00a651' : '#cbd5e1', lineHeight: 1.4, fontWeight: ativado ? 700 : 400 }}>
         {ativado
           ? 'Notificações ativas! Você receberá uma confirmação agora.'
-          : 'Ative as notificações para receber lembretes 1h antes das apostas fecharem'}
+          : 'Ative as notificações para receber lembretes 30min antes das apostas fecharem'}
       </span>
       {!ativado && (
         <>
@@ -705,7 +705,7 @@ function CardRegras() {
               ⏰ Quando as apostas fecham?
             </div>
             <div style={{ fontSize: '0.78rem', color: '#8b9bb4', lineHeight: 1.5 }}>
-              As apostas de cada jogo fecham <strong style={{ color: '#00a651' }}>1 hora antes do início</strong>. Cada partida tem seu próprio horário — você vê o tempo restante direto no card do jogo.
+              As apostas de cada jogo fecham <strong style={{ color: '#00a651' }}>30 minutos antes do início</strong>. Cada partida tem seu próprio horário — você vê o tempo restante direto no card do jogo.
             </div>
             <div style={{ fontSize: '0.78rem', color: '#8b9bb4', lineHeight: 1.5 }}>
               Você recebe uma notificação <strong style={{ color: '#f5a623' }}>2 horas antes</strong> de cada jogo lembrando de apostar — se ainda não tiver apostado.
