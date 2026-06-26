@@ -133,6 +133,7 @@ export default function Partida() {
     if (aposta.placarCasa === '' || aposta.placarFora === '') return
     const placarCasa = Math.max(0, Number(aposta.placarCasa))
     const placarFora = Math.max(0, Number(aposta.placarFora))
+    const vencedor = placarCasa > placarFora ? 'casa' : placarFora > placarCasa ? 'fora' : 'empate'
     setEnviando(true)
     try {
       await api.post('/aposta', {
@@ -146,6 +147,8 @@ export default function Partida() {
         placarFora: Number(aposta.placarFora),
       }
       setApostaFeita(feita)
+      setVencedorFeito(vencedor)
+      localStorage.setItem(`vencedor_${id}`, vencedor)
     } catch (err) {
       alert('Erro ao registrar aposta: ' + err.message)
     } finally {

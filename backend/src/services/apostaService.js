@@ -9,6 +9,10 @@ async function criarAposta({ usuarioId, partidaId, placarCasa, placarFora }) {
   if (!partida) throw new Error('Partida não encontrada');
   if (partida.status !== 'AGENDADA') throw new Error('Apostas encerradas para esta partida');
 
+  const casa = Number(placarCasa);
+  const fora = Number(placarFora);
+  const vencedor = casa > fora ? 'casa' : fora > casa ? 'fora' : 'empate';
+
   const apostaExistente = await prisma.aposta.findFirst({
     where: { usuarioId: Number(usuarioId), partidaId: Number(partidaId) },
   });
@@ -16,10 +20,7 @@ async function criarAposta({ usuarioId, partidaId, placarCasa, placarFora }) {
   if (apostaExistente) {
     return prisma.aposta.update({
       where: { id: apostaExistente.id },
-      data: {
-        placarCasa: Number(placarCasa),
-        placarFora: Number(placarFora),
-      },
+      data: { placarCasa: casa, placarFora: fora, vencedor },
     });
   }
 
@@ -27,8 +28,9 @@ async function criarAposta({ usuarioId, partidaId, placarCasa, placarFora }) {
     data: {
       usuarioId: Number(usuarioId),
       partidaId: Number(partidaId),
-      placarCasa: Number(placarCasa),
-      placarFora: Number(placarFora),
+      placarCasa: casa,
+      placarFora: fora,
+      vencedor,
     },
   });
 }
