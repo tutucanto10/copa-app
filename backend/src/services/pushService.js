@@ -146,9 +146,9 @@ async function notificarLembretes() {
   if (!vapidConfigurado) return
 
   const agora = new Date()
-  // Janela de 30 min centrada em 2h antes do jogo = 1h antes de fechar apostas
-  const min = new Date(agora.getTime() + 105 * 60 * 1000) // 1h45
-  const max = new Date(agora.getTime() + 135 * 60 * 1000) // 2h15
+  // Janela de 30 min centrada em 1h antes do jogo = 30min antes de fechar apostas
+  const min = new Date(agora.getTime() + 45 * 60 * 1000)  // 45min
+  const max = new Date(agora.getTime() + 75 * 60 * 1000)  // 1h15min
 
   const partidas = await prisma.partida.findMany({
     where: { status: 'AGENDADA', data: { gte: min, lte: max } },
@@ -167,8 +167,8 @@ async function notificarLembretes() {
     })
 
     const payload = JSON.stringify({
-      titulo: '⏰ Apostas fechando em 1h!',
-      corpo: `Falta 1h para as apostas de ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} (${hora}) fecharem — já fez as suas?`,
+      titulo: '⏰ Apostas fechando em 30min!',
+      corpo: `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} começa às ${hora} — as apostas fecham em 30 minutos!`,
       url: `/partida/${partida.id}`,
     })
 
