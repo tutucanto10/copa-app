@@ -6,14 +6,14 @@ import { subscribePush } from '../utils/push'
 
 // Expira domingo 05/07/2026 às 12h BRT (15h UTC)
 const ANUNCIO_EXPIRY = new Date('2026-07-05T15:00:00.000Z').getTime()
-const ANUNCIO_KEY = 'anuncio_temas_v1'
+const ANUNCIO_KEY = 'anuncio_temas_v2'
 
 const TEMAS_INFO = [
   { icon: '🌙', nome: 'Escuro',          desc: 'Tema padrão. Fundo escuro clássico.' },
   { icon: '☀️', nome: 'Claro',           desc: 'Fundo branco, ideal para uso na luz do sol.' },
-  { icon: '🇧🇷', nome: 'Brasil',         desc: 'Ilustrações dos craques (Pelé, Ronaldo, Neymar...) no fundo, cores da bandeira.' },
-  { icon: '📰', nome: 'Retrô',           desc: 'Visual de jornal antigo. Fontes clássicas com fundo bege.' },
-  { icon: '🏟', nome: 'Estádio Anos 80', desc: 'Placar digital de LED, fonte de estádio, fundo com scanlines.' },
+  { icon: '🇧🇷', nome: 'Brasil',         desc: 'Ilustrações dos craques no fundo, cores da bandeira.' },
+  { icon: '📰', nome: 'Retrô',           desc: 'Visual de jornal antigo com fontes clássicas.' },
+  { icon: '🏟', nome: 'Estádio Anos 80', desc: 'Placar digital de LED com fonte de estádio retrô.' },
   { icon: '🏆', nome: 'Ouro',            desc: 'Preto e dourado. Para quem joga pra ganhar.' },
 ]
 
@@ -42,23 +42,35 @@ function AnuncioBanner() {
         }}
       >✕</button>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-        <span style={{ fontSize: '1.5rem' }}>🎨</span>
-        <span style={{
-          fontFamily: 'var(--fonte-display)', fontSize: '1.1rem',
-          letterSpacing: '1.5px', color: '#f5d000',
-        }}>NOVOS TEMAS NO BOLÃO</span>
+      {/* Aviso 1 — horário */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+        <span style={{ fontSize: '1.3rem' }}>⏱️</span>
+        <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1rem', letterSpacing: '1.5px', color: '#f5d000' }}>
+          MUDANÇA NO HORÁRIO
+        </span>
       </div>
-
-      <p style={{ margin: '0 0 0.75rem', fontSize: '0.85rem', color: '#fff', lineHeight: 1.5 }}>
-        Clique no ícone ao lado do seu perfil para trocar o visual. São <strong style={{ color: '#f5d000' }}>6 temas</strong> disponíveis:
+      <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: '#fff', lineHeight: 1.5 }}>
+        As apostas agora fecham <strong style={{ color: '#f5d000' }}>30 minutos</strong> antes do apito — você ganhou mais tempo para analisar e decidir!
       </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+      {/* Divisor */}
+      <div style={{ borderTop: '1px solid rgba(245,208,0,0.3)', marginBottom: '0.85rem' }} />
+
+      {/* Aviso 2 — temas */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+        <span style={{ fontSize: '1.3rem' }}>🎨</span>
+        <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1rem', letterSpacing: '1.5px', color: '#f5d000' }}>
+          NOVOS TEMAS
+        </span>
+      </div>
+      <p style={{ margin: '0 0 0.6rem', fontSize: '0.85rem', color: '#fff', lineHeight: 1.5 }}>
+        Clique no ícone ao lado do perfil para trocar. São <strong style={{ color: '#f5d000' }}>6 temas</strong>:
+      </p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
         {TEMAS_INFO.map(({ icon, nome, desc }) => (
-          <div key={nome} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.8rem' }}>
-            <span style={{ fontSize: '1rem', flexShrink: 0, lineHeight: 1.4 }}>{icon}</span>
-            <span style={{ color: 'rgba(255,255,255,0.9)', lineHeight: 1.4 }}>
+          <div key={nome} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.78rem' }}>
+            <span style={{ flexShrink: 0, lineHeight: 1.5 }}>{icon}</span>
+            <span style={{ color: 'rgba(255,255,255,0.9)', lineHeight: 1.5 }}>
               <strong style={{ color: '#f5d000' }}>{nome}</strong> — {desc}
             </span>
           </div>

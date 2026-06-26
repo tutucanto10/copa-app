@@ -135,28 +135,6 @@ export default function Copa() {
 
   return (
     <div style={{ padding: '1.5rem 1rem', maxWidth: 1400, margin: '0 auto' }}>
-      <style>{`
-        .copa-grupos-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 0.65rem;
-        }
-        @media (min-width: 640px) {
-          .copa-grupos-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-        }
-        @media (min-width: 1024px) {
-          .copa-grupos-grid { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-        }
-        .copa-stats-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 1.5rem;
-        }
-        @media (min-width: 640px) {
-          .copa-stats-grid { grid-template-columns: 1fr 1fr; }
-        }
-      `}</style>
-
       {/* Header */}
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{
