@@ -101,7 +101,10 @@ function Nav() {
                 fontSize: '1rem', cursor: 'pointer', lineHeight: 1,
                 color: 'var(--color-text-muted)',
               }}
-            >{theme.icon}</button>
+            >{theme.isImg
+              ? <img src={theme.icon} alt={theme.label} style={{ width: 20, height: 14, objectFit: 'cover', borderRadius: 2, display: 'block' }} />
+              : theme.icon
+            }</button>
             <button onClick={() => setModalAberto(true)} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
               <Avatar />
               {!isMobile && <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{usuario?.nome}</span>}

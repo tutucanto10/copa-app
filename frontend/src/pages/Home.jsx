@@ -9,12 +9,12 @@ const ANUNCIO_EXPIRY = new Date('2026-07-05T15:00:00.000Z').getTime()
 const ANUNCIO_KEY = 'anuncio_temas_v2'
 
 const TEMAS_INFO = [
-  { icon: '🌙', nome: 'Escuro',          desc: 'Tema padrão. Fundo escuro clássico.' },
-  { icon: '☀️', nome: 'Claro',           desc: 'Fundo branco, ideal para uso na luz do sol.' },
-  { icon: '🇧🇷', nome: 'Brasil',         desc: 'Ilustrações dos craques no fundo, cores da bandeira.' },
-  { icon: '📰', nome: 'Retrô',           desc: 'Visual de jornal antigo com fontes clássicas.' },
-  { icon: '🏟', nome: 'Estádio Anos 80', desc: 'Placar digital de LED com fonte de estádio retrô.' },
-  { icon: '🏆', nome: 'Ouro',            desc: 'Preto e dourado. Para quem joga pra ganhar.' },
+  { icon: '🌙',          nome: 'Escuro',          desc: 'Tema padrão. Fundo escuro clássico.' },
+  { icon: '☀️',          nome: 'Claro',           desc: 'Fundo branco, ideal para uso na luz do sol.' },
+  { icon: '/image.png',  nome: 'Brasil',          desc: 'Ilustrações dos craques no fundo, cores da bandeira.', isImg: true },
+  { icon: '📰',          nome: 'Retrô',           desc: 'Visual de jornal antigo com fontes clássicas.' },
+  { icon: '🏟',          nome: 'Estádio Anos 80', desc: 'Placar digital de LED com fonte de estádio retrô.' },
+  { icon: '🏆',          nome: 'Ouro',            desc: 'Preto e dourado. Para quem joga pra ganhar.' },
 ]
 
 function AnuncioBanner() {
@@ -42,6 +42,13 @@ function AnuncioBanner() {
         }}
       >✕</button>
 
+      <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+        <span style={{
+          fontFamily: 'var(--fonte-display)', fontSize: '1.2rem',
+          letterSpacing: '2px', color: '#f5d000',
+        }}>⚡ NOVIDADES DO BOLÃO ⚡</span>
+      </div>
+
       {/* Aviso 1 — horário */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
         <span style={{ fontSize: '1.3rem' }}>⏱️</span>
@@ -67,9 +74,12 @@ function AnuncioBanner() {
         Clique no ícone ao lado do perfil para trocar. São <strong style={{ color: '#f5d000' }}>6 temas</strong>:
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-        {TEMAS_INFO.map(({ icon, nome, desc }) => (
-          <div key={nome} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.78rem' }}>
-            <span style={{ flexShrink: 0, lineHeight: 1.5 }}>{icon}</span>
+        {TEMAS_INFO.map(({ icon, nome, desc, isImg }) => (
+          <div key={nome} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem' }}>
+            {isImg
+              ? <img src={icon} alt={nome} style={{ width: 20, height: 14, objectFit: 'cover', borderRadius: 2, flexShrink: 0 }} />
+              : <span style={{ flexShrink: 0, lineHeight: 1.5 }}>{icon}</span>
+            }
             <span style={{ color: 'rgba(255,255,255,0.9)', lineHeight: 1.5 }}>
               <strong style={{ color: '#f5d000' }}>{nome}</strong> — {desc}
             </span>

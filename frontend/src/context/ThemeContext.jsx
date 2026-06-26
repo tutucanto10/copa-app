@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 const THEMES = [
   { id: 'dark',    label: 'Escuro',  icon: '🌙' },
   { id: 'light',   label: 'Claro',   icon: '☀️' },
-  { id: 'brasil',  label: 'Brasil',  icon: '🇧🇷' },
+  { id: 'brasil',  label: 'Brasil',  icon: '/image.png', isImg: true },
   { id: 'retro',   label: 'Retrô',   icon: '📰' },
   { id: 'estadio', label: 'Estádio Anos 80', icon: '🏟' },
   { id: 'ouro',    label: 'Ouro',    icon: '🏆' },
