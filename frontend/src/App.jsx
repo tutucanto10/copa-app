@@ -43,8 +43,8 @@ function Nav() {
     fontWeight: 600,
     letterSpacing: '1px',
     textTransform: 'uppercase',
-    color: pathname === path ? '#00a651' : '#8b9bb4',
-    borderBottom: pathname === path ? '2px solid #00a651' : '2px solid transparent',
+    color: pathname === path ? 'var(--color-accent)' : 'var(--color-text-muted)',
+    borderBottom: pathname === path ? '2px solid var(--color-accent)' : '2px solid transparent',
     paddingBottom: '4px',
     transition: 'color 0.2s',
   })
@@ -57,9 +57,9 @@ function Nav() {
   ]
 
   const Avatar = ({ size = 34 }) => usuario?.foto_url ? (
-    <img src={usuario.foto_url} alt={usuario.nome} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', border: '2px solid #00a651' }} />
+    <img src={usuario.foto_url} alt={usuario.nome} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-accent)' }} />
   ) : (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: '#0a1a10', border: '2px solid #00a651', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: size * 0.35, color: '#00a651' }}>{iniciais}</div>
+    <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--color-accent-dark)', border: '2px solid var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: size * 0.35, color: 'var(--color-accent)' }}>{iniciais}</div>
   )
 
   return (
@@ -123,7 +123,7 @@ function Nav() {
               flex: 1, display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center',
               padding: '0.5rem 0',
-              color: pathname === path ? '#00a651' : '#8b9bb4',
+              color: pathname === path ? 'var(--color-accent)' : 'var(--color-text-muted)',
               fontSize: '0.6rem', fontWeight: 600,
               letterSpacing: '0.5px', textTransform: 'uppercase', gap: '0.2rem',
             }}>

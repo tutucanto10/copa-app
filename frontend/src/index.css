@@ -77,18 +77,33 @@ html[data-theme="brasil"] {
 
 /* ── TEMA RETRÔ ───────────────────────────────────────────── */
 html[data-theme="retro"] {
-  --color-bg:           #1a0f08;
-  --color-bg-nav:       #2c1c10;
-  --color-card:         #2c1c10;
-  --color-card2:        #3d2614;
-  --color-card3:        #4e3018;
-  --color-border:       #6e4a28;
-  --color-text:         #f5e6c8;
-  --color-text-muted:   #c4a882;
-  --color-accent:       #d4891a;
-  --color-accent-deep:  #a06010;
-  --color-accent-dark:  #2c1808;
-  --color-accent-glow:  rgba(212,137,26,0.25);
+  --color-bg:           #f2ead8;
+  --color-bg-nav:       #e8dcc8;
+  --color-card:         #ede4cf;
+  --color-card2:        #e8dcc8;
+  --color-card3:        #ddd0b8;
+  --color-border:       #b8a484;
+  --color-text:         #2c1a0e;
+  --color-text-muted:   #7a5c3a;
+  --color-accent:       #8b3a0f;
+  --color-accent-deep:  #6b2a08;
+  --color-accent-dark:  #f5edde;
+  --color-accent-glow:  rgba(139,58,15,0.15);
+
+  --fonte-display: 'Playfair Display', serif;
+  --fonte-body:    'Special Elite', cursive;
+}
+
+html[data-theme="retro"] body {
+  background-image:
+    radial-gradient(ellipse at center, transparent 50%, rgba(90,50,10,0.35) 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 34px,
+      rgba(0,0,0,0.025) 34px,
+      rgba(0,0,0,0.025) 35px
+    );
 }
 
 /* ── TEMA ESTÁDIO ─────────────────────────────────────────── */
