@@ -106,20 +106,31 @@ html[data-theme="retro"] body {
     );
 }
 
-/* ── TEMA ESTÁDIO ─────────────────────────────────────────── */
+/* ── TEMA ESTÁDIO (LED Scoreboard) ───────────────────────── */
 html[data-theme="estadio"] {
-  --color-bg:           #020a1a;
-  --color-bg-nav:       #061428;
-  --color-card:         #061428;
-  --color-card2:        #091c38;
-  --color-card3:        #0d2448;
-  --color-border:       #163a80;
-  --color-text:         #e0eaff;
-  --color-text-muted:   #5a7ab0;
-  --color-accent:       #4d9fff;
-  --color-accent-deep:  #1a6fd4;
-  --color-accent-dark:  #061428;
-  --color-accent-glow:  rgba(77,159,255,0.25);
+  --color-bg:           #080600;
+  --color-bg-nav:       #0f0c00;
+  --color-card:         #0f0c00;
+  --color-card2:        #161200;
+  --color-card3:        #1e1800;
+  --color-border:       #3d2e00;
+  --color-text:         #f0dfa0;
+  --color-text-muted:   #9a7a30;
+  --color-accent:       #ff8c00;
+  --color-accent-deep:  #c86000;
+  --color-accent-dark:  #1e1400;
+  --color-accent-glow:  rgba(255,140,0,0.3);
+
+  --fonte-display: 'VT323', monospace;
+}
+
+html[data-theme="estadio"] body {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 140, 0, 0.18) 1px,
+    transparent 0
+  );
+  background-size: 8px 8px;
 }
 
 /* ── TEMA OURO ────────────────────────────────────────────── */
