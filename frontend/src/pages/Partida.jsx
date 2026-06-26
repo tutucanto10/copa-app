@@ -237,20 +237,20 @@ export default function Partida() {
   }
 
   if (!partida) return (
-    <div style={{ textAlign: 'center', padding: '4rem', color: '#8b9bb4' }}>Carregando...</div>
+    <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--color-text-muted)' }}>Carregando...</div>
   )
 
   const inputStyle = {
-    width: 70, background: '#0a0e1a', border: '1px solid #1e2d45',
-    borderRadius: 8, color: '#f0f4ff', fontSize: '1.5rem',
+    width: 70, background: 'var(--color-bg)', border: '1px solid var(--color-border)',
+    borderRadius: 8, color: 'var(--color-text)', fontSize: '1.5rem',
     fontFamily: 'var(--fonte-display)', textAlign: 'center',
     padding: '0.5rem', outline: 'none',
   }
 
   const abaStyle = (a) => ({
     background: 'none', border: 'none',
-    borderBottom: abaAtiva === a ? '2px solid #00a651' : '2px solid transparent',
-    color: abaAtiva === a ? '#f0f4ff' : '#8b9bb4',
+    borderBottom: abaAtiva === a ? `2px solid var(--color-accent)` : '2px solid transparent',
+    color: abaAtiva === a ? 'var(--color-text)' : 'var(--color-text-muted)',
     fontFamily: 'var(--fonte-display)', fontSize: '0.95rem',
     letterSpacing: '1.5px', padding: '0.5rem 1rem', cursor: 'pointer',
   })
@@ -273,7 +273,7 @@ export default function Partida() {
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '2rem 1rem' }}>
       <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
         <button onClick={() => navigate('/', { state: { rodada: partida?.rodada } })} style={{
-          background: 'none', border: '1px solid #1e2d45', color: '#8b9bb4',
+          background: 'none', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)',
           fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4,
           cursor: 'pointer', borderRadius: 8, padding: '0.4rem 0.75rem',
         }}>← Início</button>
@@ -281,7 +281,7 @@ export default function Partida() {
         <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
           {partidaAnterior && (
             <button onClick={() => navigate(`/partida/${partidaAnterior.id}`)} style={{
-              background: '#0a0e1a', border: '1px solid #1e2d45', color: '#8b9bb4',
+              background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)',
               fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4,
               cursor: 'pointer', borderRadius: 8, padding: '0.4rem 0.75rem',
               whiteSpace: 'nowrap',
@@ -291,7 +291,7 @@ export default function Partida() {
           )}
           {proximaPartida && (
             <button onClick={() => navigate(`/partida/${proximaPartida.id}`)} style={{
-              background: '#00a651', border: 'none', color: '#fff',
+              background: 'var(--color-accent)', border: 'none', color: '#fff',
               fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4,
               cursor: 'pointer', borderRadius: 8, padding: '0.4rem 0.75rem',
               fontWeight: 700, whiteSpace: 'nowrap',
@@ -304,7 +304,7 @@ export default function Partida() {
 
       {/* Placar */}
       <div style={{
-        background: '#111827', border: '1px solid #1e2d45',
+        background: 'var(--color-card2)', border: '1px solid var(--color-border)',
         borderRadius: 12, padding: '2rem', marginBottom: '1.5rem', textAlign: 'center',
       }}>
         <Placar partida={partida} grande />
@@ -328,7 +328,7 @@ export default function Partida() {
                 }}>
                   {acertouVencedor ? 'VENCEDOR CERTO!' : 'VENCEDOR ERRADO!'}
                 </div>
-                <div style={{ fontSize: '0.8rem', color: '#8b9bb4', marginTop: 2 }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
                   Você apostou: {vencedorFeito === 'casa' ? partida.selecaoCasa?.nome : vencedorFeito === 'fora' ? partida.selecaoFora?.nome : 'Empate'}
                   {' · '}
                   Resultado: {vencedorReal === 'casa' ? partida.selecaoCasa?.nome : vencedorReal === 'fora' ? partida.selecaoFora?.nome : 'Empate'}
@@ -361,7 +361,7 @@ export default function Partida() {
                 }}>
                   {acertouPlacar ? 'PLACAR EXATO!' : 'PLACAR ERRADO!'}
                 </div>
-                <div style={{ fontSize: '0.8rem', color: '#8b9bb4', marginTop: 2 }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
                   {acertouPlacar
                     ? `Placar correto: ${partida.placarCasa} × ${partida.placarFora}`
                     : `Você apostou: ${apostaFeita.placarCasa} × ${apostaFeita.placarFora} · Resultado: ${partida.placarCasa} × ${partida.placarFora}`
@@ -462,10 +462,10 @@ export default function Partida() {
 
       {/* Abas de aposta */}
       <div style={{
-        background: '#111827', border: '1px solid #1e2d45',
+        background: 'var(--color-card2)', border: '1px solid var(--color-border)',
         borderRadius: 12, marginBottom: '1.5rem', overflow: 'hidden',
       }}>
-        <div style={{ display: 'flex', borderBottom: '1px solid #1e2d45', padding: '0 1rem' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--color-border)', padding: '0 1rem' }}>
           <button style={abaStyle('vencedor')} onClick={() => setAbaAtiva('vencedor')}>🏆 QUEM VENCE?</button>
           <button style={abaStyle('placar')} onClick={() => setAbaAtiva('placar')}>🎯 PLACAR EXATO</button>
           <button style={abaStyle('goleadores')} onClick={() => setAbaAtiva('goleadores')}>⚽ GOLEADORES</button>
@@ -476,15 +476,15 @@ export default function Partida() {
           {/* ABA VENCEDOR */}
           {abaAtiva === 'vencedor' && (
             <>
-              <p style={{ color: '#8b9bb4', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
                 Quem você acha que vai vencer? Acerte e ganhe <strong style={{ color: '#f5d000' }}>+1pts</strong>
               </p>
 
               {vencedorFeito ? (
                 <div style={{
-                  background: '#0a1a10', border: '1px solid #00a651',
+                  background: 'var(--color-accent-dark)', border: '1px solid var(--color-accent)',
                   borderRadius: 8, padding: '0.75rem 1rem',
-                  color: '#00a651', fontWeight: 600,
+                  color: 'var(--color-accent)', fontWeight: 600,
                 }}>
                   ✅ Você apostou em: <strong>
                     {vencedorFeito === 'casa' ? partida.selecaoCasa?.nome
@@ -495,8 +495,8 @@ export default function Partida() {
                     <button onClick={() => { setVencedorFeito(null); localStorage.removeItem(`vencedor_${id}`) }}
                       style={{
                         marginLeft: '1rem', background: 'none',
-                        border: '1px solid #1e2d45', borderRadius: 6,
-                        color: '#8b9bb4', padding: '0.2rem 0.6rem',
+                        border: '1px solid var(--color-border)', borderRadius: 6,
+                        color: 'var(--color-text-muted)', padding: '0.2rem 0.6rem',
                         fontSize: '0.75rem', cursor: 'pointer',
                       }}>Alterar</button>
                   )}
@@ -513,8 +513,8 @@ export default function Partida() {
                         disabled={enviandoVencedor}
                         style={{
                           flex: 1, minWidth: 100,
-                          background: vencedorAposta === op.key ? '#0a1a10' : '#0a0e1a',
-                          border: `2px solid ${vencedorAposta === op.key ? '#00a651' : '#1e2d45'}`,
+                          background: vencedorAposta === op.key ? 'var(--color-accent-dark)' : 'var(--color-bg)',
+                          border: `2px solid ${vencedorAposta === op.key ? 'var(--color-accent)' : 'var(--color-border)'}`,
                           borderRadius: 12, padding: '1rem',
                           display: 'flex', flexDirection: 'column',
                           alignItems: 'center', gap: '0.5rem',
@@ -529,7 +529,7 @@ export default function Partida() {
                         )}
                         <span style={{
                           fontFamily: 'var(--fonte-display)', fontSize: '0.95rem',
-                          letterSpacing: 1, color: '#f0f4ff',
+                          letterSpacing: 1, color: 'var(--color-text)',
                         }}>
                           {enviandoVencedor && vencedorAposta === op.key ? 'Registrando...' : op.label}
                         </span>
@@ -559,12 +559,12 @@ export default function Partida() {
                 const lider = opcoes.reduce((a, b) => a.pct >= b.pct ? a : b)
 
                 return (
-                  <div style={{ marginTop: '1.5rem', borderTop: '1px solid #1e2d45', paddingTop: '1.25rem' }}>
+                  <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--color-border)', paddingTop: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                      <span style={{ fontSize: '0.7rem', color: '#8b9bb4', letterSpacing: 2, textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', letterSpacing: 2, textTransform: 'uppercase' }}>
                         O que o bolão acha
                       </span>
-                      <span style={{ fontSize: '0.7rem', color: '#8b9bb4' }}>{total} votos</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>{total} votos</span>
                     </div>
 
                     <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -572,7 +572,7 @@ export default function Partida() {
                         <div key={op.key} style={{
                           flex: 1, textAlign: 'center',
                           background: op.key === lider.key ? op.cor + '15' : 'transparent',
-                          border: `1px solid ${op.key === lider.key ? op.cor + '50' : '#1e2d45'}`,
+                          border: `1px solid ${op.key === lider.key ? op.cor + '50' : 'var(--color-border)'}`,
                           borderRadius: 10, padding: '0.75rem 0.25rem',
                           transition: 'all 0.2s',
                         }}>
@@ -587,7 +587,7 @@ export default function Partida() {
                             lineHeight: 1, marginTop: 6,
                           }}>{op.pct}%</div>
                           <div style={{
-                            fontSize: '0.68rem', color: '#8b9bb4',
+                            fontSize: '0.68rem', color: 'var(--color-text-muted)',
                             marginTop: 4, whiteSpace: 'nowrap',
                             overflow: 'hidden', textOverflow: 'ellipsis',
                             maxWidth: '100%', padding: '0 4px',
@@ -614,16 +614,16 @@ export default function Partida() {
           {/* ABA PLACAR */}
           {abaAtiva === 'placar' && (
             <>
-              <p style={{ color: '#8b9bb4', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
                 Acerte o placar exato e ganhe <strong style={{ color: '#f5d000' }}>+3pts</strong>
               </p>
 
               {apostaFeita ? (
                 <div>
                   <div style={{
-                    background: '#0a1a10', border: '1px solid #00a651',
+                    background: 'var(--color-accent-dark)', border: '1px solid var(--color-accent)',
                     borderRadius: 8, padding: '0.75rem 1rem',
-                    color: '#00a651', fontWeight: 600,
+                    color: 'var(--color-accent)', fontWeight: 600,
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem',
                   }}>
                     <span>✅ {apostaFeita.placarCasa >= 0 ? `Aposta: ${apostaFeita.placarCasa} × ${apostaFeita.placarFora}` : 'Vencedor apostado'}
@@ -633,8 +633,8 @@ export default function Partida() {
                       disabled={compartilhando}
                       title="Compartilhar palpite"
                       style={{
-                        background: 'none', border: '1px solid #1e4d30', borderRadius: 8,
-                        color: '#00a651', padding: '0.3rem 0.65rem',
+                        background: 'none', border: '1px solid var(--color-border)', borderRadius: 8,
+                        color: 'var(--color-accent)', padding: '0.3rem 0.65rem',
                         display: 'flex', alignItems: 'center', gap: 5,
                         fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer',
                         opacity: compartilhando ? 0.5 : 1, flexShrink: 0,
@@ -652,18 +652,18 @@ export default function Partida() {
                   {podeApostar && (
                     <form onSubmit={handleAposta} style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{partida.selecaoCasa?.nome}</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{partida.selecaoCasa?.nome}</span>
                         <input type="number" min={0} value={aposta.placarCasa}
                           onChange={(e) => setAposta({ ...aposta, placarCasa: Math.max(0, Number(e.target.value)) })}
                           style={inputStyle} />
-                        <span style={{ color: '#8b9bb4' }}>×</span>
+                        <span style={{ color: 'var(--color-text-muted)' }}>×</span>
                         <input type="number" min={0} value={aposta.placarFora}
                           onChange={(e) => setAposta({ ...aposta, placarFora: Math.max(0, Number(e.target.value)) })}
                           style={inputStyle} />
-                        <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{partida.selecaoFora?.nome}</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{partida.selecaoFora?.nome}</span>
                       </div>
                       <button type="submit" disabled={enviando} style={{
-                        background: '#1e2d45', color: '#f0f4ff', border: 'none',
+                        background: 'var(--color-border)', color: 'var(--color-text)', border: 'none',
                         borderRadius: 8, padding: '0.6rem 1.5rem',
                         fontWeight: 700, fontSize: '0.9rem', letterSpacing: 1,
                         opacity: enviando ? 0.6 : 1, cursor: 'pointer',
@@ -676,18 +676,18 @@ export default function Partida() {
               ) : !podeApostar ? msgBloqueio : (
                 <form onSubmit={handleAposta} style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{partida.selecaoCasa?.nome}</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{partida.selecaoCasa?.nome}</span>
                     <input type="number" min={0} value={aposta.placarCasa}
                       onChange={(e) => setAposta({ ...aposta, placarCasa: Math.max(0, Number(e.target.value)) })}
                       style={inputStyle} />
-                    <span style={{ color: '#8b9bb4' }}>×</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>×</span>
                     <input type="number" min={0} value={aposta.placarFora}
                       onChange={(e) => setAposta({ ...aposta, placarFora: Math.max(0, Number(e.target.value)) })}
                       style={inputStyle} />
-                    <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{partida.selecaoFora?.nome}</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{partida.selecaoFora?.nome}</span>
                   </div>
                   <button type="submit" disabled={enviando} style={{
-                    background: '#00a651', color: '#fff', border: 'none',
+                    background: 'var(--color-accent)', color: '#fff', border: 'none',
                     borderRadius: 8, padding: '0.6rem 1.5rem',
                     fontWeight: 700, fontSize: '0.9rem', letterSpacing: 1,
                     opacity: enviando ? 0.6 : 1, cursor: 'pointer',
@@ -702,21 +702,21 @@ export default function Partida() {
           {/* ABA GOLEADORES */}
           {abaAtiva === 'goleadores' && (
             <>
-              <p style={{ color: '#8b9bb4', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
                 Selecione os jogadores que você acha que vão marcar gol
               </p>
 
               {goleadoresFeitos ? (
                 <div>
-                  <div style={{ color: '#00a651', fontWeight: 600, marginBottom: '0.75rem' }}>
+                  <div style={{ color: 'var(--color-accent)', fontWeight: 600, marginBottom: '0.75rem' }}>
                     ✅ Goleadores apostados:
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                     {goleadoresFeitos.map((nome) => (
                       <span key={nome} style={{
-                        background: '#0a1a10', border: '1px solid #00a651',
+                        background: 'var(--color-accent-dark)', border: '1px solid var(--color-accent)',
                         borderRadius: 20, padding: '0.3rem 0.75rem',
-                        fontSize: '0.85rem', color: '#00a651',
+                        fontSize: '0.85rem', color: 'var(--color-accent)',
                       }}>⚽ {nome}</span>
                     ))}
                   </div>
@@ -724,8 +724,8 @@ export default function Partida() {
                     <button onClick={() => { setGoleadoresFeitos(null); localStorage.removeItem(`goleadores_${id}`) }}
                       style={{
                         marginTop: '1rem', background: 'none',
-                        border: '1px solid #1e2d45', borderRadius: 8,
-                        color: '#8b9bb4', padding: '0.4rem 1rem',
+                        border: '1px solid var(--color-border)', borderRadius: 8,
+                        color: 'var(--color-text-muted)', padding: '0.4rem 1rem',
                         fontSize: '0.8rem', cursor: 'pointer',
                       }}>Alterar apostas</button>
                   )}
@@ -738,25 +738,25 @@ export default function Partida() {
                       return (
                         <div key={j.id} onClick={() => toggleGoleador(j.id)} style={{
                           display: 'flex', alignItems: 'center', gap: '0.75rem',
-                          background: sel ? '#0a1a10' : '#0a0e1a',
-                          border: `1px solid ${sel ? '#00a651' : '#1e2d45'}`,
+                          background: sel ? 'var(--color-accent-dark)' : 'var(--color-bg)',
+                          border: `1px solid ${sel ? 'var(--color-accent)' : 'var(--color-border)'}`,
                           borderRadius: 8, padding: '0.6rem 1rem', cursor: 'pointer',
                         }}>
                           <div style={{
                             width: 20, height: 20, borderRadius: '50%',
-                            border: `2px solid ${sel ? '#00a651' : '#1e2d45'}`,
-                            background: sel ? '#00a651' : 'transparent',
+                            border: `2px solid ${sel ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                            background: sel ? 'var(--color-accent)' : 'transparent',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             fontSize: '0.7rem', color: '#fff', flexShrink: 0,
                           }}>{sel ? '✓' : ''}</div>
-                          <span style={{ fontWeight: 600, color: '#f0f4ff' }}>{j.nome}</span>
-                          <span style={{ color: '#8b9bb4', fontSize: '0.8rem', marginLeft: 'auto' }}>{j.selecao?.nome}</span>
+                          <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{j.nome}</span>
+                          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginLeft: 'auto' }}>{j.selecao?.nome}</span>
                         </div>
                       )
                     })}
                   </div>
                   <button type="submit" disabled={enviando || goleadoresSelecionados.length === 0} style={{
-                    background: goleadoresSelecionados.length > 0 ? '#00a651' : '#1e2d45',
+                    background: goleadoresSelecionados.length > 0 ? 'var(--color-accent)' : 'var(--color-border)',
                     color: '#fff', border: 'none', borderRadius: 8,
                     padding: '0.6rem 1.5rem', fontWeight: 700,
                     fontSize: '0.9rem', letterSpacing: 1,
@@ -773,12 +773,12 @@ export default function Partida() {
 
       {/* Timeline */}
       <div style={{
-        background: '#111827', border: '1px solid #1e2d45',
+        background: 'var(--color-card2)', border: '1px solid var(--color-border)',
         borderRadius: 12, padding: '1.5rem',
       }}>
         <h2 style={{
           fontFamily: 'var(--fonte-display)', fontSize: '1.4rem',
-          letterSpacing: '2px', marginBottom: '1rem', color: '#f0f4ff',
+          letterSpacing: '2px', marginBottom: '1rem', color: 'var(--color-text)',
         }}>
           📋 TIMELINE DE EVENTOS
         </h2>
@@ -788,12 +788,12 @@ export default function Partida() {
       {/* Feed de apostas reveladas */}
       {!podeApostar && feedApostas.length > 0 && (
         <div style={{
-          background: '#111827', border: '1px solid #1e2d45',
+          background: 'var(--color-card2)', border: '1px solid var(--color-border)',
           borderRadius: 12, padding: '1.5rem', marginTop: '1.5rem',
         }}>
           <h2 style={{
             fontFamily: 'var(--fonte-display)', fontSize: '1.4rem',
-            letterSpacing: '2px', marginBottom: '1rem', color: '#f0f4ff',
+            letterSpacing: '2px', marginBottom: '1rem', color: 'var(--color-text)',
           }}>
             👥 PALPITES DE TODOS
           </h2>
@@ -819,8 +819,8 @@ export default function Partida() {
 
               return (
                 <div key={a.id} style={{
-                  background: '#0a0e1a',
-                  border: `1px solid ${finalizada ? cor + '44' : '#1e2d45'}`,
+                  background: 'var(--color-bg)',
+                  border: `1px solid ${finalizada ? cor + '44' : 'var(--color-border)'}`,
                   borderRadius: 10, padding: '0.65rem 1rem',
                   display: 'flex', alignItems: 'center', gap: '0.75rem',
                 }}>
@@ -832,14 +832,14 @@ export default function Partida() {
                   ) : (
                     <div style={{
                       width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                      background: '#0a1a10', border: '2px solid #1e2d45',
+                      background: 'var(--color-accent-dark)', border: '2px solid var(--color-border)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '0.7rem', fontWeight: 700, color: '#8b9bb4',
+                      fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-text-muted)',
                     }}>{iniciais}</div>
                   )}
 
                   {/* Nome */}
-                  <span style={{ fontSize: '0.85rem', color: '#f0f4ff', fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--color-text)', fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {a.usuario.nome}
                   </span>
 

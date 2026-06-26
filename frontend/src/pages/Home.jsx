@@ -75,22 +75,22 @@ function MinhaPosicao({ usuarioId }) {
       title="Ver ranking completo"
       style={{
         position: 'fixed', bottom: 80, right: 16, zIndex: 90,
-        background: '#111827', border: '1.5px solid #00a651',
+        background: 'var(--color-card2)', border: '1.5px solid var(--color-accent)',
         borderRadius: 40, padding: '0.5rem 1rem',
         display: 'flex', alignItems: 'center', gap: '0.5rem',
-        cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,166,81,0.25)',
+        cursor: 'pointer', boxShadow: '0 4px 16px var(--color-accent-glow)',
         userSelect: 'none',
       }}
     >
       {medalha
         ? <span style={{ fontSize: '1.2rem' }}>{medalha}</span>
-        : <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#8b9bb4' }}>#{info.posicao}</span>
+        : <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-text-muted)' }}>#{info.posicao}</span>
       }
       <div style={{ lineHeight: 1.2 }}>
-        <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#00a651' }}>
-          {info.posicao}º <span style={{ color: '#8b9bb4', fontWeight: 400, fontSize: '0.7rem' }}>de {info.total}</span>
+        <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-accent)' }}>
+          {info.posicao}º <span style={{ color: 'var(--color-text-muted)', fontWeight: 400, fontSize: '0.7rem' }}>de {info.total}</span>
         </div>
-        <div style={{ fontSize: '0.65rem', color: '#8b9bb4' }}>{info.pontos} pts</div>
+        <div style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>{info.pontos} pts</div>
       </div>
     </div>
   )
@@ -135,15 +135,15 @@ function NotifBanner({ usuarioId }) {
 
   return (
     <div style={{
-      background: ativado ? 'linear-gradient(135deg, #0a1a10, #003320)' : 'linear-gradient(135deg, #0a1a10, #001a3d)',
-      border: `1px solid ${ativado ? '#00a651' : '#00a65155'}`,
+      background: 'var(--color-card2)',
+      border: `1px solid ${ativado ? 'var(--color-accent)' : 'var(--color-border)'}`,
       borderRadius: 12, padding: '0.75rem 1rem',
       display: 'flex', alignItems: 'center', gap: '0.75rem',
       marginBottom: '1rem',
       transition: 'border-color 0.3s',
     }}>
       <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>{ativado ? '✅' : '🔔'}</span>
-      <span style={{ flex: 1, fontSize: 13, color: ativado ? '#00a651' : '#cbd5e1', lineHeight: 1.4, fontWeight: ativado ? 700 : 400 }}>
+      <span style={{ flex: 1, fontSize: 13, color: ativado ? 'var(--color-accent)' : 'var(--color-text)', lineHeight: 1.4, fontWeight: ativado ? 700 : 400 }}>
         {ativado
           ? 'Notificações ativas! Você receberá uma confirmação agora.'
           : 'Ative as notificações para receber lembretes 30min antes das apostas fecharem'}
@@ -154,7 +154,7 @@ function NotifBanner({ usuarioId }) {
             onClick={ativar}
             disabled={ativando}
             style={{
-              background: '#00a651', color: '#fff', border: 'none',
+              background: 'var(--color-accent)', color: '#fff', border: 'none',
               borderRadius: 8, padding: '0.45rem 0.9rem',
               fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0,
               opacity: ativando ? 0.7 : 1,
@@ -165,7 +165,7 @@ function NotifBanner({ usuarioId }) {
           <button
             onClick={dispensar}
             style={{
-              background: 'none', border: 'none', color: '#8b9bb4',
+              background: 'none', border: 'none', color: 'var(--color-text-muted)',
               fontSize: '1rem', cursor: 'pointer', flexShrink: 0, padding: 4,
             }}
           >✕</button>
@@ -494,46 +494,46 @@ function CardCampeao({ usuarioId }) {
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #0a1a10, #001a3d)',
-      border: '1px solid #00a651',
+      background: 'var(--color-card2)',
+      border: '1px solid var(--color-accent)',
       borderRadius: 16, padding: '1.25rem',
       marginBottom: '1.75rem',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div>
-          <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.1rem', letterSpacing: 2, color: '#f5d000' }}>
+          <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.1rem', letterSpacing: 2, color: 'var(--color-text)' }}>
             🏆 PALPITE DO CAMPEÃO
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#8b9bb4', marginTop: 2 }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
             {todas.length > 0 ? `${todas.length} palpite${todas.length > 1 ? 's' : ''} registrado${todas.length > 1 ? 's' : ''}` : 'Seja o primeiro a apostar!'}
           </div>
         </div>
         {minha && !selecionando && (
           <button onClick={() => setSelecionando(true)} style={{
-            background: 'none', border: '1px solid #1e2d45', borderRadius: 8,
-            color: '#8b9bb4', padding: '0.3rem 0.75rem', fontSize: '0.75rem', cursor: 'pointer',
+            background: 'none', border: '1px solid var(--color-border)', borderRadius: 8,
+            color: 'var(--color-text-muted)', padding: '0.3rem 0.75rem', fontSize: '0.75rem', cursor: 'pointer',
           }}>Alterar</button>
         )}
       </div>
 
       {/* Minha aposta */}
       {minha === undefined ? (
-        <div style={{ color: '#8b9bb4', fontSize: '0.85rem' }}>Carregando...</div>
+        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Carregando...</div>
       ) : minha && !selecionando ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {minha.selecao.escudo_url && (
             <img src={minha.selecao.escudo_url} alt="" style={{ width: 40, height: 40, objectFit: 'contain' }} />
           )}
           <div>
-            <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.1rem', color: '#f0f4ff', letterSpacing: 1 }}>
+            <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1.1rem', color: 'var(--color-text)', letterSpacing: 1 }}>
               {minha.selecao.nome}
             </div>
-            <div style={{ fontSize: '0.7rem', color: '#00a651' }}>✅ Seu palpite</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--color-accent)' }}>✅ Seu palpite</div>
           </div>
         </div>
       ) : !selecionando ? (
         <button onClick={() => setSelecionando(true)} style={{
-          width: '100%', background: '#00a651', color: '#fff', border: 'none',
+          width: '100%', background: 'var(--color-accent)', color: '#fff', border: 'none',
           borderRadius: 10, padding: '0.75rem', fontFamily: 'var(--fonte-display)',
           fontSize: '0.95rem', letterSpacing: 1, cursor: 'pointer',
         }}>ESCOLHER CAMPEÃO</button>
@@ -549,17 +549,17 @@ function CardCampeao({ usuarioId }) {
             onChange={(e) => setBusca(e.target.value)}
             style={{
               width: '100%', boxSizing: 'border-box',
-              background: '#0a0e1a', border: '1px solid #1e2d45',
+              background: 'var(--color-bg)', border: '1px solid var(--color-border)',
               borderRadius: 8, padding: '0.5rem 0.75rem',
-              color: '#f0f4ff', fontSize: '0.85rem', outline: 'none',
+              color: 'var(--color-text)', fontSize: '0.85rem', outline: 'none',
               marginBottom: '0.75rem',
             }}
           />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', maxHeight: 260, overflowY: 'auto', marginBottom: '0.75rem' }}>
             {selecoesFiltradas.map((s) => (
               <button key={s.id} onClick={() => setEscolha(s)} style={{
-                background: escolha?.id === s.id ? '#0a1a10' : '#0a0e1a',
-                border: `2px solid ${escolha?.id === s.id ? '#00a651' : '#1e2d45'}`,
+                background: escolha?.id === s.id ? 'var(--color-accent-dark)' : 'var(--color-bg)',
+                border: `2px solid ${escolha?.id === s.id ? 'var(--color-accent)' : 'var(--color-border)'}`,
                 borderRadius: 10, padding: '0.5rem 0.25rem',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem',
                 cursor: 'pointer',
@@ -568,7 +568,7 @@ function CardCampeao({ usuarioId }) {
                   ? <img src={s.escudo_url} alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} />
                   : <span style={{ fontSize: '1.2rem' }}>🏳</span>
                 }
-                <span style={{ fontSize: '0.6rem', color: '#f0f4ff', textAlign: 'center', lineHeight: 1.2 }}>
+                <span style={{ fontSize: '0.6rem', color: 'var(--color-text)', textAlign: 'center', lineHeight: 1.2 }}>
                   {s.nome.substring(0, 9)}
                 </span>
               </button>
@@ -576,13 +576,13 @@ function CardCampeao({ usuarioId }) {
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button onClick={confirmar} disabled={!escolha || salvando} style={{
-              flex: 1, background: escolha ? '#00a651' : '#1e2d45', color: '#fff',
+              flex: 1, background: escolha ? 'var(--color-accent)' : 'var(--color-border)', color: '#fff',
               border: 'none', borderRadius: 8, padding: '0.6rem',
               fontWeight: 700, fontSize: '0.9rem', cursor: escolha ? 'pointer' : 'not-allowed',
             }}>{salvando ? 'Salvando...' : 'CONFIRMAR'}</button>
             <button onClick={() => { setSelecionando(false); setEscolha(null); setBusca('') }} style={{
-              background: 'none', border: '1px solid #1e2d45', borderRadius: 8,
-              color: '#8b9bb4', padding: '0.6rem 1rem', cursor: 'pointer',
+              background: 'none', border: '1px solid var(--color-border)', borderRadius: 8,
+              color: 'var(--color-text-muted)', padding: '0.6rem 1rem', cursor: 'pointer',
             }}>Cancelar</button>
           </div>
         </div>
@@ -590,9 +590,9 @@ function CardCampeao({ usuarioId }) {
 
       {/* Ver palpites de todos */}
       {!selecionando && rankCampeao.length > 0 && (
-        <div style={{ marginTop: '1rem', borderTop: '1px solid #1e2d45', paddingTop: '0.75rem' }}>
+        <div style={{ marginTop: '1rem', borderTop: '1px solid var(--color-border)', paddingTop: '0.75rem' }}>
           <button onClick={() => setVerTodas(!verTodas)} style={{
-            background: 'none', border: 'none', color: '#8b9bb4',
+            background: 'none', border: 'none', color: 'var(--color-text-muted)',
             fontSize: '0.78rem', cursor: 'pointer', padding: 0,
           }}>
             {verTodas ? '▲ Ocultar' : '▼ Ver palpites de todos'}
@@ -602,11 +602,11 @@ function CardCampeao({ usuarioId }) {
               {rankCampeao.map(({ selecao, count }) => (
                 <div key={selecao.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   {selecao.escudo_url && <img src={selecao.escudo_url} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />}
-                  <span style={{ fontSize: '0.82rem', color: '#f0f4ff', flex: 1 }}>{selecao.nome}</span>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--color-text)', flex: 1 }}>{selecao.nome}</span>
                   <span style={{
-                    background: '#0a1a10', border: '1px solid #00a651',
+                    background: 'var(--color-accent-dark)', border: '1px solid var(--color-accent)',
                     borderRadius: 20, padding: '0.1rem 0.5rem',
-                    fontSize: '0.72rem', color: '#00a651', fontWeight: 700,
+                    fontSize: '0.72rem', color: 'var(--color-accent)', fontWeight: 700,
                   }}>{count}</span>
                 </div>
               ))}
@@ -623,8 +623,8 @@ function CardRegras() {
 
   return (
     <div style={{
-      background: '#111827',
-      border: '1px solid #1e2d45',
+      background: 'var(--color-card2)',
+      border: '1px solid var(--color-border)',
       borderRadius: 12, marginBottom: '1.75rem', overflow: 'hidden',
     }}>
       <button
@@ -635,17 +635,17 @@ function CardRegras() {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
       >
-        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f0f4ff', letterSpacing: 1 }}>
+        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text)', letterSpacing: 1 }}>
           📋 REGRAS DO BOLÃO
         </span>
-        <span style={{ color: '#8b9bb4', fontSize: '0.85rem' }}>{aberto ? '▲' : '▼'}</span>
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>{aberto ? '▲' : '▼'}</span>
       </button>
 
       {aberto && (
         <div style={{ padding: '0 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {/* Pontuação */}
           <div>
-            <div style={{ fontSize: '0.72rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.6rem' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.6rem' }}>
               Pontuação
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -656,12 +656,12 @@ function CardRegras() {
               ].map((r) => (
                 <div key={r.label} style={{
                   display: 'flex', alignItems: 'center', gap: '0.75rem',
-                  background: '#0a0e1a', borderRadius: 8, padding: '0.6rem 0.85rem',
+                  background: 'var(--color-bg)', borderRadius: 8, padding: '0.6rem 0.85rem',
                 }}>
                   <span style={{ fontSize: '1.1rem' }}>{r.icone}</span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#f0f4ff' }}>{r.label}</div>
-                    <div style={{ fontSize: '0.72rem', color: '#8b9bb4' }}>{r.desc}</div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text)' }}>{r.label}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>{r.desc}</div>
                   </div>
                   <span style={{ fontFamily: 'var(--fonte-display)', fontSize: '1rem', color: r.cor, fontWeight: 700 }}>{r.pts}</span>
                 </div>
@@ -671,7 +671,7 @@ function CardRegras() {
 
           {/* Tipos de aposta */}
           <div>
-            <div style={{ fontSize: '0.72rem', color: '#8b9bb4', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.6rem' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.6rem' }}>
               Tipos de Aposta
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -688,7 +688,7 @@ function CardRegras() {
                   <span style={{ fontSize: '1.1rem', marginTop: 1 }}>{t.icone}</span>
                   <div>
                     <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>{t.label}</div>
-                    <div style={{ fontSize: '0.72rem', color: '#8b9bb4', marginTop: 2 }}>{t.desc}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>{t.desc}</div>
                   </div>
                 </div>
               ))}
@@ -697,18 +697,18 @@ function CardRegras() {
 
           {/* Quando apostas fecham */}
           <div style={{
-            background: '#0a1a10', border: '1px solid #00a65144',
+            background: 'var(--color-accent-dark)', border: '1px solid var(--color-border)',
             borderRadius: 8, padding: '0.75rem 1rem',
             display: 'flex', flexDirection: 'column', gap: '0.35rem',
           }}>
-            <div style={{ fontSize: '0.82rem', color: '#f0f4ff', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.82rem', color: 'var(--color-text)', fontWeight: 600 }}>
               ⏰ Quando as apostas fecham?
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#8b9bb4', lineHeight: 1.5 }}>
-              As apostas de cada jogo fecham <strong style={{ color: '#00a651' }}>30 minutos antes do início</strong>. Cada partida tem seu próprio horário — você vê o tempo restante direto no card do jogo.
+            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+              As apostas de cada jogo fecham <strong style={{ color: 'var(--color-accent)' }}>30 minutos antes do início</strong>. Cada partida tem seu próprio horário — você vê o tempo restante direto no card do jogo.
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#8b9bb4', lineHeight: 1.5 }}>
-              Você recebe uma notificação <strong style={{ color: '#f5a623' }}>2 horas antes</strong> de cada jogo lembrando de apostar — se ainda não tiver apostado.
+            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+              Você recebe uma notificação <strong style={{ color: '#f5a623' }}>30 min antes</strong> de cada jogo lembrando de apostar — se ainda não tiver apostado.
             </div>
           </div>
         </div>

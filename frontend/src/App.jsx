@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
+import { ThemeProvider, useTheme } from './context/ThemeContext'
 import Home from './pages/Home'
 import Partida from './pages/Partida'
 import { useParams } from 'react-router-dom'
@@ -31,6 +32,7 @@ function useIsMobile() {
 function Nav() {
   const { pathname } = useLocation()
   const { usuario, logout } = useAuth()
+  const { theme, cycleTheme } = useTheme()
   const [modalAberto, setModalAberto] = useState(false)
   const isMobile = useIsMobile()
 
@@ -64,8 +66,8 @@ function Nav() {
     <>
       {/* Top navbar */}
       <nav style={{
-        background: '#0d1321',
-        borderBottom: '1px solid #1e2d45',
+        background: 'var(--color-bg-nav)',
+        borderBottom: '1px solid var(--color-border)',
         padding: '0 1.5rem',
         height: '60px',
         position: 'sticky',
@@ -85,12 +87,22 @@ function Nav() {
           </>}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: 'auto' }}>
+            <button
+              onClick={cycleTheme}
+              title={`Tema: ${theme.label}`}
+              style={{
+                background: 'none', border: '1px solid var(--color-border)',
+                borderRadius: 8, padding: '0.3rem 0.55rem',
+                fontSize: '1rem', cursor: 'pointer', lineHeight: 1,
+                color: 'var(--color-text-muted)',
+              }}
+            >{theme.icon}</button>
             <button onClick={() => setModalAberto(true)} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
               <Avatar />
-              {!isMobile && <span style={{ fontSize: '0.85rem', color: '#8b9bb4' }}>{usuario?.nome}</span>}
+              {!isMobile && <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{usuario?.nome}</span>}
             </button>
             {!isMobile && (
-              <button onClick={logout} style={{ background: 'none', border: '1px solid #1e2d45', borderRadius: 8, color: '#8b9bb4', padding: '0.3rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Sair</button>
+              <button onClick={logout} style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 8, color: 'var(--color-text-muted)', padding: '0.3rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Sair</button>
             )}
           </div>
         </div>
@@ -100,8 +112,8 @@ function Nav() {
       {isMobile && (
         <nav style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
-          background: '#0d1321',
-          borderTop: '1px solid #1e2d45',
+          background: 'var(--color-bg-nav)',
+          borderTop: '1px solid var(--color-border)',
           display: 'flex',
           zIndex: 100,
           paddingBottom: 'env(safe-area-inset-bottom)',
@@ -329,6 +341,7 @@ function BannerInstalar() {
 
 export default function App() {
   return (
+    <ThemeProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<><BannerLentidao /><Login /></>} />
@@ -352,5 +365,6 @@ export default function App() {
         } />
       </Routes>
     </BrowserRouter>
+    </ThemeProvider>
   )
 }

@@ -13,16 +13,16 @@ function Avatar({ user, size = 44 }) {
     return (
       <img src={user.foto_url} alt={user.nome} style={{
         width: size, height: size, borderRadius: '50%',
-        objectFit: 'cover', border: '2px solid #1e2d45', flexShrink: 0,
+        objectFit: 'cover', border: '2px solid var(--color-border)', flexShrink: 0,
       }} />
     )
   }
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%',
-      background: '#0a1a10', border: '2px solid #00a651',
+      background: 'var(--color-accent-dark)', border: '2px solid var(--color-accent)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontWeight: 700, fontSize: size * 0.35, color: '#00a651', flexShrink: 0,
+      fontWeight: 700, fontSize: size * 0.35, color: 'var(--color-accent)', flexShrink: 0,
     }}>{iniciais}</div>
   )
 }
@@ -100,8 +100,8 @@ export default function Ranking() {
       <div
         onClick={() => setPerfilAberto(user.id)}
         style={{
-          background: index === 0 ? '#1a1500' : '#111827',
-          border: `1px solid ${index === 0 ? '#f5d000' : index === 1 ? '#9ca3af' : index === 2 ? '#92400e' : '#1e2d45'}`,
+          background: index === 0 ? 'var(--color-accent-dark)' : 'var(--color-card2)',
+          border: `1px solid ${index === 0 ? '#f5d000' : index === 1 ? '#9ca3af' : index === 2 ? '#92400e' : 'var(--color-border)'}`,
           borderRadius: 12, padding: '1rem',
           display: 'flex', alignItems: 'center', gap: '0.65rem',
           cursor: 'pointer', transition: 'opacity 0.15s',
@@ -113,23 +113,23 @@ export default function Ranking() {
           fontFamily: 'var(--fonte-display)',
           fontSize: index < 3 ? '1.8rem' : '1.2rem',
           minWidth: 40, textAlign: 'center',
-          color: index === 0 ? '#f5d000' : index === 1 ? '#9ca3af' : index === 2 ? '#cd7c2f' : '#8b9bb4',
+          color: index === 0 ? '#f5d000' : index === 1 ? '#9ca3af' : index === 2 ? '#cd7c2f' : 'var(--color-text-muted)',
         }}>
           {index < 3 ? MEDALHAS[index] : `${index + 1}º`}
         </div>
         <Avatar user={user} size={44} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontWeight: 700, fontSize: '1rem', color: '#f0f4ff', marginBottom: 4,
+            fontWeight: 700, fontSize: '1rem', color: 'var(--color-text)', marginBottom: 4,
             wordBreak: 'break-word',
           }}>
             {user.nome}
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.75rem', color: user.placaresExatos > 0 ? '#00a651' : '#8b9bb4' }}>
+            <span style={{ fontSize: '0.75rem', color: user.placaresExatos > 0 ? 'var(--color-accent)' : 'var(--color-text-muted)' }}>
               🎯 {user.placaresExatos} exato{user.placaresExatos !== 1 ? 's' : ''}
             </span>
-            <span style={{ fontSize: '0.75rem', color: user.vencedoresAcertados > 0 ? '#3b82f6' : '#8b9bb4' }}>
+            <span style={{ fontSize: '0.75rem', color: user.vencedoresAcertados > 0 ? '#3b82f6' : 'var(--color-text-muted)' }}>
               🏆 {user.vencedoresAcertados} vencedor{user.vencedoresAcertados !== 1 ? 'es' : ''}
             </span>
           </div>
@@ -138,17 +138,17 @@ export default function Ranking() {
           <div style={{ textAlign: 'center' }}>
             <div style={{
               fontFamily: 'var(--fonte-display)', fontSize: '1.8rem',
-              color: index === 0 ? '#f5d000' : '#f0f4ff', lineHeight: 1,
+              color: index === 0 ? '#f5d000' : 'var(--color-text)', lineHeight: 1,
             }}>{user.pontos}</div>
-            <div style={{ fontSize: '0.65rem', color: '#8b9bb4', letterSpacing: 1, marginTop: 2 }}>PONTOS</div>
+            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', letterSpacing: 1, marginTop: 2 }}>PONTOS</div>
           </div>
           {user.id !== usuario?.id && (
             <button
               onClick={(e) => { e.stopPropagation(); navigate(`/comparativo/${usuario.id}/${user.id}`) }}
               title="Comparar comigo"
               style={{
-                background: '#0a0e1a', border: '1px solid #1e2d45',
-                borderRadius: 8, color: '#8b9bb4', padding: '0.3rem 0.6rem',
+                background: 'var(--color-bg)', border: '1px solid var(--color-border)',
+                borderRadius: 8, color: 'var(--color-text-muted)', padding: '0.3rem 0.6rem',
                 fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap',
               }}
             >⚖️ vs mim</button>
@@ -163,20 +163,19 @@ export default function Ranking() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
         <h1 style={{
           fontFamily: 'var(--fonte-display)', fontSize: '2.5rem',
-          letterSpacing: '3px', margin: 0, color: '#f0f4ff',
+          letterSpacing: '3px', margin: 0, color: 'var(--color-text)',
         }}>RANKING</h1>
 
-        {/* Busca por usuário */}
         <div ref={buscaRef} style={{ position: 'relative' }}>
           {!buscaAberta ? (
             <button
               onClick={() => setBuscaAberta(true)}
               title="Buscar jogador para comparar"
               style={{
-                background: '#111827', border: '1px solid #1e2d45',
+                background: 'var(--color-card2)', border: '1px solid var(--color-border)',
                 borderRadius: 10, width: 40, height: 40,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', fontSize: '1.1rem', color: '#8b9bb4',
+                cursor: 'pointer', fontSize: '1.1rem', color: 'var(--color-text-muted)',
               }}
             >🔍</button>
           ) : (
@@ -188,22 +187,21 @@ export default function Ranking() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Buscar jogador..."
                   style={{
-                    background: '#111827', border: '1px solid #00a651',
+                    background: 'var(--color-card2)', border: '1px solid var(--color-accent)',
                     borderRadius: 10, padding: '0.5rem 0.75rem',
-                    color: '#f0f4ff', fontSize: '0.9rem', outline: 'none',
+                    color: 'var(--color-text)', fontSize: '0.9rem', outline: 'none',
                     width: 200,
                   }}
                 />
-                {/* Dropdown resultados */}
                 {(resultados.length > 0 || buscando) && (
                   <div style={{
                     position: 'absolute', top: '110%', left: 0, right: 0,
-                    background: '#111827', border: '1px solid #1e2d45',
+                    background: 'var(--color-card2)', border: '1px solid var(--color-border)',
                     borderRadius: 10, zIndex: 50, overflow: 'hidden',
                     boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
                   }}>
                     {buscando ? (
-                      <div style={{ padding: '0.75rem 1rem', color: '#8b9bb4', fontSize: '0.85rem' }}>Buscando...</div>
+                      <div style={{ padding: '0.75rem 1rem', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Buscando...</div>
                     ) : resultados.map((u) => (
                       <button
                         key={u.id}
@@ -215,37 +213,37 @@ export default function Ranking() {
                         }}
                         style={{
                           width: '100%', background: 'none',
-                          border: 'none', borderBottom: '1px solid #1e2d45',
+                          border: 'none', borderBottom: '1px solid var(--color-border)',
                           padding: '0.75rem 1rem', textAlign: 'left',
-                          color: '#f0f4ff', fontSize: '0.9rem', cursor: 'pointer',
+                          color: 'var(--color-text)', fontSize: '0.9rem', cursor: 'pointer',
                           display: 'flex', alignItems: 'center', gap: '0.5rem',
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#0a1a10'}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-accent-dark)'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
                       >
-                        <span style={{ fontSize: '0.75rem', color: '#00a651' }}>⚖️</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-accent)' }}>⚖️</span>
                         {u.nome}
                       </button>
                     ))}
                     {!buscando && resultados.length === 0 && query.length >= 2 && (
-                      <div style={{ padding: '0.75rem 1rem', color: '#8b9bb4', fontSize: '0.85rem' }}>Nenhum jogador encontrado</div>
+                      <div style={{ padding: '0.75rem 1rem', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Nenhum jogador encontrado</div>
                     )}
                   </div>
                 )}
               </div>
               <button
                 onClick={() => { setBuscaAberta(false); setQuery(''); setResultados([]) }}
-                style={{ background: 'none', border: 'none', color: '#8b9bb4', fontSize: '1.1rem', cursor: 'pointer' }}
+                style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '1.1rem', cursor: 'pointer' }}
               >✕</button>
             </div>
           )}
         </div>
       </div>
 
-      <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: 12 }}>
+      <div style={{ background: 'var(--color-card2)', border: '1px solid var(--color-border)', borderRadius: 12 }}>
         <div style={{ padding: '1.5rem' }}>
           {ligas.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#8b9bb4', padding: '2rem' }}>
+            <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '2rem' }}>
               <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🏆</div>
               Você ainda não foi adicionado a nenhuma liga. Fale com o admin!
             </div>
@@ -255,9 +253,9 @@ export default function Ranking() {
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
                   {ligas.map((l) => (
                     <button key={l.id} onClick={() => setLigaAtiva(l.id)} style={{
-                      background: ligaAtiva === l.id ? '#00a651' : '#0a0e1a',
-                      border: `1px solid ${ligaAtiva === l.id ? '#00a651' : '#1e2d45'}`,
-                      borderRadius: 8, color: ligaAtiva === l.id ? '#fff' : '#8b9bb4',
+                      background: ligaAtiva === l.id ? 'var(--color-accent)' : 'var(--color-bg)',
+                      border: `1px solid ${ligaAtiva === l.id ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                      borderRadius: 8, color: ligaAtiva === l.id ? '#fff' : 'var(--color-text-muted)',
                       padding: '0.4rem 1rem', fontWeight: 700,
                       fontSize: '0.85rem', cursor: 'pointer',
                       display: 'flex', alignItems: 'center', gap: '0.4rem',
@@ -272,21 +270,21 @@ export default function Ranking() {
               )}
 
               <div style={{
-                background: '#0a0e1a', border: '1px solid #1e2d45',
+                background: 'var(--color-bg)', border: '1px solid var(--color-border)',
                 borderRadius: 8, padding: '0.75rem 1rem', marginBottom: '1.25rem',
                 display: 'flex', gap: '1.5rem', flexWrap: 'wrap',
               }}>
-                <span style={{ fontSize: '0.8rem', color: '#8b9bb4' }}>🎯 Placar exato <strong style={{ color: '#f5d000' }}>+3pts</strong></span>
-                <span style={{ fontSize: '0.8rem', color: '#8b9bb4' }}>🏆 Vencedor certo <strong style={{ color: '#f5d000' }}>+1pt</strong></span>
-                <span style={{ fontSize: '0.8rem', color: '#8b9bb4' }}>Clique em alguém para ver o perfil</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>🎯 Placar exato <strong style={{ color: '#f5d000' }}>+3pts</strong></span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>🏆 Vencedor certo <strong style={{ color: '#f5d000' }}>+1pt</strong></span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Clique em alguém para ver o perfil</span>
               </div>
 
               {erro ? (
                 <div style={{ textAlign: 'center', color: '#e8192c', padding: '2rem' }}>{erro}</div>
               ) : loading ? (
-                <div style={{ textAlign: 'center', color: '#8b9bb4', padding: '2rem' }}>Carregando...</div>
+                <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '2rem' }}>Carregando...</div>
               ) : rankingBolao.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#8b9bb4', padding: '2rem' }}>
+                <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '2rem' }}>
                   Nenhuma aposta registrada ainda.
                 </div>
               ) : (
