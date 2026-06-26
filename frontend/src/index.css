@@ -76,24 +76,31 @@ html[data-theme="brasil"] {
 }
 
 html[data-theme="brasil"] body {
-  background-image:
-    url('/bg-brasil.svg'),
-    repeating-linear-gradient(
-      135deg,
-      transparent 0px,
-      transparent 12px,
-      rgba(20, 60, 180, 0.09) 12px,
-      rgba(20, 60, 180, 0.09) 14px
-    ),
-    repeating-linear-gradient(
-      45deg,
-      transparent 0px,
-      transparent 12px,
-      rgba(20, 60, 180, 0.09) 12px,
-      rgba(20, 60, 180, 0.09) 14px
-    );
-  background-size: 320px 320px, 20px 20px, 20px 20px;
-  background-repeat: repeat;
+  background-image: repeating-linear-gradient(
+    -5deg,
+    transparent        0px,
+    transparent        5px,
+    rgba(30,75,210,.22) 5px,
+    rgba(30,75,210,.22) 8px,
+    transparent        8px,
+    transparent       15px,
+    rgba(25,60,195,.14) 15px,
+    rgba(25,60,195,.14) 17px,
+    transparent       17px,
+    transparent       26px,
+    rgba(30,75,210,.28) 26px,
+    rgba(30,75,210,.28) 32px,
+    transparent       32px,
+    transparent       39px,
+    rgba(25,60,195,.14) 39px,
+    rgba(25,60,195,.14) 41px,
+    transparent       41px,
+    transparent       49px,
+    rgba(30,75,210,.20) 49px,
+    rgba(30,75,210,.20) 52px,
+    transparent       52px,
+    transparent       62px
+  );
 }
 
 /* ── TEMA RETRÔ ───────────────────────────────────────────── */
