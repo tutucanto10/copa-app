@@ -70,7 +70,7 @@ async function calcularRanking() {
       id: usuario.id,
       nome: usuario.nome,
       foto_url: usuario.foto_url || null,
-      pontos,
+      pontos: pontos + (usuario.pontosBonus || 0),
       placaresExatos,
       vencedoresAcertados,
       goleadoresAcertados,

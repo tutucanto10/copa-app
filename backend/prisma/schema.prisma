@@ -16,6 +16,7 @@ model Usuario {
   senha             String?
   telefone          String?            @unique
   isAdmin           Boolean            @default(false)
+  pontosBonus       Int                @default(0)
   apostas           Aposta[]
   apostasGoleador   ApostaGoleador[]
   ligas             MembroLiga[]

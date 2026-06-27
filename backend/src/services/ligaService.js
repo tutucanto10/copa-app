@@ -57,6 +57,7 @@ async function rankingPorLiga(ligaId) {
               id: true,
               nome: true,
               foto_url: true,
+              pontosBonus: true,
               apostas: { include: { partida: true } },
               apostasGoleador: { include: { partida: true } },
             },
@@ -123,7 +124,7 @@ async function rankingPorLiga(ligaId) {
       if (golSet.has(`${apostaGol.partidaId}-${apostaGol.jogadorId}`)) goleadoresAcertados++;
     }
 
-    return { id: usuario.id, nome: usuario.nome, foto_url: usuario.foto_url || null, pontos, placaresExatos, vencedoresAcertados, goleadoresAcertados };
+    return { id: usuario.id, nome: usuario.nome, foto_url: usuario.foto_url || null, pontos: pontos + (usuario.pontosBonus || 0), placaresExatos, vencedoresAcertados, goleadoresAcertados };
   });
 
   const data = {

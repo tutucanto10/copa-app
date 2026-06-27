@@ -129,7 +129,7 @@ async function buscarPerfil(usuarioId) {
     foto_url: usuario.foto_url,
     telefone: usuario.telefone,
     isAdmin: usuario.isAdmin,
-    pontos,
+    pontos: pontos + (usuario.pontosBonus || 0),
     placaresExatos,
     vencedoresAcertados,
     goleadoresAcertados,
