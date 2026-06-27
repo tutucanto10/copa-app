@@ -229,7 +229,7 @@ export default function Copa() {
                       borderLeft: `2px solid ${index === 0 ? '#fbbf24' : index === 1 ? 'rgba(255,255,255,0.25)' : 'transparent'}`,
                     }}>
                       <img
-                        src={time.escudo ? `${API_URL}/proxy-image?url=${encodeURIComponent(time.escudo)}` : undefined}
+                        src={time.escudo || undefined}
                         alt={time.nome}
                         style={{ width: 18, height: 14, objectFit: 'contain', flexShrink: 0 }}
                         onError={(e) => { e.target.style.display = 'none' }}
