@@ -142,48 +142,86 @@ async function notificarMvpRodada(rodada, mvp) {
   )
 }
 
+async function enviarParaSubs(subs, payload) {
+  await Promise.allSettled(
+    subs.map((s) =>
+      webpush.sendNotification(
+        { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+        payload
+      ).catch(async (err) => {
+        if (err.statusCode === 410) await prisma.pushSubscription.delete({ where: { endpoint: s.endpoint } })
+      })
+    )
+  )
+}
+
 async function notificarLembretes() {
   if (!vapidConfigurado) return
 
   const agora = new Date()
-  // Janela de 30 min centrada em 1h antes do jogo = 30min antes de fechar apostas
-  const min = new Date(agora.getTime() + 45 * 60 * 1000)  // 45min
-  const max = new Date(agora.getTime() + 75 * 60 * 1000)  // 1h15min
 
-  const partidas = await prisma.partida.findMany({
-    where: { status: 'AGENDADA', data: { gte: min, lte: max } },
-    include: { selecaoCasa: true, selecaoFora: true },
-  })
+  // Janela 1 — 2h antes do jogo (105–135 min): avisa só quem ainda não apostou
+  const min2h = new Date(agora.getTime() + 105 * 60 * 1000)
+  const max2h = new Date(agora.getTime() + 135 * 60 * 1000)
 
-  if (partidas.length === 0) return
+  // Janela 2 — 1h antes do jogo (45–75 min): avisa todo mundo (apostas fecham em 30min)
+  const min1h = new Date(agora.getTime() + 45 * 60 * 1000)
+  const max1h = new Date(agora.getTime() + 75 * 60 * 1000)
 
-  // Busca todas as subscrições — avisa todo mundo, independente de já ter apostado
-  const subs = await prisma.pushSubscription.findMany()
-  if (subs.length === 0) return
+  const [partidas2h, partidas1h] = await Promise.all([
+    prisma.partida.findMany({
+      where: { status: 'AGENDADA', data: { gte: min2h, lte: max2h } },
+      include: { selecaoCasa: true, selecaoFora: true },
+    }),
+    prisma.partida.findMany({
+      where: { status: 'AGENDADA', data: { gte: min1h, lte: max1h } },
+      include: { selecaoCasa: true, selecaoFora: true },
+    }),
+  ])
 
-  for (const partida of partidas) {
+  // ── Lembrete 2h: apenas quem não apostou ainda ──
+  for (const partida of partidas2h) {
     const hora = new Date(partida.data).toLocaleTimeString('pt-BR', {
       hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
     })
 
+    // IDs que já apostaram nessa partida
+    const apostas = await prisma.aposta.findMany({
+      where: { partidaId: partida.id },
+      select: { usuarioId: true },
+    })
+    const jaApostaram = new Set(apostas.map((a) => a.usuarioId))
+
+    const subs = await prisma.pushSubscription.findMany({
+      where: { usuarioId: { notIn: [...jaApostaram] } },
+    })
+    if (subs.length === 0) continue
+
     const payload = JSON.stringify({
-      titulo: '⏰ Apostas fechando em 30min!',
-      corpo: `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} começa às ${hora} — as apostas fecham em 30 minutos!`,
+      titulo: '🎯 Não esquece de apostar!',
+      corpo: `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} começa às ${hora}. Você ainda não apostou!`,
       url: `/partida/${partida.id}`,
     })
+    await enviarParaSubs(subs, payload)
+    console.log(`🔔 Lembrete 2h (${hora}) → ${subs.length} sem aposta — ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`)
+  }
 
-    await Promise.allSettled(
-      subs.map((s) =>
-        webpush.sendNotification(
-          { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          payload
-        ).catch(async (err) => {
-          if (err.statusCode === 410) await prisma.pushSubscription.delete({ where: { endpoint: s.endpoint } })
-        })
-      )
-    )
+  // ── Alerta 1h: todo mundo — apostas fecham em 30min ──
+  for (const partida of partidas1h) {
+    const hora = new Date(partida.data).toLocaleTimeString('pt-BR', {
+      hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
+    })
 
-    console.log(`🔔 Lembrete (${hora}) enviado para ${subs.length} usuário(s) — ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`)
+    const subs = await prisma.pushSubscription.findMany()
+    if (subs.length === 0) continue
+
+    const payload = JSON.stringify({
+      titulo: '⏰ Apostas fecham em 30min!',
+      corpo: `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} começa às ${hora} — última chance de apostar!`,
+      url: `/partida/${partida.id}`,
+    })
+    await enviarParaSubs(subs, payload)
+    console.log(`🔔 Alerta 1h (${hora}) → ${subs.length} usuário(s) — ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`)
   }
 }
 

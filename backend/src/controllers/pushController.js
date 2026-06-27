@@ -5,7 +5,7 @@ async function subscribe(req, res) {
     const { usuarioId, subscription } = req.body;
     if (!usuarioId || !subscription) return res.status(400).json({ error: 'Dados inválidos' });
     await salvarSubscription(usuarioId, subscription);
-    await notificarUsuario(usuarioId, '🔔 Notificações ativas!', 'Você receberá lembretes 30min antes das apostas fecharem.', '/');
+    await notificarUsuario(usuarioId, '🔔 Notificações ativas!', 'Você receberá aviso 2h antes do jogo e alerta quando faltar 30min para fechar.', '/');
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
