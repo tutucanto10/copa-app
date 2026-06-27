@@ -179,13 +179,16 @@ async function notificarLembretes() {
     }),
   ])
 
+  const fmt = (date) => new Date(date).toLocaleTimeString('pt-BR', {
+    hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
+  })
+
   // ── Lembrete 2h: apenas quem não apostou ainda ──
   for (const partida of partidas2h) {
-    const hora = new Date(partida.data).toLocaleTimeString('pt-BR', {
-      hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
-    })
+    const horaJogo = fmt(partida.data)
+    const horaFecha = fmt(new Date(partida.data).getTime() - 30 * 60 * 1000)
+    const duelo = `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`
 
-    // IDs que já apostaram nessa partida
     const apostas = await prisma.aposta.findMany({
       where: { partidaId: partida.id },
       select: { usuarioId: true },
@@ -198,30 +201,30 @@ async function notificarLembretes() {
     if (subs.length === 0) continue
 
     const payload = JSON.stringify({
-      titulo: '🎯 Não esquece de apostar!',
-      corpo: `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} começa às ${hora}. Você ainda não apostou!`,
+      titulo: `🎯 Você ainda não apostou em ${duelo}`,
+      corpo: `A partida começa às ${horaJogo} e as apostas fecham às ${horaFecha} — ainda dá tempo, vai lá!`,
       url: `/partida/${partida.id}`,
     })
     await enviarParaSubs(subs, payload)
-    console.log(`🔔 Lembrete 2h (${hora}) → ${subs.length} sem aposta — ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`)
+    console.log(`🔔 Lembrete 2h (${horaJogo}) → ${subs.length} sem aposta — ${duelo}`)
   }
 
   // ── Alerta 1h: todo mundo — apostas fecham em 30min ──
   for (const partida of partidas1h) {
-    const hora = new Date(partida.data).toLocaleTimeString('pt-BR', {
-      hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
-    })
+    const horaJogo = fmt(partida.data)
+    const horaFecha = fmt(new Date(partida.data).getTime() - 30 * 60 * 1000)
+    const duelo = `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`
 
     const subs = await prisma.pushSubscription.findMany()
     if (subs.length === 0) continue
 
     const payload = JSON.stringify({
-      titulo: '⏰ Apostas fecham em 30min!',
-      corpo: `${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome} começa às ${hora} — última chance de apostar!`,
+      titulo: `⏰ Apostas fecham às ${horaFecha}!`,
+      corpo: `Última chance de apostar em ${duelo} (${horaJogo}) — as apostas encerram em 30 minutos!`,
       url: `/partida/${partida.id}`,
     })
     await enviarParaSubs(subs, payload)
-    console.log(`🔔 Alerta 1h (${hora}) → ${subs.length} usuário(s) — ${partida.selecaoCasa.nome} × ${partida.selecaoFora.nome}`)
+    console.log(`🔔 Alerta 1h (${horaJogo}) → ${subs.length} usuário(s) — ${duelo}`)
   }
 }
 
