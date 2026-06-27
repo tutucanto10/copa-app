@@ -70,12 +70,43 @@ async function buscarPartidasDoDia() {
   }
 }
  
+const EN_TO_PT = {
+  'Mexico': 'México', 'South Africa': 'África do Sul', 'South Korea': 'Coreia do Sul',
+  'Czechia': 'Rep. Tcheca', 'Switzerland': 'Suíça', 'Canada': 'Canadá',
+  'Bosnia & Herzegovina': 'Bósnia H.', 'Qatar': 'Qatar', 'Brazil': 'Brasil',
+  'Morocco': 'Marrocos', 'Scotland': 'Escócia', 'Haiti': 'Haiti',
+  'USA': 'EUA', 'Australia': 'Austrália', 'Paraguay': 'Paraguai', 'Türkiye': 'Turquia',
+  'Germany': 'Alemanha', 'Ivory Coast': 'Costa do Marfim', 'Ecuador': 'Equador',
+  'Curaçao': 'Curaçao', 'Netherlands': 'Holanda', 'Japan': 'Japão',
+  'Sweden': 'Suécia', 'Tunisia': 'Tunísia', 'Belgium': 'Bélgica', 'Egypt': 'Egito',
+  'Iran': 'Irã', 'New Zealand': 'Nova Zelândia', 'Spain': 'Espanha',
+  'Cape Verde Islands': 'Cabo Verde', 'Uruguay': 'Uruguai', 'Saudi Arabia': 'Arábia Saudita',
+  'France': 'França', 'Norway': 'Noruega', 'Senegal': 'Senegal', 'Iraq': 'Iraque',
+  'Argentina': 'Argentina', 'Austria': 'Áustria', 'Algeria': 'Argélia',
+  'Jordan': 'Jordânia', 'Colombia': 'Colômbia', 'Portugal': 'Portugal',
+  'Congo DR': 'RD Congo', 'Uzbekistan': 'Uzbequistão', 'England': 'Inglaterra',
+  'Ghana': 'Gana', 'Croatia': 'Croácia', 'Panama': 'Panamá',
+}
+
 // Busca classificação — usa API-Football se disponível, senão calcula da base local
 async function buscarClassificacao() {
   if (process.env.APIFOOTBALL_KEY) {
     try {
       const grupos = await buscarStandings(1, 2026);
-      if (grupos && Object.keys(grupos).length > 0) return grupos;
+      if (grupos && Object.keys(grupos).length > 0) {
+        // Traduz nomes EN→PT e substitui escudos pelos do banco
+        const selecoes = await prisma.selecao.findMany({ select: { nome: true, escudo_url: true } })
+        const escudoMap = Object.fromEntries(selecoes.map((s) => [s.nome, s.escudo_url]))
+        const fixado = {}
+        Object.entries(grupos).forEach(([letra, times]) => {
+          if (!GRUPOS[letra]) return // ignora entradas fora dos grupos (ex: "Stage")
+          fixado[letra] = times.map((t) => {
+            const ptNome = EN_TO_PT[t.nome] || t.nome
+            return { ...t, nome: ptNome, escudo: escudoMap[ptNome] || t.escudo }
+          })
+        })
+        return fixado
+      }
     } catch (e) {
       console.warn('API-Football standings falhou, usando base local:', e.message);
     }

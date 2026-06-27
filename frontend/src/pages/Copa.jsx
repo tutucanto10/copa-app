@@ -86,7 +86,7 @@ const GRUPOS_COPA = {
     { nome: 'Argentina', escudo: 'https://upload.wikimedia.org/wikipedia/pt/f/fc/230px-Afa_logo.svg.png' },
     { nome: 'Argélia', escudo: 'https://upload.wikimedia.org/wikipedia/pt/6/6b/Algeria_National_Football_Team_logo.png' },
     { nome: 'Áustria', escudo: 'https://upload.wikimedia.org/wikipedia/pt/c/cb/OFB.png' },
-    { nome: 'Jordânia', escudo: 'https://upload.wikimedia.org/wikipedia/pt/4/44/Jordan_Football_Association.png' },
+    { nome: 'Jordânia', escudo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Jordan_national_football_team_logo_2024.svg/960px-Jordan_national_football_team_logo_2024.svg.png' },
   ],
   K: [
     { nome: 'Portugal', escudo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Portugal_National_Team_logo.png/250px-Portugal_National_Team_logo.png' },
@@ -98,7 +98,7 @@ const GRUPOS_COPA = {
     { nome: 'Inglaterra', escudo: 'https://upload.wikimedia.org/wikipedia/en/8/8b/England_national_football_team_crest.svg' },
     { nome: 'Croácia', escudo: 'https://upload.wikimedia.org/wikipedia/pt/c/cf/Croatia_football_federation.png' },
     { nome: 'Gana', escudo: 'https://upload.wikimedia.org/wikipedia/pt/6/67/Ghana_Football_Association.png' },
-    { nome: 'Panamá', escudo: 'https://upload.wikimedia.org/wikipedia/pt/a/aa/Panama_FA_2.svg.png' },
+    { nome: 'Panamá', escudo: 'https://upload.wikimedia.org/wikipedia/en/thumb/e/ee/Panamanian_Football_Federation_logo_2024.svg/960px-Panamanian_Football_Federation_logo_2024.svg.png' },
   ],
 }
 
@@ -181,11 +181,16 @@ export default function Copa() {
       {abaAtiva === 'grupos' && (
         <div className="copa-grupos-grid">
           {Object.keys(GRUPOS_COPA).map((letra) => {
-            const raw = classificacao[letra] || GRUPOS_COPA[letra].map((s) => ({
-              nome: s.nome, escudo: s.escudo,
-              jogos: 0, saldoGols: 0, pontos: 0,
-            }))
-            const times = raw
+            const fallbackEscudos = Object.fromEntries(
+              (GRUPOS_COPA[letra] || []).map((s) => [s.nome, s.escudo])
+            )
+            const base = classificacao[letra]
+              ? classificacao[letra].map((t) => ({ ...t, escudo: t.escudo || fallbackEscudos[t.nome] || null }))
+              : GRUPOS_COPA[letra].map((s) => ({
+                  nome: s.nome, escudo: s.escudo,
+                  jogos: 0, saldoGols: 0, pontos: 0,
+                }))
+            const times = base
               .filter((t, i, arr) => arr.findIndex((x) => x.nome === t.nome) === i)
               .slice(0, 4)
 
@@ -224,7 +229,7 @@ export default function Copa() {
                       borderLeft: `2px solid ${index === 0 ? '#fbbf24' : index === 1 ? 'rgba(255,255,255,0.25)' : 'transparent'}`,
                     }}>
                       <img
-                        src={time.escudo}
+                        src={time.escudo ? `${API_URL}/proxy-image?url=${encodeURIComponent(time.escudo)}` : undefined}
                         alt={time.nome}
                         style={{ width: 18, height: 14, objectFit: 'contain', flexShrink: 0 }}
                         onError={(e) => { e.target.style.display = 'none' }}
