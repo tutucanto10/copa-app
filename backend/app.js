@@ -183,12 +183,11 @@ setInterval(() => {
   );
 }, 30 * 60 * 1000);
 
-// Job: AGENDADA → AO_VIVO quando falta ≤ 1 hora para o início
+// Job: AGENDADA → AO_VIVO no horário do jogo (apostas já fecham 30min antes por check de tempo)
 setInterval(async () => {
   try {
-    const umaHoraFutura = new Date(Date.now() + 60 * 60 * 1000);
     const { count } = await prisma.partida.updateMany({
-      where: { status: 'AGENDADA', data: { lte: umaHoraFutura } },
+      where: { status: 'AGENDADA', data: { lte: new Date() } },
       data: { status: 'AO_VIVO' },
     });
     if (count > 0) {
