@@ -8,6 +8,8 @@ async function criarAposta({ usuarioId, partidaId, placarCasa, placarFora }) {
   const partida = await prisma.partida.findUnique({ where: { id: Number(partidaId) } });
   if (!partida) throw new Error('Partida não encontrada');
   if (partida.status !== 'AGENDADA') throw new Error('Apostas encerradas para esta partida');
+  const minutosAteJogo = (new Date(partida.data) - new Date()) / 60000;
+  if (minutosAteJogo <= 30) throw new Error('Apostas encerradas — menos de 30 minutos para o jogo');
 
   const casa = Number(placarCasa);
   const fora = Number(placarFora);
@@ -42,6 +44,8 @@ async function salvarVencedor({ usuarioId, partidaId, vencedor }) {
   const partida = await prisma.partida.findUnique({ where: { id: Number(partidaId) } });
   if (!partida) throw new Error('Partida não encontrada');
   if (partida.status !== 'AGENDADA') throw new Error('Apostas encerradas para esta partida');
+  const minutosAteJogoV = (new Date(partida.data) - new Date()) / 60000;
+  if (minutosAteJogoV <= 30) throw new Error('Apostas encerradas — menos de 30 minutos para o jogo');
 
   const apostaExistente = await prisma.aposta.findFirst({
     where: { usuarioId: Number(usuarioId), partidaId: Number(partidaId) },

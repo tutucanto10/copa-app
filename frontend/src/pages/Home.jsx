@@ -457,7 +457,7 @@ function CardPartida({ partida, aposta, apostasAbertas, onClick }) {
               )}
             </div>
           )
-        })() : apostasAbertas && partida.status === 'AGENDADA' ? (
+        })() : apostasAbertas && partida.status === 'AGENDADA' && (new Date(partida.data) - new Date()) > 30 * 60000 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <span style={{ fontSize: 12, color: '#f5a623' }}>⚠ Você ainda não apostou</span>
             {horarioFechamento(partida.data) && (

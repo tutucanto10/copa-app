@@ -91,7 +91,9 @@ export default function Partida() {
 
   const finalizada = partida?.status === 'FINALIZADA'
   const aoVivo = partida?.status === 'AO_VIVO'
-  const podeApostar = !finalizada && !aoVivo
+  const minutosAteJogo = partida?.data ? (new Date(partida.data) - new Date()) / 60000 : Infinity
+  const apostasEncerradas = minutosAteJogo <= 30
+  const podeApostar = !finalizada && !aoVivo && !apostasEncerradas
 
   const idxAtual = todasPartidas.findIndex((p) => p.id === Number(id))
   const partidaAnterior = idxAtual > 0 ? todasPartidas[idxAtual - 1] : null
@@ -265,6 +267,8 @@ export default function Partida() {
         ? 'Partida finalizada — apostas encerradas'
         : aoVivo
         ? 'Jogo em andamento — apostas encerradas'
+        : apostasEncerradas
+        ? 'Apostas encerradas — menos de 30min para o jogo'
         : 'Apostas encerradas'}
     </div>
   )
