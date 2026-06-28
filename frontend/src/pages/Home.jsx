@@ -763,7 +763,7 @@ function CardRegras() {
 export default function Home() {
   const { usuario } = useAuth()
   const location = useLocation()
-  const [rodadaAtiva, setRodadaAtiva] = useState(location.state?.rodada || 1)
+  const [rodadaAtiva, setRodadaAtiva] = useState(location.state?.rodada || 4)
   const [apostas, setApostas] = useState({})
   const [loading, setLoading] = useState(true)
   const [mostrarHoje, setMostrarHoje] = useState(false)
@@ -776,7 +776,7 @@ export default function Home() {
       api.get('/partidas'),
       usuario ? api.get(`/apostas/usuario/${usuario.id}`) : Promise.resolve({ data: [] }),
     ]).then(([rPartidas, rApostas]) => {
-      const partidasCopa = rPartidas.data.filter(p => p.rodada >= 1 && p.rodada <= 3)
+      const partidasCopa = rPartidas.data.filter(p => p.rodada >= 1)
       setTodasPartidas(partidasCopa)
       const mapa = {}
       rApostas.data.forEach(a => { mapa[a.partidaId] = a })
@@ -859,23 +859,25 @@ export default function Home() {
         </button>
         
         {/* Botões de Rodadas da Copa */}
-        {[1, 2, 3].map((numRodada) => (
+        {[
+          { num: 1, label: 'Rodada 1' },
+          { num: 2, label: 'Rodada 2' },
+          { num: 3, label: 'Rodada 3' },
+          { num: 4, label: '16avos' },
+        ].map(({ num, label }) => (
           <button
-            key={numRodada}
-            onClick={() => {
-              setMostrarHoje(false)
-              setRodadaAtiva(numRodada)
-            }}
+            key={num}
+            onClick={() => { setMostrarHoje(false); setRodadaAtiva(num) }}
             style={{
-              background: (rodadaAtiva === numRodada && !mostrarHoje) ? '#00a651' : 'var(--color-background-secondary)',
-              color: (rodadaAtiva === numRodada && !mostrarHoje) ? '#fff' : 'var(--color-text-secondary)',
-              border: (rodadaAtiva === numRodada && !mostrarHoje) ? 'none' : '0.5px solid var(--color-border-tertiary)',
+              background: (rodadaAtiva === num && !mostrarHoje) ? '#00a651' : 'var(--color-background-secondary)',
+              color: (rodadaAtiva === num && !mostrarHoje) ? '#fff' : 'var(--color-text-secondary)',
+              border: (rodadaAtiva === num && !mostrarHoje) ? 'none' : '0.5px solid var(--color-border-tertiary)',
               borderRadius: 20, padding: '6px 16px',
               fontSize: 13, fontWeight: 600, cursor: 'pointer',
               transition: 'all 0.15s',
             }}
           >
-            Rodada {numRodada}
+            {label}
           </button>
         ))}
       </div>
@@ -907,7 +909,7 @@ export default function Home() {
           display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
         }}>
           <span style={{ fontSize: 13, color: 'var(--color-text-primary)', fontWeight: 600 }}>
-            ⚽ Rodada {rodadaAtiva}
+            ⚽ {{ 4: '16avos de Final' }[rodadaAtiva] || `Rodada ${rodadaAtiva}`}
           </span>
           <span style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>
             • {partidas.length} {partidas.length === 1 ? 'jogo' : 'jogos'}
