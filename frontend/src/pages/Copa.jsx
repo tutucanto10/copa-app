@@ -102,24 +102,139 @@ const GRUPOS_COPA = {
   ],
 }
 
+// ──── BRACKET MATA-MATA ────
+const BR = { UNIT: 80, W: 96, GAP: 20, LINE: '#1e3456' }
+
+function brAbbr(nome) {
+  if (!nome) return '?'
+  const map = { 'Rep. Tcheca': 'TCH', 'Bósnia H.': 'BIH', 'Costa do Marfim': 'CIV', 'RD Congo': 'COD', 'Cabo Verde': 'CPV', 'Arábia Saudita': 'KSA', 'Nova Zelândia': 'NZL', 'Coreia do Sul': 'KOR', 'África do Sul': 'RSA' }
+  if (map[nome]) return map[nome]
+  return nome.split(' ')[0].slice(0, 3).toUpperCase()
+}
+
+function BrCard({ partida }) {
+  if (!partida) return (
+    <div style={{ width: BR.W, background: '#0a1628', borderRadius: 6, border: '1px dashed #1e3456', padding: '5px 7px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+      {[0, 1].map(i => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#1e3456', flexShrink: 0 }} />
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#334155' }}>TBD</span>
+        </div>
+      ))}
+    </div>
+  )
+  const { selecaoCasa: c, selecaoFora: f, placarCasa: pc, placarFora: pf, status } = partida
+  const live = status === 'AO_VIVO', done = status === 'FINALIZADA'
+  const show = live || done
+  const venc = show && pc != null && pf != null ? (pc > pf ? 'casa' : pf > pc ? 'fora' : null) : null
+  const row = (sel, score, side) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 5, opacity: venc && venc !== side ? 0.38 : 1 }}>
+      <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#1e3456', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <img src={sel.escudo_url} alt={sel.nome} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={e => e.target.style.display = 'none'} />
+      </div>
+      <span style={{ fontSize: 10, fontWeight: 700, color: venc === side ? '#fbbf24' : '#e2e8f0', flex: 1, letterSpacing: 0.3 }}>{brAbbr(sel.nome)}</span>
+      {show && <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', minWidth: 8 }}>{score ?? ''}</span>}
+    </div>
+  )
+  return (
+    <div style={{ width: BR.W, background: '#0a1628', borderRadius: 6, border: `1px solid ${live ? '#ef4444' : '#1e3456'}`, padding: '5px 7px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+      {row(c, pc, 'casa')}{row(f, pf, 'fora')}
+    </div>
+  )
+}
+
+function BrSlot({ partida, slotH, isTopOfPair, isLeft, outgoing, incoming, isSolo }) {
+  const dir = isLeft ? 'left' : 'right'
+  const opp = isLeft ? 'Right' : 'Left'
+  return (
+    <div style={{ height: slotH, width: BR.W, position: 'relative', display: 'flex', alignItems: 'center', overflow: 'visible' }}>
+      {incoming && (
+        <div style={{ position: 'absolute', [dir]: -BR.GAP, width: BR.GAP, top: '50%', borderTop: `1px solid ${BR.LINE}`, pointerEvents: 'none' }} />
+      )}
+      <BrCard partida={partida} />
+      {outgoing && isSolo && (
+        <div style={{ position: 'absolute', [dir]: BR.W, width: BR.GAP, top: '50%', borderTop: `1px solid ${BR.LINE}`, pointerEvents: 'none' }} />
+      )}
+      {outgoing && !isSolo && (
+        <div style={{
+          position: 'absolute', [dir]: BR.W, width: BR.GAP, pointerEvents: 'none',
+          ...(isTopOfPair ? { top: '50%', bottom: 0 } : { top: 0, bottom: '50%' }),
+          borderStyle: 'solid', borderColor: BR.LINE, borderWidth: 0,
+          [`border${opp}Width`]: '1px',
+          [`border${isTopOfPair ? 'Top' : 'Bottom'}Width`]: '1px',
+        }} />
+      )}
+    </div>
+  )
+}
+
+function BrColumn({ partidas, label, level, isLeft }) {
+  const slotH = BR.UNIT * Math.pow(2, level)
+  const isSolo = partidas.length === 1
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
+      <div style={{ fontSize: 9, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, textAlign: 'center', height: 14 }}>{label}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
+        {partidas.map((p, i) => (
+          <BrSlot key={i} partida={p} slotH={slotH} isTopOfPair={i % 2 === 0} isLeft={isLeft} outgoing incoming={level > 0} isSolo={isSolo} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function MataMata({ jogos16 }) {
+  const sorted = [...jogos16].sort((a, b) => a.id - b.id)
+  const fill = (arr, n) => [...arr, ...Array(Math.max(0, n - arr.length)).fill(null)]
+  const left = fill(sorted.slice(0, 8), 8)
+  const right = fill(sorted.slice(8, 16), 8)
+  return (
+    <div>
+      <div style={{ fontSize: 11, color: '#475569', marginBottom: 14, textAlign: 'center' }}>
+        Oitavas, Quartas e Semi serão preenchidos conforme os jogos avançam
+      </div>
+      <div style={{ overflowX: 'auto', overflowY: 'hidden' }}>
+        <div style={{ display: 'flex', gap: BR.GAP, alignItems: 'flex-start', minWidth: 'max-content', padding: '0 4px 12px', overflow: 'visible' }}>
+          <BrColumn partidas={left}            label="16avos"  level={0} isLeft={true}  />
+          <BrColumn partidas={Array(4).fill(null)} label="Oitavas" level={1} isLeft={true}  />
+          <BrColumn partidas={Array(2).fill(null)} label="Quartas" level={2} isLeft={true}  />
+          <BrColumn partidas={Array(1).fill(null)} label="Semi"    level={3} isLeft={true}  />
+          <div style={{ display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, textAlign: 'center', height: 14 }}>Final</div>
+            <div style={{ height: BR.UNIT * 8, display: 'flex', alignItems: 'center' }}><BrCard partida={null} /></div>
+          </div>
+          <BrColumn partidas={Array(1).fill(null)} label="Semi"    level={3} isLeft={false} />
+          <BrColumn partidas={Array(2).fill(null)} label="Quartas" level={2} isLeft={false} />
+          <BrColumn partidas={Array(4).fill(null)} label="Oitavas" level={1} isLeft={false} />
+          <BrColumn partidas={right}           label="16avos"  level={0} isLeft={false} />
+        </div>
+      </div>
+    </div>
+  )
+}
+// ──── FIM BRACKET ────
+
 export default function Copa() {
   const [abaAtiva, setAbaAtiva] = useState('grupos')
   const [classificacao, setClassificacao] = useState({})
   const [artilheiros, setArtilheiros] = useState([])
   const [assistentes, setAssistentes] = useState([])
+  const [jogos16, setJogos16] = useState([])
 
   useEffect(() => { carregarDadosCopa() }, [])
 
   async function carregarDadosCopa() {
     try {
-      const [resClass, resArt, resAss] = await Promise.all([
+      const [resClass, resArt, resAss, resPartidas] = await Promise.all([
         api.get('/copa/classificacao'),
         api.get('/copa/artilheiros?limit=5'),
         api.get('/copa/assistencias?limit=5'),
+        api.get('/partidas'),
       ])
       setClassificacao(resClass.data)
       setArtilheiros(resArt.data)
       setAssistentes(resAss.data)
+      setJogos16(resPartidas.data.filter(p => p.rodada === 4))
     } catch (error) {
       console.error('Erro ao carregar dados da Copa:', error)
       const vazio = {}
@@ -392,13 +507,8 @@ export default function Copa() {
 
       {/* ── MATA-MATA ── */}
       {abaAtiva === 'matamata' && (
-        <div style={{
-          background: 'var(--color-background-secondary)',
-          borderRadius: 12, padding: '2rem', textAlign: 'center',
-        }}>
-          <p style={{ fontSize: 15, color: 'var(--color-text-secondary)', margin: 0 }}>
-            Chaveamento será exibido após a fase de grupos
-          </p>
+        <div style={{ background: 'var(--color-background-secondary)', borderRadius: 12, padding: '1.25rem 1rem' }}>
+          <MataMata jogos16={jogos16} />
         </div>
       )}
     </div>
