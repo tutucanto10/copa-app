@@ -117,8 +117,9 @@ setInterval(async () => {
       if (!fixture) continue;
 
       const novoStatus   = converterStatus(fixture.fixture.status.short);
-      const novoPlacarCasa = fixture.goals.home ?? partida.placarCasa;
-      const novoPlacarFora = fixture.goals.away ?? partida.placarFora;
+      // score.fulltime = placar nos 90min (fixo); goals inclui prorrogação → sempre usar fulltime quando disponível
+      const novoPlacarCasa = fixture.score?.fulltime?.home ?? fixture.goals.home ?? partida.placarCasa;
+      const novoPlacarFora = fixture.score?.fulltime?.away ?? fixture.goals.away ?? partida.placarFora;
 
       const mudou =
         novoStatus   !== partida.status ||
