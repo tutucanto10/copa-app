@@ -183,11 +183,15 @@ function BrColumn({ partidas, label, level, isLeft }) {
   )
 }
 
+// Ordem da chave (cada string = nome de UM time do jogo, para localizá-lo)
+const CHAVE_ESQUERDA = ['Alemanha', 'França', 'África do Sul', 'Holanda', 'Colômbia', 'Espanha', 'EUA', 'Egito']
+const CHAVE_DIREITA  = ['Brasil', 'Costa do Marfim', 'México', 'Inglaterra', 'Argentina', 'Bélgica', 'Suíça', 'Portugal']
+
 function MataMata({ jogos16 }) {
-  const sorted = [...jogos16].sort((a, b) => a.id - b.id)
-  const fill = (arr, n) => [...arr, ...Array(Math.max(0, n - arr.length)).fill(null)]
-  const left = fill(sorted.slice(0, 8), 8)
-  const right = fill(sorted.slice(8, 16), 8)
+  const encontrar = (nome) => jogos16.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
+  const left  = CHAVE_ESQUERDA.map(encontrar)
+  const right = CHAVE_DIREITA.map(encontrar)
+  const totalH = BR.UNIT * 8
   return (
     <div>
       <div style={{ fontSize: 11, color: '#475569', marginBottom: 14, textAlign: 'center' }}>
@@ -195,18 +199,24 @@ function MataMata({ jogos16 }) {
       </div>
       <div style={{ overflowX: 'auto', overflowY: 'hidden' }}>
         <div style={{ display: 'flex', gap: BR.GAP, alignItems: 'flex-start', minWidth: 'max-content', padding: '0 4px 12px', overflow: 'visible' }}>
-          <BrColumn partidas={left}            label="16avos"  level={0} isLeft={true}  />
+          <BrColumn partidas={left}               label="16avos"  level={0} isLeft={true}  />
           <BrColumn partidas={Array(4).fill(null)} label="Oitavas" level={1} isLeft={true}  />
           <BrColumn partidas={Array(2).fill(null)} label="Quartas" level={2} isLeft={true}  />
           <BrColumn partidas={Array(1).fill(null)} label="Semi"    level={3} isLeft={true}  />
-          <div style={{ display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
+
+          {/* FINAL */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'visible' }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, textAlign: 'center', height: 14 }}>Final</div>
-            <div style={{ height: BR.UNIT * 8, display: 'flex', alignItems: 'center' }}><BrCard partida={null} /></div>
+            <div style={{ height: totalH, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+              <img src="/trophy.png" alt="Taça" style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 0 8px #f59e0b88)' }} />
+              <BrCard partida={null} />
+            </div>
           </div>
+
           <BrColumn partidas={Array(1).fill(null)} label="Semi"    level={3} isLeft={false} />
           <BrColumn partidas={Array(2).fill(null)} label="Quartas" level={2} isLeft={false} />
           <BrColumn partidas={Array(4).fill(null)} label="Oitavas" level={1} isLeft={false} />
-          <BrColumn partidas={right}           label="16avos"  level={0} isLeft={false} />
+          <BrColumn partidas={right}               label="16avos"  level={0} isLeft={false} />
         </div>
       </div>
     </div>
