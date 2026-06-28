@@ -19,7 +19,7 @@ const COR_POSICAO = { GOL: '#f5a000', DEF: '#00e85a', MEI: '#60aaff', ATA: '#ff3
 
 export default function Admin() {
   const [abaAtiva, setAbaAtiva] = useState('partidas')
-  const [rodadaAdminAtiva, setRodadaAdminAtiva] = useState(1) // Rodada da Copa no Admin
+  const [rodadaAdminAtiva, setRodadaAdminAtiva] = useState(4)
 
   // Eventos
   const [partidas, setPartidas]   = useState([])
@@ -283,20 +283,25 @@ export default function Admin() {
               
               {/* Mini-abas de Rodadas */}
               <div style={{ display: 'flex', gap: 8, marginTop: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-                {[1, 2, 3].map((numRodada) => (
+                {[
+                  { num: 1, label: 'Rodada 1' },
+                  { num: 2, label: 'Rodada 2' },
+                  { num: 3, label: 'Rodada 3' },
+                  { num: 4, label: '16avos' },
+                ].map(({ num, label }) => (
                   <button
-                    key={numRodada}
-                    onClick={() => setRodadaAdminAtiva(numRodada)}
+                    key={num}
+                    onClick={() => setRodadaAdminAtiva(num)}
                     style={{
-                      background: rodadaAdminAtiva === numRodada ? '#00a651' : '#1e2d45',
-                      color: rodadaAdminAtiva === numRodada ? '#fff' : '#8b9bb4',
+                      background: rodadaAdminAtiva === num ? '#00a651' : '#1e2d45',
+                      color: rodadaAdminAtiva === num ? '#fff' : '#8b9bb4',
                       border: 'none',
                       borderRadius: 20, padding: '6px 16px',
                       fontSize: 13, fontWeight: 600, cursor: 'pointer',
                       transition: 'all 0.15s',
                     }}
                   >
-                    Rodada {numRodada}
+                    {label}
                   </button>
                 ))}
               </div>
