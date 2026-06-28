@@ -136,9 +136,15 @@ function BrCard({ partida }) {
       {show && <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', minWidth: 8 }}>{score ?? ''}</span>}
     </div>
   )
+  const hasPen = partida.penCasa != null && partida.penFora != null
   return (
     <div style={{ width: BR.W, background: '#0a1628', borderRadius: 6, border: `1px solid ${live ? '#ef4444' : '#1e3456'}`, padding: '5px 7px', display: 'flex', flexDirection: 'column', gap: 5 }}>
       {row(c, pc, 'casa')}{row(f, pf, 'fora')}
+      {hasPen && (
+        <div style={{ textAlign: 'center', fontSize: 9, fontWeight: 700, color: '#f59e0b', letterSpacing: 0.5, marginTop: 1 }}>
+          {partida.penCasa} × {partida.penFora} PEN
+        </div>
+      )}
     </div>
   )
 }

@@ -370,6 +370,11 @@ export default function Partida() {
                     ? `Placar correto: ${partida.placarCasa} × ${partida.placarFora}`
                     : `Você apostou: ${apostaFeita.placarCasa} × ${apostaFeita.placarFora} · Resultado: ${partida.placarCasa} × ${partida.placarFora}`
                   }
+                  {partida.penCasa != null && partida.penFora != null && (
+                    <span style={{ marginLeft: 6, color: '#f59e0b', fontWeight: 700 }}>
+                      ({partida.penCasa} × {partida.penFora} pên.)
+                    </span>
+                  )}
                 </div>
               </div>
               {acertouPlacar && (

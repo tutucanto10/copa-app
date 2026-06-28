@@ -64,6 +64,8 @@ model Partida {
   data            DateTime
   placarCasa      Int              @default(0)
   placarFora      Int              @default(0)
+  penCasa         Int?
+  penFora         Int?
   status          Status           @default(AGENDADA)
   rodada          Int              @default(1)
   selecaoCasa     Selecao          @relation("SelecaoCasa", fields: [selecaoCasaId], references: [id])

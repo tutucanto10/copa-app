@@ -121,16 +121,23 @@ setInterval(async () => {
       const novoPlacarCasa = fixture.score?.fulltime?.home ?? fixture.goals.home ?? partida.placarCasa;
       const novoPlacarFora = fixture.score?.fulltime?.away ?? fixture.goals.away ?? partida.placarFora;
 
+      // Placar de pênaltis (só preenchido quando status = PEN)
+      const isPen = fixture.fixture.status.short === 'PEN';
+      const novoPenCasa = isPen ? (fixture.score?.penalty?.home ?? null) : (partida.penCasa ?? null);
+      const novoPenFora = isPen ? (fixture.score?.penalty?.away ?? null) : (partida.penFora ?? null);
+
       const mudou =
-        novoStatus   !== partida.status ||
+        novoStatus     !== partida.status ||
         novoPlacarCasa !== partida.placarCasa ||
-        novoPlacarFora !== partida.placarFora;
+        novoPlacarFora !== partida.placarFora ||
+        novoPenCasa    !== partida.penCasa ||
+        novoPenFora    !== partida.penFora;
 
       if (!mudou) continue;
 
       const atualizada = await prisma.partida.update({
         where: { id: partida.id },
-        data: { status: novoStatus, placarCasa: novoPlacarCasa, placarFora: novoPlacarFora },
+        data: { status: novoStatus, placarCasa: novoPlacarCasa, placarFora: novoPlacarFora, penCasa: novoPenCasa, penFora: novoPenFora },
         include: { selecaoCasa: true, selecaoFora: true },
       });
 
