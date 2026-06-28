@@ -200,6 +200,19 @@ function MataMata({ jogos16 }) {
   const totalH = BR.UNIT * 8
   return (
     <div>
+      {new Date() < new Date('2026-06-29T02:59:00Z') && (
+        <div style={{
+          borderLeft: '4px solid #f59e0b', background: '#1a1200',
+          borderRadius: '0 8px 8px 0', padding: '10px 14px', marginBottom: '1rem',
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
+            ⏱️ Tempo regulamentar
+          </div>
+          <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
+            A pontuação do bolão considera apenas o placar aos 90 minutos. Prorrogação e pênaltis não alteram o seu resultado.
+          </div>
+        </div>
+      )}
       <div style={{ fontSize: 11, color: '#475569', marginBottom: 14, textAlign: 'center' }}>
         Oitavas, Quartas e Semi serão preenchidos conforme os jogos avançam
       </div>

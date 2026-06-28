@@ -314,6 +314,21 @@ export default function Partida() {
         <Placar partida={partida} grande />
       </div>
 
+      {/* Aviso tempo regulamentar — só nos 16avos em diante, some às 23:59 de 28/06 */}
+      {partida.rodada >= 4 && new Date() < new Date('2026-06-29T02:59:00Z') && (
+        <div style={{
+          borderLeft: '4px solid #f59e0b', background: '#1a1200',
+          borderRadius: '0 8px 8px 0', padding: '10px 14px', marginBottom: '1.25rem',
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
+            ⏱️ Tempo regulamentar
+          </div>
+          <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
+            A pontuação do bolão considera apenas o placar aos 90 minutos. Prorrogação e pênaltis não alteram o seu resultado.
+          </div>
+        </div>
+      )}
+
       {/* Resultado das apostas */}
       {finalizada && (apostaFeita || vencedorFeito) && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
