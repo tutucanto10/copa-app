@@ -314,8 +314,8 @@ export default function Partida() {
         <Placar partida={partida} grande />
       </div>
 
-      {/* Aviso tempo regulamentar — só nos 16avos em diante, some às 23:59 de 28/06 */}
-      {partida.rodada >= 4 && new Date() < new Date('2026-06-29T02:59:00Z') && (
+      {/* Aviso tempo regulamentar — só nos 16avos em diante */}
+      {partida.rodada >= 4 && (
         <div style={{
           borderLeft: '4px solid #f59e0b', background: '#1a1200',
           borderRadius: '0 8px 8px 0', padding: '10px 14px', marginBottom: '1.25rem',

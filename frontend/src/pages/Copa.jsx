@@ -193,49 +193,76 @@ function BrColumn({ partidas, label, level, isLeft }) {
 const CHAVE_ESQUERDA = ['Alemanha', 'França', 'África do Sul', 'Holanda', 'Colômbia', 'Espanha', 'EUA', 'Egito']
 const CHAVE_DIREITA  = ['Brasil', 'Costa do Marfim', 'México', 'Inglaterra', 'Argentina', 'Bélgica', 'Suíça', 'Portugal']
 
+function getVencedor(partida) {
+  if (!partida || partida.status !== 'FINALIZADA') return null
+  const { placarCasa: pc, placarFora: pf, penCasa, penFora, selecaoCasa, selecaoFora } = partida
+  if (penCasa != null && penFora != null) return penCasa > penFora ? selecaoCasa : selecaoFora
+  if (pc > pf) return selecaoCasa
+  if (pf > pc) return selecaoFora
+  return null
+}
+
+function makeVirtual(selA, selB) {
+  if (!selA && !selB) return null
+  const tbd = { nome: 'TBD', escudo_url: null }
+  return { selecaoCasa: selA || tbd, selecaoFora: selB || tbd, status: 'AGENDADA', placarCasa: 0, placarFora: 0, penCasa: null, penFora: null }
+}
+
+function computeNextRound(partidas) {
+  const result = []
+  for (let i = 0; i < partidas.length; i += 2) {
+    result.push(makeVirtual(getVencedor(partidas[i]), getVencedor(partidas[i + 1])))
+  }
+  return result
+}
+
 function MataMata({ jogos16 }) {
   const encontrar = (nome) => jogos16.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
   const left  = CHAVE_ESQUERDA.map(encontrar)
   const right = CHAVE_DIREITA.map(encontrar)
+
+  const oitL  = computeNextRound(left)
+  const oitR  = computeNextRound(right)
+  const qrtL  = computeNextRound(oitL)
+  const qrtR  = computeNextRound(oitR)
+  const semiL = computeNextRound(qrtL)
+  const semiR = computeNextRound(qrtR)
+  const final = makeVirtual(getVencedor(semiL[0]), getVencedor(semiR[0]))
+
   const totalH = BR.UNIT * 8
   return (
     <div>
-      {new Date() < new Date('2026-06-29T02:59:00Z') && (
-        <div style={{
-          borderLeft: '4px solid #f59e0b', background: '#1a1200',
-          borderRadius: '0 8px 8px 0', padding: '10px 14px', marginBottom: '1rem',
-        }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
-            ⏱️ Tempo regulamentar
-          </div>
-          <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
-            A pontuação do bolão considera apenas o placar aos 90 minutos. Prorrogação e pênaltis não alteram o seu resultado.
-          </div>
+      <div style={{
+        borderLeft: '4px solid #f59e0b', background: '#1a1200',
+        borderRadius: '0 8px 8px 0', padding: '10px 14px', marginBottom: '1rem',
+      }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
+          ⏱️ Tempo regulamentar
         </div>
-      )}
-      <div style={{ fontSize: 11, color: '#475569', marginBottom: 14, textAlign: 'center' }}>
-        Oitavas, Quartas e Semi serão preenchidos conforme os jogos avançam
+        <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
+          A pontuação do bolão considera apenas o placar aos 90 minutos. Prorrogação e pênaltis não alteram o seu resultado.
+        </div>
       </div>
       <div style={{ overflowX: 'auto', overflowY: 'hidden' }}>
         <div style={{ display: 'flex', gap: BR.GAP, alignItems: 'flex-start', minWidth: 'max-content', padding: '0 4px 12px', overflow: 'visible' }}>
-          <BrColumn partidas={left}               label="16avos"  level={0} isLeft={true}  />
-          <BrColumn partidas={Array(4).fill(null)} label="Oitavas" level={1} isLeft={true}  />
-          <BrColumn partidas={Array(2).fill(null)} label="Quartas" level={2} isLeft={true}  />
-          <BrColumn partidas={Array(1).fill(null)} label="Semi"    level={3} isLeft={true}  />
+          <BrColumn partidas={left}  label="16avos"  level={0} isLeft={true}  />
+          <BrColumn partidas={oitL}  label="Oitavas" level={1} isLeft={true}  />
+          <BrColumn partidas={qrtL}  label="Quartas" level={2} isLeft={true}  />
+          <BrColumn partidas={semiL} label="Semi"    level={3} isLeft={true}  />
 
           {/* FINAL */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'visible' }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, textAlign: 'center', height: 14 }}>Final</div>
             <div style={{ height: totalH, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
               <img src="/trophy.png" alt="Taça" style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 0 8px #f59e0b88)' }} />
-              <BrCard partida={null} />
+              <BrCard partida={final} />
             </div>
           </div>
 
-          <BrColumn partidas={Array(1).fill(null)} label="Semi"    level={3} isLeft={false} />
-          <BrColumn partidas={Array(2).fill(null)} label="Quartas" level={2} isLeft={false} />
-          <BrColumn partidas={Array(4).fill(null)} label="Oitavas" level={1} isLeft={false} />
-          <BrColumn partidas={right}               label="16avos"  level={0} isLeft={false} />
+          <BrColumn partidas={semiR} label="Semi"    level={3} isLeft={false} />
+          <BrColumn partidas={qrtR}  label="Quartas" level={2} isLeft={false} />
+          <BrColumn partidas={oitR}  label="Oitavas" level={1} isLeft={false} />
+          <BrColumn partidas={right} label="16avos"  level={0} isLeft={false} />
         </div>
       </div>
     </div>
