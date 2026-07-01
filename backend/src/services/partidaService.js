@@ -38,8 +38,16 @@ async function listarJogadoresPorPartida(partidaId) {
 async function atualizarPartida(id, { status, placarCasa, placarFora }) {
   const data = {};
   if (status !== undefined) data.status = status;
-  if (placarCasa !== undefined) data.placarCasa = Number(placarCasa);
-  if (placarFora !== undefined) data.placarFora = Number(placarFora);
+  if (status === 'AGENDADA') {
+    // Ao resetar para AGENDADA, zera placares e pênaltis automaticamente
+    data.placarCasa = 0;
+    data.placarFora = 0;
+    data.penCasa = null;
+    data.penFora = null;
+  } else {
+    if (placarCasa !== undefined) data.placarCasa = Number(placarCasa);
+    if (placarFora !== undefined) data.placarFora = Number(placarFora);
+  }
 
   return prisma.partida.update({
     where: { id: Number(id) },

@@ -355,7 +355,11 @@ export default function Admin() {
                       }}>
                         <div>
                           <label style={labelStyle}>Status</label>
-                          <select value={novoStatus} onChange={(e) => setNovoStatus(e.target.value)}
+                          <select value={novoStatus} onChange={(e) => {
+                            const s = e.target.value
+                            setNovoStatus(s)
+                            if (s === 'AGENDADA') { setNovoPlacarCasa(0); setNovoPlacarFora(0) }
+                          }}
                             style={{ ...selectStyle, width: 'auto' }}>
                             {STATUS_OPCOES.map((s) => <option key={s} value={s}>{s}</option>)}
                           </select>

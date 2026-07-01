@@ -31,10 +31,17 @@ export default function Partida() {
   const shareCardRef = useRef(null)
   const confettiFired = useRef(false)
 
+  // Ticker de 60s: força re-render para manter apostasEncerradas atualizado
+  const [, forceUpdate] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => forceUpdate(n => n + 1), 60000)
+    return () => clearInterval(t)
+  }, [])
+
   useEffect(() => {
     api.get('/partidas').then((r) => {
       const copa = r.data
-        .filter((p) => p.rodada >= 1 && p.rodada <= 3)
+        .filter((p) => p.rodada >= 1 && p.rodada <= 4)
         .sort((a, b) => new Date(a.data) - new Date(b.data))
       setTodasPartidas(copa)
     })
@@ -67,6 +74,15 @@ export default function Partida() {
     const goleadoresSalvos = localStorage.getItem(`goleadores_${id}`)
     if (goleadoresSalvos) setGoleadoresFeitos(JSON.parse(goleadoresSalvos))
   }, [id, USUARIO_ID])
+
+  // Polling de status: atualiza partida a cada 30s enquanto não finalizada
+  useEffect(() => {
+    if (!partida || partida.status === 'FINALIZADA') return
+    const t = setInterval(() => {
+      api.get(`/partidas/${id}`).then((r) => setPartida(r.data)).catch(() => {})
+    }, 30000)
+    return () => clearInterval(t)
+  }, [id, partida?.status])
 
   useEffect(() => {
     if (!partida) return
