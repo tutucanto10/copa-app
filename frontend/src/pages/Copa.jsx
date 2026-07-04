@@ -195,7 +195,10 @@ const CHAVE_DIREITA  = ['Brasil', 'Costa do Marfim', 'México', 'Inglaterra', 'A
 
 function getVencedor(partida) {
   if (!partida || partida.status !== 'FINALIZADA') return null
-  const { placarCasa: pc, placarFora: pf, penCasa, penFora, selecaoCasa, selecaoFora } = partida
+  const { placarCasa: pc, placarFora: pf, penCasa, penFora, vencedorKO, selecaoCasa, selecaoFora } = partida
+  // Usa vencedorKO quando disponível (AET/PEN resolvido explicitamente)
+  if (vencedorKO === 'casa') return selecaoCasa
+  if (vencedorKO === 'fora') return selecaoFora
   if (penCasa != null && penFora != null) return penCasa > penFora ? selecaoCasa : selecaoFora
   if (pc > pf) return selecaoCasa
   if (pf > pc) return selecaoFora
@@ -216,13 +219,24 @@ function computeNextRound(partidas) {
   return result
 }
 
-function MataMata({ jogos16 }) {
-  const encontrar = (nome) => jogos16.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
-  const left  = CHAVE_ESQUERDA.map(encontrar)
-  const right = CHAVE_DIREITA.map(encontrar)
+function MataMata({ jogos16, jogosOit }) {
+  const encontrar16 = (nome) => jogos16.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
+  const encontrarOit = (nome) => jogosOit.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
 
-  const oitL  = computeNextRound(left)
-  const oitR  = computeNextRound(right)
+  const left  = CHAVE_ESQUERDA.map(encontrar16)
+  const right = CHAVE_DIREITA.map(encontrar16)
+
+  // Oitavas: prefere jogo real; fallback virtual pelos vencedores dos 16avos
+  function oitSlot(jogos16Pair) {
+    const wA = getVencedor(jogos16Pair[0])
+    const wB = getVencedor(jogos16Pair[1])
+    if (!wA && !wB) return null
+    const real = encontrarOit(wA?.nome) || encontrarOit(wB?.nome)
+    return real || makeVirtual(wA, wB)
+  }
+  const oitL  = [0,1,2,3].map(i => oitSlot([left[i*2], left[i*2+1]]))
+  const oitR  = [0,1,2,3].map(i => oitSlot([right[i*2], right[i*2+1]]))
+
   const qrtL  = computeNextRound(oitL)
   const qrtR  = computeNextRound(oitR)
   const semiL = computeNextRound(qrtL)
@@ -276,6 +290,7 @@ export default function Copa() {
   const [artilheiros, setArtilheiros] = useState([])
   const [assistentes, setAssistentes] = useState([])
   const [jogos16, setJogos16] = useState([])
+  const [jogosOit, setJogosOit] = useState([])
 
   useEffect(() => { carregarDadosCopa() }, [])
 
@@ -291,6 +306,7 @@ export default function Copa() {
       setArtilheiros(resArt.data)
       setAssistentes(resAss.data)
       setJogos16(resPartidas.data.filter(p => p.rodada === 4))
+      setJogosOit(resPartidas.data.filter(p => p.rodada === 5))
     } catch (error) {
       console.error('Erro ao carregar dados da Copa:', error)
       const vazio = {}
@@ -564,7 +580,7 @@ export default function Copa() {
       {/* ── MATA-MATA ── */}
       {abaAtiva === 'matamata' && (
         <div style={{ background: 'var(--color-background-secondary)', borderRadius: 12, padding: '1.25rem 1rem' }}>
-          <MataMata jogos16={jogos16} />
+          <MataMata jogos16={jogos16} jogosOit={jogosOit} />
         </div>
       )}
     </div>

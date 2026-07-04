@@ -20,7 +20,9 @@
       "Bash(node scripts/importarJogadoresFracoRuim.js)",
       "Bash(findstr /i \"total\\\\|conclu\\\\|erro\\\\|jogadores\")",
       "Bash(node app.js)",
-      "Bash(curl -s http://localhost:3333/partidas)"
+      "Bash(curl -s http://localhost:3333/partidas)",
+      "Bash(node scripts/criar_oitavas.js)",
+      "Bash(node -e ' *)"
     ]
   }
 }

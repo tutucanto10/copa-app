@@ -123,21 +123,35 @@ setInterval(async () => {
 
       // Placar de pênaltis (só preenchido quando status = PEN)
       const isPen = fixture.fixture.status.short === 'PEN';
+      const isAet = fixture.fixture.status.short === 'AET';
       const novoPenCasa = isPen ? (fixture.score?.penalty?.home ?? null) : (partida.penCasa ?? null);
       const novoPenFora = isPen ? (fixture.score?.penalty?.away ?? null) : (partida.penFora ?? null);
+
+      // vencedorKO: quem avança no mata-mata (considera PEN e AET)
+      let novoVencedorKO = partida.vencedorKO ?? null;
+      if (novoStatus === 'FINALIZADA') {
+        if (isPen) {
+          novoVencedorKO = (novoPenCasa ?? 0) > (novoPenFora ?? 0) ? 'casa' : 'fora';
+        } else if (isAet) {
+          novoVencedorKO = (fixture.goals.home ?? 0) > (fixture.goals.away ?? 0) ? 'casa' : 'fora';
+        } else if (novoPlacarCasa !== novoPlacarFora) {
+          novoVencedorKO = novoPlacarCasa > novoPlacarFora ? 'casa' : 'fora';
+        }
+      }
 
       const mudou =
         novoStatus     !== partida.status ||
         novoPlacarCasa !== partida.placarCasa ||
         novoPlacarFora !== partida.placarFora ||
         novoPenCasa    !== partida.penCasa ||
-        novoPenFora    !== partida.penFora;
+        novoPenFora    !== partida.penFora ||
+        novoVencedorKO !== partida.vencedorKO;
 
       if (!mudou) continue;
 
       const atualizada = await prisma.partida.update({
         where: { id: partida.id },
-        data: { status: novoStatus, placarCasa: novoPlacarCasa, placarFora: novoPlacarFora, penCasa: novoPenCasa, penFora: novoPenFora },
+        data: { status: novoStatus, placarCasa: novoPlacarCasa, placarFora: novoPlacarFora, penCasa: novoPenCasa, penFora: novoPenFora, vencedorKO: novoVencedorKO },
         include: { selecaoCasa: true, selecaoFora: true },
       });
 

@@ -17,7 +17,20 @@
       "Bash(git -C c:\\\\copa-app diff frontend/src/pages/Partida.jsx)",
       "WebSearch",
       "Bash(node scripts/criarNovasLigas.js)",
-      "Bash(node scripts/mapearPartidas.js)"
+      "Bash(node scripts/mapearPartidas.js)",
+      "Bash(Get-Content \"c:\\\\copa-app\\\\backend\\\\.env\")",
+      "Bash(Select-String \"DATABASE\")",
+      "Bash(node scripts/corrigirAposta.js)",
+      "Bash(findstr /v \"injected\\\\|tip:\")",
+      "Bash(npx prisma *)",
+      "Bash(curl -o /dev/null -s -w \"%{http_code}\" \"https://upload.wikimedia.org/wikipedia/pt/4/44/Jordan_Football_Association.png\")",
+      "Bash(curl -o /dev/null -s -w \"%{http_code}\" \"https://upload.wikimedia.org/wikipedia/pt/a/aa/Panama_FA_2.svg.png\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://upload.wikimedia.org/wikipedia/pt/f/f3/Mexico_national_football_team_crest_%282022%29.png\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -A \"Mozilla/5.0\" \"https://upload.wikimedia.org/wikipedia/pt/f/f3/Mexico_national_football_team_crest_%282022%29.png\")",
+      "Bash(git remote *)",
+      "Bash(node scripts/fix_aposta_pedro.js)",
+      "Bash(node scripts/check_external_ids.js)",
+      "Bash(node scripts/fix_externalid_16avos.js)"
     ]
   }
 }

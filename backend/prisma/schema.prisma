@@ -66,6 +66,7 @@ model Partida {
   placarFora      Int              @default(0)
   penCasa         Int?
   penFora         Int?
+  vencedorKO      String?
   status          Status           @default(AGENDADA)
   rodada          Int              @default(1)
   selecaoCasa     Selecao          @relation("SelecaoCasa", fields: [selecaoCasaId], references: [id])
