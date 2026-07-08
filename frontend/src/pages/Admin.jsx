@@ -19,7 +19,7 @@ const COR_POSICAO = { GOL: '#f5a000', DEF: '#00e85a', MEI: '#60aaff', ATA: '#ff3
 
 export default function Admin() {
   const [abaAtiva, setAbaAtiva] = useState('partidas')
-  const [rodadaAdminAtiva, setRodadaAdminAtiva] = useState(5)
+  const [rodadaAdminAtiva, setRodadaAdminAtiva] = useState(6)
 
   // Eventos
   const [partidas, setPartidas]   = useState([])
@@ -289,6 +289,7 @@ export default function Admin() {
                   { num: 3, label: 'Rodada 3' },
                   { num: 4, label: '16avos' },
                   { num: 5, label: 'Oitavas' },
+                  { num: 6, label: 'Quartas' },
                 ].map(({ num, label }) => (
                   <button
                     key={num}

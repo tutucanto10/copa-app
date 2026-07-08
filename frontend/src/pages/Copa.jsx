@@ -219,9 +219,10 @@ function computeNextRound(partidas) {
   return result
 }
 
-function MataMata({ jogos16, jogosOit }) {
+function MataMata({ jogos16, jogosOit, jogosQrt }) {
   const encontrar16 = (nome) => jogos16.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
   const encontrarOit = (nome) => jogosOit.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
+  const encontrarQrt = (nome) => jogosQrt.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
 
   const left  = CHAVE_ESQUERDA.map(encontrar16)
   const right = CHAVE_DIREITA.map(encontrar16)
@@ -237,8 +238,16 @@ function MataMata({ jogos16, jogosOit }) {
   const oitL  = [0,1,2,3].map(i => oitSlot([left[i*2], left[i*2+1]]))
   const oitR  = [0,1,2,3].map(i => oitSlot([right[i*2], right[i*2+1]]))
 
-  const qrtL  = computeNextRound(oitL)
-  const qrtR  = computeNextRound(oitR)
+  // Quartas: prefere jogo real; fallback virtual pelos vencedores das oitavas
+  function qrtSlot(oitPair) {
+    const wA = getVencedor(oitPair[0])
+    const wB = getVencedor(oitPair[1])
+    if (!wA && !wB) return null
+    const real = encontrarQrt(wA?.nome) || encontrarQrt(wB?.nome)
+    return real || makeVirtual(wA, wB)
+  }
+  const qrtL  = [0,1].map(i => qrtSlot([oitL[i*2], oitL[i*2+1]]))
+  const qrtR  = [0,1].map(i => qrtSlot([oitR[i*2], oitR[i*2+1]]))
   const semiL = computeNextRound(qrtL)
   const semiR = computeNextRound(qrtR)
   const final = makeVirtual(getVencedor(semiL[0]), getVencedor(semiR[0]))
@@ -291,6 +300,7 @@ export default function Copa() {
   const [assistentes, setAssistentes] = useState([])
   const [jogos16, setJogos16] = useState([])
   const [jogosOit, setJogosOit] = useState([])
+  const [jogosQrt, setJogosQrt] = useState([])
 
   useEffect(() => { carregarDadosCopa() }, [])
 
@@ -307,6 +317,7 @@ export default function Copa() {
       setAssistentes(resAss.data)
       setJogos16(resPartidas.data.filter(p => p.rodada === 4))
       setJogosOit(resPartidas.data.filter(p => p.rodada === 5))
+      setJogosQrt(resPartidas.data.filter(p => p.rodada === 6))
     } catch (error) {
       console.error('Erro ao carregar dados da Copa:', error)
       const vazio = {}
@@ -580,7 +591,7 @@ export default function Copa() {
       {/* ── MATA-MATA ── */}
       {abaAtiva === 'matamata' && (
         <div style={{ background: 'var(--color-background-secondary)', borderRadius: 12, padding: '1.25rem 1rem' }}>
-          <MataMata jogos16={jogos16} jogosOit={jogosOit} />
+          <MataMata jogos16={jogos16} jogosOit={jogosOit} jogosQrt={jogosQrt} />
         </div>
       )}
     </div>
