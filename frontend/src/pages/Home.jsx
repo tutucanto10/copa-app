@@ -763,7 +763,7 @@ function CardRegras() {
 export default function Home() {
   const { usuario } = useAuth()
   const location = useLocation()
-  const [rodadaAtiva, setRodadaAtiva] = useState(location.state?.rodada || 6)
+  const [rodadaAtiva, setRodadaAtiva] = useState(location.state?.rodada || 7)
   const [apostas, setApostas] = useState({})
   const [loading, setLoading] = useState(true)
   const [mostrarHoje, setMostrarHoje] = useState(false)
@@ -866,6 +866,7 @@ export default function Home() {
           { num: 4, label: '16avos' },
           { num: 5, label: 'Oitavas' },
           { num: 6, label: 'Quartas' },
+          { num: 7, label: 'Semifinais' },
         ].map(({ num, label }) => (
           <button
             key={num}
@@ -911,7 +912,7 @@ export default function Home() {
           display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
         }}>
           <span style={{ fontSize: 13, color: 'var(--color-text-primary)', fontWeight: 600 }}>
-            ⚽ {{ 4: '16avos de Final', 5: 'Oitavas de Final', 6: 'Quartas de Final' }[rodadaAtiva] || `Rodada ${rodadaAtiva}`}
+            ⚽ {{ 4: '16avos de Final', 5: 'Oitavas de Final', 6: 'Quartas de Final', 7: 'Semifinais' }[rodadaAtiva] || `Rodada ${rodadaAtiva}`}
           </span>
           <span style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>
             • {partidas.length} {partidas.length === 1 ? 'jogo' : 'jogos'}

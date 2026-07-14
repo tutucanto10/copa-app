@@ -189,9 +189,11 @@ function BrColumn({ partidas, label, level, isLeft }) {
   )
 }
 
-// Ordem da chave (cada string = nome de UM time do jogo, para localizá-lo)
-const CHAVE_ESQUERDA = ['Alemanha', 'França', 'África do Sul', 'Holanda', 'Colômbia', 'Espanha', 'EUA', 'Egito']
-const CHAVE_DIREITA  = ['Brasil', 'Costa do Marfim', 'México', 'Inglaterra', 'Argentina', 'Bélgica', 'Suíça', 'Portugal']
+// Âncoras por bracket: um time de cada jogo de 16avos, agrupados pela chave correta do mata-mata
+// Esquerda: Canadá/Marrocos → Paraguai/França → Portugal/Espanha → EUA/Bélgica
+// Direita:  Brasil/Noruega  → México/Inglaterra → Argentina/Egito → Suíça/Colômbia
+const CHAVE_ESQUERDA = ['Canadá', 'Marrocos', 'Paraguai', 'França', 'Portugal', 'Espanha', 'EUA', 'Bélgica']
+const CHAVE_DIREITA  = ['Brasil', 'Noruega', 'México', 'Inglaterra', 'Argentina', 'Egito', 'Suíça', 'Colômbia']
 
 function getVencedor(partida) {
   if (!partida || partida.status !== 'FINALIZADA') return null
@@ -219,10 +221,11 @@ function computeNextRound(partidas) {
   return result
 }
 
-function MataMata({ jogos16, jogosOit, jogosQrt }) {
-  const encontrar16 = (nome) => jogos16.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
-  const encontrarOit = (nome) => jogosOit.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
-  const encontrarQrt = (nome) => jogosQrt.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
+function MataMata({ jogos16, jogosOit, jogosQrt, jogosSemi }) {
+  const encontrar16   = (nome) => jogos16.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
+  const encontrarOit  = (nome) => jogosOit.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
+  const encontrarQrt  = (nome) => jogosQrt.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
+  const encontrarSemi = (nome) => jogosSemi.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
 
   const left  = CHAVE_ESQUERDA.map(encontrar16)
   const right = CHAVE_DIREITA.map(encontrar16)
@@ -248,8 +251,16 @@ function MataMata({ jogos16, jogosOit, jogosQrt }) {
   }
   const qrtL  = [0,1].map(i => qrtSlot([oitL[i*2], oitL[i*2+1]]))
   const qrtR  = [0,1].map(i => qrtSlot([oitR[i*2], oitR[i*2+1]]))
-  const semiL = computeNextRound(qrtL)
-  const semiR = computeNextRound(qrtR)
+  // Semi: prefere jogo real; fallback virtual pelos vencedores das quartas
+  function semiSlot(qrtPair) {
+    const wA = getVencedor(qrtPair[0])
+    const wB = getVencedor(qrtPair[1])
+    if (!wA && !wB) return null
+    const real = encontrarSemi(wA?.nome) || encontrarSemi(wB?.nome)
+    return real || makeVirtual(wA, wB)
+  }
+  const semiL = [semiSlot([qrtL[0], qrtL[1]])]
+  const semiR = [semiSlot([qrtR[0], qrtR[1]])]
   const final = makeVirtual(getVencedor(semiL[0]), getVencedor(semiR[0]))
 
   const totalH = BR.UNIT * 8
@@ -301,6 +312,7 @@ export default function Copa() {
   const [jogos16, setJogos16] = useState([])
   const [jogosOit, setJogosOit] = useState([])
   const [jogosQrt, setJogosQrt] = useState([])
+  const [jogosSemi, setJogosSemi] = useState([])
 
   useEffect(() => { carregarDadosCopa() }, [])
 
@@ -318,6 +330,7 @@ export default function Copa() {
       setJogos16(resPartidas.data.filter(p => p.rodada === 4))
       setJogosOit(resPartidas.data.filter(p => p.rodada === 5))
       setJogosQrt(resPartidas.data.filter(p => p.rodada === 6))
+      setJogosSemi(resPartidas.data.filter(p => p.rodada === 7))
     } catch (error) {
       console.error('Erro ao carregar dados da Copa:', error)
       const vazio = {}
@@ -591,7 +604,7 @@ export default function Copa() {
       {/* ── MATA-MATA ── */}
       {abaAtiva === 'matamata' && (
         <div style={{ background: 'var(--color-background-secondary)', borderRadius: 12, padding: '1.25rem 1rem' }}>
-          <MataMata jogos16={jogos16} jogosOit={jogosOit} jogosQrt={jogosQrt} />
+          <MataMata jogos16={jogos16} jogosOit={jogosOit} jogosQrt={jogosQrt} jogosSemi={jogosSemi} />
         </div>
       )}
     </div>
