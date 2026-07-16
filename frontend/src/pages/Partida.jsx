@@ -41,7 +41,7 @@ export default function Partida() {
   useEffect(() => {
     api.get('/partidas').then((r) => {
       const copa = r.data
-        .filter((p) => p.rodada >= 1 && p.rodada <= 7)
+        .filter((p) => p.rodada >= 1 && p.rodada <= 9)
         .sort((a, b) => new Date(a.data) - new Date(b.data))
       setTodasPartidas(copa)
     })

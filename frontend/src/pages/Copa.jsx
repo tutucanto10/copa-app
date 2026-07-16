@@ -221,7 +221,7 @@ function computeNextRound(partidas) {
   return result
 }
 
-function MataMata({ jogos16, jogosOit, jogosQrt, jogosSemi }) {
+function MataMata({ jogos16, jogosOit, jogosQrt, jogosSemi, jogosFinal, jogos3Lugar }) {
   const encontrar16   = (nome) => jogos16.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
   const encontrarOit  = (nome) => jogosOit.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
   const encontrarQrt  = (nome) => jogosQrt.find(g => g.selecaoCasa.nome === nome || g.selecaoFora.nome === nome) || null
@@ -261,7 +261,8 @@ function MataMata({ jogos16, jogosOit, jogosQrt, jogosSemi }) {
   }
   const semiL = [semiSlot([qrtL[0], qrtL[1]])]
   const semiR = [semiSlot([qrtR[0], qrtR[1]])]
-  const final = makeVirtual(getVencedor(semiL[0]), getVencedor(semiR[0]))
+  // Final: jogo real da rodada 9 se existir, senão virtual pelos vencedores das semis
+  const finalGame = jogosFinal[0] || makeVirtual(getVencedor(semiL[0]), getVencedor(semiR[0]))
 
   const totalH = BR.UNIT * 8
   return (
@@ -289,7 +290,7 @@ function MataMata({ jogos16, jogosOit, jogosQrt, jogosSemi }) {
             <div style={{ fontSize: 9, fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, textAlign: 'center', height: 14 }}>Final</div>
             <div style={{ height: totalH, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
               <img src="/trophy.png" alt="Taça" style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 0 8px #f59e0b88)' }} />
-              <BrCard partida={final} />
+              <BrCard partida={finalGame} />
             </div>
           </div>
 
@@ -299,6 +300,16 @@ function MataMata({ jogos16, jogosOit, jogosQrt, jogosSemi }) {
           <BrColumn partidas={right} label="16avos"  level={0} isLeft={false} />
         </div>
       </div>
+
+      {/* 3° Lugar */}
+      {jogos3Lugar[0] && (
+        <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div style={{ fontSize: 9, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
+            🥉 3° Lugar — {new Date(jogos3Lugar[0].data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' })}
+          </div>
+          <BrCard partida={jogos3Lugar[0]} />
+        </div>
+      )}
     </div>
   )
 }
@@ -313,6 +324,8 @@ export default function Copa() {
   const [jogosOit, setJogosOit] = useState([])
   const [jogosQrt, setJogosQrt] = useState([])
   const [jogosSemi, setJogosSemi] = useState([])
+  const [jogos3Lugar, setJogos3Lugar] = useState([])
+  const [jogosFinal, setJogosFinal] = useState([])
 
   useEffect(() => { carregarDadosCopa() }, [])
 
@@ -331,6 +344,8 @@ export default function Copa() {
       setJogosOit(resPartidas.data.filter(p => p.rodada === 5))
       setJogosQrt(resPartidas.data.filter(p => p.rodada === 6))
       setJogosSemi(resPartidas.data.filter(p => p.rodada === 7))
+      setJogos3Lugar(resPartidas.data.filter(p => p.rodada === 8))
+      setJogosFinal(resPartidas.data.filter(p => p.rodada === 9))
     } catch (error) {
       console.error('Erro ao carregar dados da Copa:', error)
       const vazio = {}
@@ -604,7 +619,7 @@ export default function Copa() {
       {/* ── MATA-MATA ── */}
       {abaAtiva === 'matamata' && (
         <div style={{ background: 'var(--color-background-secondary)', borderRadius: 12, padding: '1.25rem 1rem' }}>
-          <MataMata jogos16={jogos16} jogosOit={jogosOit} jogosQrt={jogosQrt} jogosSemi={jogosSemi} />
+          <MataMata jogos16={jogos16} jogosOit={jogosOit} jogosQrt={jogosQrt} jogosSemi={jogosSemi} jogosFinal={jogosFinal} jogos3Lugar={jogos3Lugar} />
         </div>
       )}
     </div>
