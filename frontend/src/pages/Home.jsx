@@ -90,12 +90,15 @@ function AnuncioBanner() {
   )
 }
 
-function BannerEncerramento() {
-  const [vencedor, setVencedor] = useState(null)
+function BannerEncerramento({ usuarioId }) {
+  const [ligas, setLigas] = useState(null)
 
   useEffect(() => {
-    api.get('/ligas/vencedor').then(r => setVencedor(r.data)).catch(() => {})
-  }, [])
+    if (!usuarioId) return
+    api.get(`/ligas/resumo-final/${usuarioId}`).then(r => setLigas(r.data)).catch(() => {})
+  }, [usuarioId])
+
+  const medalha = (pos) => pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `${pos}º`
 
   return (
     <div style={{
@@ -106,48 +109,45 @@ function BannerEncerramento() {
       marginBottom: '1.25rem',
     }}>
       {/* Cabeçalho */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.65rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.7rem' }}>
         <span style={{ fontSize: '1.4rem' }}>🏆</span>
         <div>
           <div style={{ fontFamily: 'var(--fonte-display)', fontSize: '1rem', letterSpacing: '2px', color: '#f5d000', fontWeight: 800 }}>
             COPA 2026 ENCERRADA
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#86efac', fontWeight: 600, letterSpacing: '0.5px' }}>
+          <div style={{ fontSize: '0.75rem', color: '#86efac', fontWeight: 600 }}>
             🇪🇸 Espanha Campeã do Mundo!
           </div>
         </div>
       </div>
 
-      <div style={{ borderTop: '1px solid rgba(0,166,81,0.35)', paddingTop: '0.65rem' }}>
-        {vencedor ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '1.5rem' }}>🥇</span>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#f5d000', fontFamily: 'var(--fonte-display)', letterSpacing: '1px' }}>
-                {vencedor.nome}
-              </div>
-              <div style={{ fontSize: '0.75rem', color: '#86efac', marginTop: 2 }}>
-                {vencedor.pontos} pts · {vencedor.placaresExatos} placares exatos
-              </div>
-              {vencedor.ligas.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.4rem' }}>
-                  {vencedor.ligas.map(l => (
-                    <span key={l.nome} style={{
-                      background: 'rgba(0,166,81,0.25)', border: '1px solid rgba(0,166,81,0.5)',
-                      borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 700,
-                      color: l.posicao === 1 ? '#f5d000' : '#86efac',
-                    }}>
-                      #{l.posicao} {l.nome}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div style={{ fontSize: 12, color: '#64748b' }}>Calculando vencedor…</div>
+      {/* Resultado por liga */}
+      <div style={{ borderTop: '1px solid rgba(0,166,81,0.3)', paddingTop: '0.65rem', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+        {ligas === null && usuarioId && (
+          <div style={{ fontSize: 12, color: '#64748b' }}>Carregando resultado…</div>
         )}
-        <div style={{ fontSize: '0.72rem', color: 'rgba(134,239,172,0.6)', marginTop: '0.6rem' }}>
+        {ligas && ligas.map(l => (
+          <div key={l.ligaNome} style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b', minWidth: 0 }}>
+              {l.ligaNome}:
+            </span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#f5d000' }}>
+              🥇 {l.vencedor.nome}
+            </span>
+            <span style={{ fontSize: 12, color: '#86efac' }}>
+              ({l.vencedor.pontos} pts)
+            </span>
+            <span style={{ fontSize: 12, color: '#94a3b8' }}>
+              — você ficou em {medalha(l.minha.posicao)} ({l.minha.pontos} pts)
+            </span>
+          </div>
+        ))}
+        {!usuarioId && (
+          <div style={{ fontSize: 12, color: '#86efac' }}>
+            Faça login para ver sua posição em cada liga.
+          </div>
+        )}
+        <div style={{ fontSize: '0.7rem', color: 'rgba(134,239,172,0.5)', marginTop: '0.25rem' }}>
           Obrigado por participar! Foi um bolão incrível 🎉
         </div>
       </div>
@@ -886,7 +886,7 @@ export default function Home() {
         }
       `}</style>
 
-      <BannerEncerramento />
+      <BannerEncerramento usuarioId={usuario?.id} />
       <AnuncioBanner />
       <NotifBanner usuarioId={usuario?.id} />
       <MinhaPosicao usuarioId={usuario?.id} />

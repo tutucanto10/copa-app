@@ -89,4 +89,31 @@ async function vencedor(req, res) {
   }
 }
 
-module.exports = { index, store, addMembro, removeMembro, ranking, vencedor, usuarios, updateUsuario };
+async function resumoFinal(req, res) {
+  try {
+    const usuarioId = Number(req.params.usuarioId);
+    const prisma = require('../config/prisma');
+    const ligas = await prisma.liga.findMany({
+      where: { membros: { some: { usuarioId } } },
+      orderBy: { id: 'asc' },
+    });
+    const resultado = [];
+    for (const liga of ligas) {
+      const { ranking } = await rankingPorLiga(liga.id);
+      const minhaPos = ranking.findIndex(u => u.id === usuarioId);
+      const eu = ranking[minhaPos];
+      const venc = ranking[0];
+      resultado.push({
+        ligaNome: liga.nome,
+        vencedor: { nome: venc.nome, pontos: venc.pontos },
+        minha: { posicao: minhaPos + 1, pontos: eu?.pontos ?? 0 },
+        total: ranking.length,
+      });
+    }
+    res.json(resultado);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+module.exports = { index, store, addMembro, removeMembro, ranking, vencedor, resumoFinal, usuarios, updateUsuario };
