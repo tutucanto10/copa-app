@@ -1,9 +1,10 @@
 const { Router } = require('express');
 const {
-  index, store, addMembro, removeMembro, ranking, usuarios, updateUsuario,
+  index, store, addMembro, removeMembro, ranking, vencedor, usuarios, updateUsuario,
 } = require('../controllers/ligaController');
 
 const router = Router();
+router.get('/vencedor', vencedor);
 router.get('/', index);
 router.post('/', store);
 router.get('/usuarios', usuarios);

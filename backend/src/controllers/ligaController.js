@@ -4,6 +4,7 @@ const {
   adicionarMembro,
   removerMembro,
   rankingPorLiga,
+  vencedorGeral,
   listarUsuarios,
   atualizarUsuario,
 } = require('../services/ligaService');
@@ -79,4 +80,13 @@ async function updateUsuario(req, res) {
   }
 }
 
-module.exports = { index, store, addMembro, removeMembro, ranking, usuarios, updateUsuario };
+async function vencedor(req, res) {
+  try {
+    const result = await vencedorGeral();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+module.exports = { index, store, addMembro, removeMembro, ranking, vencedor, usuarios, updateUsuario };

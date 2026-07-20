@@ -129,7 +129,11 @@ async function rankingPorLiga(ligaId) {
 
   const data = {
     liga: { id: liga.id, nome: liga.nome },
-    ranking: ranking.sort((a, b) => b.pontos - a.pontos),
+    ranking: ranking.sort((a, b) =>
+      b.pontos - a.pontos ||
+      b.placaresExatos - a.placaresExatos ||
+      b.vencedoresAcertados - a.vencedoresAcertados
+    ),
   };
   rankingCache.set(key, { data, ts: Date.now() });
   return data;
@@ -153,12 +157,47 @@ async function atualizarUsuario(id, { nome, foto_url }) {
   return prisma.usuario.update({ where: { id: Number(id) }, data });
 }
 
+async function vencedorGeral() {
+  const ligas = await prisma.liga.findMany({ orderBy: { id: 'asc' } });
+  const rankings = await Promise.all(ligas.map(l => rankingPorLiga(l.id)));
+
+  // Agrega pontos únicos por usuário (pontos são globais, não por liga)
+  const byUser = new Map();
+  for (let i = 0; i < ligas.length; i++) {
+    for (const u of rankings[i].ranking) {
+      if (!byUser.has(u.id)) {
+        byUser.set(u.id, { id: u.id, nome: u.nome, foto_url: u.foto_url, pontos: u.pontos, placaresExatos: u.placaresExatos, vencedoresAcertados: u.vencedoresAcertados });
+      }
+    }
+  }
+
+  if (byUser.size === 0) return null;
+
+  // Ordena: pontos → placaresExatos → vencedoresAcertados
+  const sorted = [...byUser.values()].sort((a, b) =>
+    b.pontos - a.pontos || b.placaresExatos - a.placaresExatos || b.vencedoresAcertados - a.vencedoresAcertados
+  );
+  const winner = sorted[0];
+
+  // Posição em cada liga que o vencedor participa
+  const ligasDoVencedor = [];
+  for (let i = 0; i < ligas.length; i++) {
+    const pos = rankings[i].ranking.findIndex(u => u.id === winner.id);
+    if (pos >= 0) {
+      ligasDoVencedor.push({ nome: ligas[i].nome, posicao: pos + 1, total: rankings[i].ranking.length });
+    }
+  }
+
+  return { ...winner, ligas: ligasDoVencedor };
+}
+
 module.exports = {
   listarLigas,
   criarLiga,
   adicionarMembro,
   removerMembro,
   rankingPorLiga,
+  vencedorGeral,
   listarUsuarios,
   atualizarUsuario,
   limparCacheRanking,
